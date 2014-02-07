@@ -1,30 +1,42 @@
-Litecoin integration/staging tree
+Marscoin integration/staging tree
 ================================
 
-http://www.litecoin.org
+http://www.marscoin.org
 
 Copyright (c) 2009-2013 Bitcoin Developers
+
 Copyright (c) 2011-2013 Litecoin Developers
 
-What is Litecoin?
+Copyright (c) 2013-2014 Marscoin Developers
+
+What is Marscoin?
 ----------------
 
-Litecoin is a lite version of Bitcoin using scrypt as a proof-of-work algorithm.
- - 2.5 minute block targets
- - subsidy halves in 840k blocks (~4 years)
- - ~84 million total coins
+Marscoin targets to become the first cryptocurrency on Mars, and functions as a proof of concept for incentivizing and privatizing space exploration funding.
 
-The rest is the same as Bitcoin.
- - 50 coins per block
- - 2016 blocks to retarget difficulty
+- Scrypt Litecoin-based CryptoCurrency
+
+- 1 block per 2 Mars minutes
+
+- 50 coins per block
+
+- 590 Blocks Per Mars Day
+
+- Difficulty retarget every 24 hours 39 Minutes (Mars day)
+
+- Subsidy halves every Mars Year
+
+- ~33 million total coins
+
+- 300k donation premined for non-profit MarsOne
 
 For more information, as well as an immediately useable, binary version of
-the Litecoin client sofware, see http://www.litecoin.org.
+the Marscoin client sofware, see http://www.marscoin.org.
 
 License
 -------
 
-Litecoin is released under the terms of the MIT license. See `COPYING` for more
+Marscoin is released under the terms of the MIT license. See `COPYING` for more
 information or see http://opensource.org/licenses/MIT.
 
 Development process
@@ -33,7 +45,7 @@ Development process
 Developers work in their own trees, then submit pull requests when they think
 their feature or bug fix is ready.
 
-If it is a simple/trivial/non-controversial change, then one of the Litecoin
+If it is a simple/trivial/non-controversial change, then one of the Marscoin
 development team members simply pulls it.
 
 If it is a *more complicated or potentially controversial* change, then the patch
@@ -46,8 +58,8 @@ match the project's coding conventions (see `doc/coding.txt`) or are
 controversial.
 
 The `master` branch is regularly built and tested, but is not guaranteed to be
-completely stable. [Tags](https://github.com/bitcoin/bitcoin/tags) are created
-regularly to indicate new official, stable release versions of Litecoin.
+completely stable. [Tags](https://github.com/marscoin/marscoin/tags) are created
+regularly to indicate new official, stable release versions of Marscoin.
 
 Testing
 -------
@@ -68,7 +80,7 @@ Unit tests for the core code are in `src/test/`. To compile and run them:
 
 Unit tests for the GUI code are in `src/qt/test/`. To compile and run them:
 
-    qmake BITCOIN_QT_TEST=1 -o Makefile.test bitcoin-qt.pro
+    qmake MARSCOIN_QT_TEST=1 -o Makefile.test marscoin-qt.pro
     make -f Makefile.test
-    ./litecoin-qt_test
+    ./marscoin-qt_test
 

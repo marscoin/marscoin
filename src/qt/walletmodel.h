@@ -30,7 +30,7 @@ public:
     qint64 amount;
 };
 
-/** Interface to Bitcoin wallet from Qt view code. */
+/** Interface to Marscoin wallet from Qt view code. */
 class WalletModel : public QObject
 {
     Q_OBJECT
