@@ -70,7 +70,7 @@ BOOST_AUTO_TEST_CASE(bloom_create_insert_serialize_with_tweak)
 BOOST_AUTO_TEST_CASE(bloom_create_insert_key)
 {
     string strSecret = string("6v7hgtX6r7frdh7XDRJ3L4JRLMAn9chCgNgSccwqWdp69XfPdX6");
-    CBitcoinSecret vchSecret;
+    CMarscoinSecret vchSecret;
     BOOST_CHECK(vchSecret.SetString(strSecret));
 
     CKey key = vchSecret.GetKey();

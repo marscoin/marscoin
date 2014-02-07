@@ -1,33 +1,33 @@
 #!/usr/bin/make -f
 # -*- mode: makefile; coding: utf-8 -*-
 
-#DEB_MAKE_CHECK_TARGET = test_bitcoin
-#build/bitcoind::
-#	$(if $(filter nocheck,$(DEB_BUILD_OPTIONS)),,src/test_bitcoin)
+#DEB_MAKE_CHECK_TARGET = test_marscoin
+#build/marscoind::
+#	$(if $(filter nocheck,$(DEB_BUILD_OPTIONS)),,src/test_marscoin)
 
-DEB_INSTALL_EXAMPLES_bitcoind += debian/examples/*
-DEB_INSTALL_MANPAGES_bitcoind += debian/manpages/*
+DEB_INSTALL_EXAMPLES_marscoind += debian/examples/*
+DEB_INSTALL_MANPAGES_marscoind += debian/manpages/*
 
 %:
 	dh --with bash-completion $@
 
 override_dh_auto_build:
-	cd src; $(MAKE) -f makefile.unix bitcoind
+	cd src; $(MAKE) -f makefile.unix marscoind
 	$(MAKE)
 
 override_dh_auto_clean:
-	if [ -f Makefile ]; then $(MAKE) clean; else rm -rf build/; rm -f bitcoin-qt; fi
+	if [ -f Makefile ]; then $(MAKE) clean; else rm -rf build/; rm -f marscoin-qt; fi
 	cd src; $(MAKE) -f makefile.unix clean
 
 override_dh_auto_configure:
-	qmake bitcoin-qt.pro USE_QRCODE=1
+	qmake marscoin-qt.pro USE_QRCODE=1
 
 override_dh_auto_test:
-	cd src; $(MAKE) -f makefile.unix test_bitcoin
-	src/test_bitcoin
+	cd src; $(MAKE) -f makefile.unix test_marscoin
+	src/test_marscoin
 
 # Ensure wrapper is set executable
-binary-post-install/bitcoind:
-	chmod +x $(cdbs_curdestdir)usr/bin/bitcoind
-binary-post-install/bitcoin-qt:
-	chmod +x $(cdbs_curdestdir)usr/bin/bitcoin-qt
+binary-post-install/marscoind:
+	chmod +x $(cdbs_curdestdir)usr/bin/marscoind
+binary-post-install/marscoin-qt:
+	chmod +x $(cdbs_curdestdir)usr/bin/marscoin-qt

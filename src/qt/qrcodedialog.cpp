@@ -1,7 +1,7 @@
 #include "qrcodedialog.h"
 #include "ui_qrcodedialog.h"
 
-#include "bitcoinunits.h"
+#include "marscoinunits.h"
 #include "guiconstants.h"
 #include "guiutil.h"
 #include "optionsmodel.h"
@@ -46,7 +46,7 @@ void QRCodeDialog::setModel(OptionsModel *model)
     if (model)
         connect(model, SIGNAL(displayUnitChanged(int)), this, SLOT(updateDisplayUnit()));
 
-    // update the display unit, to not use the default ("BTC")
+    // update the display unit, to not use the default ("MRS")
     updateDisplayUnit();
 }
 
@@ -85,7 +85,7 @@ void QRCodeDialog::genCode()
 
 QString QRCodeDialog::getURI()
 {
-    QString ret = QString("litecoin:%1").arg(address);
+    QString ret = QString("marscoin:%1").arg(address);
     int paramCount = 0;
 
     ui->outUri->clear();
@@ -94,8 +94,8 @@ QString QRCodeDialog::getURI()
     {
         if (ui->lnReqAmount->validate())
         {
-            // even if we allow a non BTC unit input in lnReqAmount, we generate the URI with BTC as unit (as defined in BIP21)
-            ret += QString("?amount=%1").arg(BitcoinUnits::format(BitcoinUnits::BTC, ui->lnReqAmount->value()));
+            // even if we allow a non MRS unit input in lnReqAmount, we generate the URI with MRS as unit (as defined in BIP21)
+            ret += QString("?amount=%1").arg(MarscoinUnits::format(MarscoinUnits::MRS, ui->lnReqAmount->value()));
             paramCount++;
         }
         else

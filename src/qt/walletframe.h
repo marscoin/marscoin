@@ -1,15 +1,15 @@
 /*
- * Qt4 bitcoin GUI.
+ * Qt4 marscoin GUI.
  *
  * W.J. van der Laan 2011-2012
- * The Bitcoin Developers 2011-2013
+ * The Marscoin Developers 2011-2013
  */
 #ifndef WALLETFRAME_H
 #define WALLETFRAME_H
 
 #include <QFrame>
 
-class BitcoinGUI;
+class MarscoinGUI;
 class ClientModel;
 class WalletModel;
 class WalletStack;
@@ -20,7 +20,7 @@ class WalletFrame : public QFrame
     Q_OBJECT
 
 public:
-    explicit WalletFrame(BitcoinGUI *_gui = 0);
+    explicit WalletFrame(MarscoinGUI *_gui = 0);
     ~WalletFrame();
 
     void setClientModel(ClientModel *clientModel);
@@ -35,7 +35,7 @@ public:
     void showOutOfSyncWarning(bool fShow);
 
 private:
-    BitcoinGUI *gui;
+    MarscoinGUI *gui;
     ClientModel *clientModel;
     WalletStack *walletStack;
 
