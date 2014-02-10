@@ -1,30 +1,23 @@
 # -*- mode: Makefile; -*-
-# Copyright (c) 2011 Marscoin Developers
+# Copyright (c) 2011 Bitcoin Developers
+# Copyright (c) 2013-2014 Marscoin Developers
 # Distributed under the MIT/X11 software license, see the accompanying
 # file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-# Mac OS X makefile for marscoin
-# Originally by Laszlo Hanyecz (solar@heliacal.net)
+# Mac OS X makefile for Marscoin
 
-CXX=llvm-g++
+CXX=c++
+
 DEPSDIR=/usr/local
-DB4DIR=/usr/local/opt/berkeley-db4
-OPENSSLDIR=/usr/local/opt/openssl
-BOOSTDIR=/usr/local/opt/boost
+
 
 INCLUDEPATHS= \
  -I"$(CURDIR)" \
- -I"$(CURDIR)/obj" \
- -I"$(DEPSDIR)/include" \
- -I"$(DB4DIR)/include" \
- -I"$(OPENSSLDIR)/include" \
- -I"$(BOOSTDIR)/include"
+ -I"$(CURDIR)"/obj \
+ -I"$(DEPSDIR)/include" 
 
 LIBPATHS= \
- -L"$(DEPSDIR)/lib" \
- -L"$(DB4DIR)/lib" \
- -L"$(OPENSSLDIR)/lib" \
- -L"$(BOOSTDIR)/lib"
+ -L"$(DEPSDIR)/lib" 
 
 USE_UPNP:=1
 USE_IPV6:=1
@@ -38,20 +31,20 @@ ifdef STATIC
 TESTLIBS += \
  $(DEPSDIR)/lib/libboost_unit_test_framework-mt.a
 LIBS += \
- $(DB4DIR)/lib/libdb_cxx-4.8.a \
- $(BOOSTDIR)/lib/libboost_system-mt.a \
- $(BOOSTDIR)/lib/libboost_filesystem-mt.a \
- $(BOOSTDIR)/lib/libboost_program_options-mt.a \
- $(BOOSTDIR)/lib/libboost_thread-mt.a \
- $(BOOSTDIR)/lib/libboost_chrono-mt.a \
- $(OPENSSLDIR)/lib/libssl.a \
- $(OPENSSLDIR)/lib/libcrypto.a \
+ $(DEPSDIR)/lib/libdb_cxx.a \
+ $(DEPSDIR)/lib/libboost_system-mt.a \
+ $(DEPSDIR)/lib/libboost_filesystem-mt.a \
+ $(DEPSDIR)/lib/libboost_program_options-mt.a \
+ $(DEPSDIR)/lib/libboost_thread-mt.a \
+ $(DEPSDIR)/lib/libboost_chrono-mt.a \
+ -lssl \
+ -lcrypto \
  -lz
 else
 TESTLIBS += \
  -lboost_unit_test_framework-mt
 LIBS += \
- -ldb_cxx-4.8 \
+ -ldb_cxx \
  -lboost_system-mt \
  -lboost_filesystem-mt \
  -lboost_program_options-mt \
@@ -69,13 +62,13 @@ ifdef RELEASE
 # Compile for maximum compatibility and smallest size.
 # This requires that dependencies are compiled
 # the same way.
-CFLAGS = -mmacosx-version-min=10.5 -arch x86_64 -O3
+CFLAGS = -mmacosx-version-min=10.6 -O3
 else
 DEBUGFLAGS = -g
 endif
 
 # osx 10.9 has changed the stdlib default to libc++. To prevent some link error, you may need to use libstdc++
-CFLAGS += -stdlib=libstdc++ -mmacosx-version-min=10.5 -arch x86_64
+CFLAGS += -stdlib=libstdc++
 
 # ppc doesn't work because we don't support big-endian
 CFLAGS += -Wall -Wextra -Wformat -Wformat-security -Wno-unused-parameter \
@@ -83,6 +76,7 @@ CFLAGS += -Wall -Wextra -Wformat -Wformat-security -Wno-unused-parameter \
 
 OBJS= \
     leveldb/libleveldb.a \
+    json/json_spirit_value.o \
     obj/alert.o \
     obj/version.o \
     obj/checkpoints.o \
@@ -149,7 +143,7 @@ LIBS += $(CURDIR)/leveldb/libleveldb.a $(CURDIR)/leveldb/libmemenv.a
 DEFS += $(addprefix -I,$(CURDIR)/leveldb/include)
 DEFS += $(addprefix -I,$(CURDIR)/leveldb/helpers)
 leveldb/libleveldb.a:
-	@echo "Building LevelDB ..." && cd leveldb && $(MAKE) CC=$(CC) CXX=$(CXX) OPT="$(CFLAGS)" libleveldb.a libmemenv.a && cd ..
+	@echo "Building LevelDB ..." && cd leveldb && chmod +x build_detect_platform && $(MAKE) CC=$(CC) CXX=$(CXX) OPT="$(CFLAGS)" libleveldb.a libmemenv.a && cd ..
 
 # auto-generated dependencies:
 -include obj/*.P

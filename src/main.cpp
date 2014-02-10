@@ -1071,7 +1071,7 @@ int64 static GetBlockValue(int nHeight, int64 nFees)
     return nSubsidy + nFees;
 }
 
-static const int64 nTargetTimespan = 88775.260726; // 1 mars day retarget diff
+static const int64 nTargetTimespan = 88775; // 1 mars day retarget diff
 static const int64 nTargetSpacing = 2 * 61.649486615; // Marscoin: (2 Mars minutes)
 static const int64 nInterval = nTargetTimespan / nTargetSpacing;
 
