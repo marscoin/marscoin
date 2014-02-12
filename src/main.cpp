@@ -1071,8 +1071,8 @@ int64 static GetBlockValue(int nHeight, int64 nFees)
     return nSubsidy + nFees;
 }
 
-static const int64 nTargetTimespan = 88775; // 1 mars day retarget diff
-static const int64 nTargetSpacing = 2 * 61.649486615; // Marscoin: (2 Mars minutes)
+static int64 nTargetTimespan = 3.5 * 24 * 60 * 60; // 1 mars day retarget diff
+static int64 nTargetSpacing = 2.5 * 60; // Marscoin: (2 Mars minutes)
 static const int64 nInterval = nTargetTimespan / nTargetSpacing;
 
 //
@@ -1107,7 +1107,17 @@ unsigned int static GetNextWorkRequired(const CBlockIndex* pindexLast, const CBl
     // Genesis block
     if (pindexLast == NULL)
         return nProofOfWorkLimit;
+     // The next block
+    int nHeight = pindexLast->nHeight + 1;
 
+    // Marscoin: 1 sol (every Mars sol retarget)
+    int nForkOne = 14260;
+    if(nHeight >= nForkOne)
+    {
+      //printf("Retargeting to sol day");
+      nTargetTimespan = 88775;
+      nTargetSpacing = 123.29897323;
+    }
     // Only change once per interval
     if ((pindexLast->nHeight+1) % nInterval != 0)
     {
