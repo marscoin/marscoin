@@ -24,10 +24,10 @@ SignVerifyMessageDialog::SignVerifyMessageDialog(QWidget *parent) :
 
 #if (QT_VERSION >= 0x040700)
     /* Do not move this to the XML file, Qt before 4.7 will choke on it */
-    ui->addressIn_SM->setPlaceholderText(tr("Enter a Marscoin address (e.g. Ler4HNAEfwYhBmGXcFP2Po1NpRUEiK8km2)"));
+    ui->addressIn_SM->setPlaceholderText(tr("Enter a Marscoin address (e.g. MAjgMKACk7gYty8yeHczrWjPdhXkGnVquF)"));
     ui->signatureOut_SM->setPlaceholderText(tr("Click \"Sign Message\" to generate signature"));
 
-    ui->addressIn_VM->setPlaceholderText(tr("Enter a Marscoin address (e.g. Ler4HNAEfwYhBmGXcFP2Po1NpRUEiK8km2)"));
+    ui->addressIn_VM->setPlaceholderText(tr("Enter a Marscoin address (e.g. MAjgMKACk7gYty8yeHczrWjPdhXkGnVquF)"));
     ui->signatureIn_VM->setPlaceholderText(tr("Enter Marscoin signature"));
 #endif
 

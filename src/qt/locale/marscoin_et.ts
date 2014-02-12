@@ -1406,8 +1406,8 @@ Aadress: %4⏎</translation>
     </message>
     <message>
         <location line="+34"/>
-        <source>The address to send the payment to (e.g. Ler4HNAEfwYhBmGXcFP2Po1NpRUEiK8km2)</source>
-        <translation>Tehingu saaja aadress (nt: Ler4HNAEfwYhBmGXcFP2Po1NpRUEiK8km2)</translation>
+        <source>The address to send the payment to (e.g. MAjgMKACk7gYty8yeHczrWjPdhXkGnVquF)</source>
+        <translation>Tehingu saaja aadress (nt: MAjgMKACk7gYty8yeHczrWjPdhXkGnVquF)</translation>
     </message>
     <message>
         <location line="+60"/>
@@ -1447,8 +1447,8 @@ Aadress: %4⏎</translation>
     </message>
     <message>
         <location filename="../sendcoinsentry.cpp" line="+1"/>
-        <source>Enter a Marscoin address (e.g. Ler4HNAEfwYhBmGXcFP2Po1NpRUEiK8km2)</source>
-        <translation>Sisesta Marscoini aadress (nt: Ler4HNAEfwYhBmGXcFP2Po1NpRUEiK8km2)</translation>
+        <source>Enter a Marscoin address (e.g. MAjgMKACk7gYty8yeHczrWjPdhXkGnVquF)</source>
+        <translation>Sisesta Marscoini aadress (nt: MAjgMKACk7gYty8yeHczrWjPdhXkGnVquF)</translation>
     </message>
 </context>
 <context>
@@ -1470,8 +1470,8 @@ Aadress: %4⏎</translation>
     </message>
     <message>
         <location line="+18"/>
-        <source>The address to sign the message with (e.g. Ler4HNAEfwYhBmGXcFP2Po1NpRUEiK8km2)</source>
-        <translation>Sõnumi signeerimise aadress (nt: Ler4HNAEfwYhBmGXcFP2Po1NpRUEiK8km2)</translation>
+        <source>The address to sign the message with (e.g. MAjgMKACk7gYty8yeHczrWjPdhXkGnVquF)</source>
+        <translation>Sõnumi signeerimise aadress (nt: MAjgMKACk7gYty8yeHczrWjPdhXkGnVquF)</translation>
     </message>
     <message>
         <location line="+10"/>
@@ -1543,8 +1543,8 @@ Aadress: %4⏎</translation>
     </message>
     <message>
         <location line="+21"/>
-        <source>The address the message was signed with (e.g. Ler4HNAEfwYhBmGXcFP2Po1NpRUEiK8km2)</source>
-        <translation>Aadress, millega sõnum allkirjastati (nt: Ler4HNAEfwYhBmGXcFP2Po1NpRUEiK8km2)</translation>
+        <source>The address the message was signed with (e.g. MAjgMKACk7gYty8yeHczrWjPdhXkGnVquF)</source>
+        <translation>Aadress, millega sõnum allkirjastati (nt: MAjgMKACk7gYty8yeHczrWjPdhXkGnVquF)</translation>
     </message>
     <message>
         <location line="+40"/>
@@ -1564,8 +1564,8 @@ Aadress: %4⏎</translation>
     <message>
         <location filename="../signverifymessagedialog.cpp" line="+27"/>
         <location line="+3"/>
-        <source>Enter a Marscoin address (e.g. Ler4HNAEfwYhBmGXcFP2Po1NpRUEiK8km2)</source>
-        <translation>Sisesta Marscoini aadress (nt: Ler4HNAEfwYhBmGXcFP2Po1NpRUEiK8km2)</translation>
+        <source>Enter a Marscoin address (e.g. MAjgMKACk7gYty8yeHczrWjPdhXkGnVquF)</source>
+        <translation>Sisesta Marscoini aadress (nt: MAjgMKACk7gYty8yeHczrWjPdhXkGnVquF)</translation>
     </message>
     <message>
         <location line="-2"/>
