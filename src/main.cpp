@@ -1122,7 +1122,7 @@ unsigned int static GetNextWorkRequired(const CBlockIndex* pindexLast, const CBl
     {
       //printf("Retargeting to sol day");
       nTargetTimespan = 88775;
-      nTargetSpacing = 123.29897323;
+      nTargetSpacing = 123;
     }
     // Only change once per interval
     if ((pindexLast->nHeight+1) % nInterval != 0)
