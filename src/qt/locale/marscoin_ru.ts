@@ -1449,7 +1449,7 @@ Address: %4
     <message>
         <location filename="../sendcoinsentry.cpp" line="+1"/>
         <source>Enter a Marscoin address (e.g. MAjgMKACk7gYty8yeHczrWjPdhXkGnVquF)</source>
-        <translation>Введите Marscoin-адрес (например 1LA5FtQhnnWnkK6zjFfutR7Stiit4wKd63)</translation>
+        <translation>Введите Marscoin-адрес (например MAjgMKACk7gYty8yeHczrWjPdhXkGnVquF)</translation>
     </message>
 </context>
 <context>
