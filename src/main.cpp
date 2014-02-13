@@ -1112,7 +1112,13 @@ unsigned int static GetNextWorkRequired(const CBlockIndex* pindexLast, const CBl
 
     // Marscoin: 1 sol (every Mars sol retarget)
     int nForkOne = 14260;
+    int nForkTwo = 70000;
     if(nHeight >= nForkOne)
+    {
+      //printf("Retargeting to sol day");
+      nTargetTimespan = 88775;
+    }
+    if(nHeight >= nForkTwo)
     {
       //printf("Retargeting to sol day");
       nTargetTimespan = 88775;
