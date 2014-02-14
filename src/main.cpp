@@ -356,7 +356,7 @@ unsigned int LimitOrphanTxSize(unsigned int nMaxOrphans)
 bool CTxOut::IsDust() const
 {
     // Marscoin: IsDust() detection disabled, allows any valid dust to be relayed.
-    // The fees imposed on each dust txo is considered sufficient spam deterrant. 
+    // The fees imposed on each dust txo is considered sufficient spam deterrant.
     return false;
 }
 
@@ -1065,15 +1065,16 @@ int64 static GetBlockValue(int nHeight, int64 nFees)
 {
     int64 nSubsidy = 50 * COIN;
 
-    // Marscoin: 395k blocks every Mars years (668.5991 sols)
-    nSubsidy >>= (nHeight / 395699); // Marscoin: 395k blocks every Mars years (668.5991 sols)
+    // Marscoin: 482k blocks every Mars years (668.5991 sols)
+    // with 482k blocks and retargeting every sol, we half every Mars-year
+    nSubsidy >>= (nHeight / 482560); // Marscoin: 482k blocks every Mars years (668.5991 sols)
 
     return nSubsidy + nFees;
 }
 
-static int64 nTargetTimespan = 3.5 * 24 * 60 * 60; // 1 mars day retarget diff
-static int64 nTargetSpacing = 2.5 * 60; // Marscoin: (2 Mars minutes)
-static const int64 nInterval = nTargetTimespan / nTargetSpacing;
+static int64 nTargetTimespan = 3.5 * 24 * 60 * 60; // Litecoin original
+static int64 nTargetSpacing = 2.5 * 60; // Litecoin original
+static int64 nInterval = nTargetTimespan / nTargetSpacing;
 
 //
 // minimum amount of work that could possibly be required nTime after
@@ -1121,8 +1122,9 @@ unsigned int static GetNextWorkRequired(const CBlockIndex* pindexLast, const CBl
     if(nHeight >= nForkTwo)
     {
       //printf("Retargeting to sol day");
-      nTargetTimespan = 88775;
-      nTargetSpacing = 123;
+      nTargetTimespan = 88775; //Marscoin: 1 Mars-day has 88775 seconds
+      nTargetSpacing = 123; //Marscoin: 2 Mars-minutes. 1 Mars-second is 61.649486615 seconds
+      nInterval = nTargetTimespan / nTargetSpacing; //New retargeting interval
     }
     // Only change once per interval
     if ((pindexLast->nHeight+1) % nInterval != 0)
