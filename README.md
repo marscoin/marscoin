@@ -26,7 +26,7 @@ Marscoin targets to become the first cryptocurrency on Mars, and functions as a 
 
 - Subsidy halves every Mars Year
 
-- ~33 million total coins
+- ~48 million total coins
 
 - 300k donation premined for non-profit MarsOne
 
