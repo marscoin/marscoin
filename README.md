@@ -20,7 +20,7 @@ Marscoin targets to become the first cryptocurrency on Mars, and functions as a 
 
 - 50 coins per block
 
-- 590 Blocks Per Mars Day
+- 721 Blocks Per Mars Day
 
 - Difficulty retarget every 24 hours 39 Minutes (Mars day)
 
