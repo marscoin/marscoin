@@ -73,6 +73,7 @@ int64 nHPSTimerStart = 0;
 int64 nTransactionFee = 0;
 int64 nMinimumInputValue = DUST_HARD_LIMIT;
 
+
 //////////////////////////////////////////////////////////////////////////////
 //
 // dispatching functions
@@ -154,6 +155,12 @@ void static ResendWalletTransactions()
     BOOST_FOREACH(CWallet* pwallet, setpwalletRegistered)
         pwallet->ResendWalletTransactions();
 }
+
+
+
+
+
+
 
 //////////////////////////////////////////////////////////////////////////////
 //
@@ -334,6 +341,12 @@ unsigned int LimitOrphanTxSize(unsigned int nMaxOrphans)
     }
     return nEvicted;
 }
+
+
+
+
+
+
 
 //////////////////////////////////////////////////////////////////////////////
 //
@@ -522,6 +535,12 @@ int CMerkleTx::SetMerkleBranch(const CBlock* pblock)
 
     return pindexBest->nHeight - pindex->nHeight + 1;
 }
+
+
+
+
+
+
 
 bool CTransaction::CheckTransaction(CValidationState &state) const
 {
@@ -869,6 +888,9 @@ void CTxMemPool::queryHashes(std::vector<uint256>& vtxid)
         vtxid.push_back((*mi).first);
 }
 
+
+
+
 int CMerkleTx::GetDepthInMainChain(CBlockIndex* &pindexRet) const
 {
     if (hashBlock == 0 || nIndex == -1)
@@ -908,6 +930,8 @@ bool CMerkleTx::AcceptToMemoryPool(bool fCheckInputs, bool fLimitFree)
     CValidationState state;
     return CTransaction::AcceptToMemoryPool(state, fCheckInputs, fLimitFree);
 }
+
+
 
 bool CWalletTx::AcceptWalletTransaction(bool fCheckInputs)
 {
@@ -992,6 +1016,11 @@ bool GetTransaction(const uint256 &hash, CTransaction &txOut, uint256 &hashBlock
     return false;
 }
 
+
+
+
+
+
 //////////////////////////////////////////////////////////////////////////////
 //
 // CBlock and CBlockIndex
@@ -1072,7 +1101,88 @@ unsigned int ComputeMinWork(unsigned int nBase, int64 nTime)
     return bnResult.GetCompact();
 }
 
-unsigned int static GetNextWorkRequired(const CBlockIndex* pindexLast, const CBlockHeader *pblock)
+unsigned int static DarkGravityWave2(const CBlockIndex* pindexLast, const CBlockHeader *pblock)
+{
+    /* current difficulty formula, darkcoin - DarkGravity v2, written by Evan Duffield - evan@darkcoin.io */
+    const CBlockIndex *BlockLastSolved = pindexLast;
+    const CBlockIndex *BlockReading = pindexLast;
+    const CBlockHeader *BlockCreating = pblock;
+    BlockCreating = BlockCreating;
+    int64 nBlockTimeAverage = 0;
+    int64 nBlockTimeAveragePrev = 0;
+    int64 nBlockTimeCount = 0;
+    int64 nBlockTimeSum2 = 0;
+    int64 nBlockTimeCount2 = 0;
+    int64 LastBlockTime = 0;
+    int64 PastBlocksMin = 14;
+    int64 PastBlocksMax = 140;
+    int64 CountBlocks = 0;
+    CBigNum PastDifficultyAverage;
+    CBigNum PastDifficultyAveragePrev;
+
+    nTargetTimespan = 88775; //Marscoin: 1 Mars-day has 88775 seconds
+    nTargetSpacing = 123; //Marscoin: 2 Mars-minutes. 1 Mars-second is 61.649486615 seconds
+
+    if (BlockLastSolved == NULL || BlockLastSolved->nHeight == 0 || BlockLastSolved->nHeight < PastBlocksMin) { return bnProofOfWorkLimit.GetCompact(); }
+
+    for (unsigned int i = 1; BlockReading && BlockReading->nHeight > 0; i++) {
+        if (PastBlocksMax > 0 && i > PastBlocksMax) { break; }
+        CountBlocks++;
+
+        if(CountBlocks <= PastBlocksMin) {
+            if (CountBlocks == 1) { PastDifficultyAverage.SetCompact(BlockReading->nBits); }
+            else { PastDifficultyAverage = ((CBigNum().SetCompact(BlockReading->nBits) - PastDifficultyAveragePrev) / CountBlocks) + PastDifficultyAveragePrev; }
+            PastDifficultyAveragePrev = PastDifficultyAverage;
+        }
+
+        if(LastBlockTime > 0){
+            int64 Diff = (LastBlockTime - BlockReading->GetBlockTime());
+            if(nBlockTimeCount <= PastBlocksMin) {
+                nBlockTimeCount++;
+
+                if (nBlockTimeCount == 1) { nBlockTimeAverage = Diff; }
+                else { nBlockTimeAverage = ((Diff - nBlockTimeAveragePrev) / nBlockTimeCount) + nBlockTimeAveragePrev; }
+                nBlockTimeAveragePrev = nBlockTimeAverage;
+            }
+            nBlockTimeCount2++;
+            nBlockTimeSum2 += Diff;
+        }
+        LastBlockTime = BlockReading->GetBlockTime();
+
+        if (BlockReading->pprev == NULL) { assert(BlockReading); break; }
+        BlockReading = BlockReading->pprev;
+    }
+
+    CBigNum bnNew(PastDifficultyAverage);
+    if (nBlockTimeCount != 0 && nBlockTimeCount2 != 0) {
+            double SmartAverage = ((((long double)nBlockTimeAverage)*0.7)+(((long double)nBlockTimeSum2 / (long double)nBlockTimeCount2)*0.3));
+            if(SmartAverage < 1) SmartAverage = 1;
+            double Shift = nTargetSpacing/SmartAverage;
+
+            double fActualTimespan = ((long double)CountBlocks*(double)nTargetSpacing)/Shift;
+            double fTargetTimespan = ((long double)CountBlocks*(double)nTargetSpacing);
+
+            if (fActualTimespan < fTargetTimespan/3)
+                fActualTimespan = fTargetTimespan/3;
+            if (fActualTimespan > fTargetTimespan*3)
+                fActualTimespan = fTargetTimespan*3;
+
+            int64 nActualTimespan = fActualTimespan;
+            int64 nTargetTimespan = fTargetTimespan;
+
+            // Retarget
+            bnNew *= nActualTimespan;
+            bnNew /= nTargetTimespan;
+    }
+
+    if (bnNew > bnProofOfWorkLimit){
+        bnNew = bnProofOfWorkLimit;
+    }
+
+    return bnNew.GetCompact();
+}
+
+unsigned int static GetNextWorkRequired_V1(const CBlockIndex* pindexLast, const CBlockHeader *pblock)
 {
     unsigned int nProofOfWorkLimit = bnProofOfWorkLimit.GetCompact();
 
@@ -1157,6 +1267,23 @@ unsigned int static GetNextWorkRequired(const CBlockIndex* pindexLast, const CBl
 
     return bnNew.GetCompact();
 }
+
+unsigned int static GetNextWorkRequired(const CBlockIndex* pindexLast, const CBlockHeader *pblock)
+{
+        int DiffMode = 1;
+        if (fTestNet) {
+                if (pindexLast->nHeight+1 >= 15) { DiffMode = 4; }
+                else if (pindexLast->nHeight+1 >= 5) { DiffMode = 1; }
+        }
+        else {
+                if (pindexLast->nHeight+1 >= 100000) { DiffMode = 4; }
+        }
+
+        if (DiffMode == 1) { return GetNextWorkRequired_V1(pindexLast, pblock); }
+        else if (DiffMode == 4) { return DarkGravityWave2(pindexLast, pblock); }
+        return DarkGravityWave2(pindexLast, pblock);
+}
+
 
 bool CheckProofOfWork(uint256 hash, unsigned int nBits)
 {
@@ -1285,6 +1412,16 @@ void CBlockHeader::UpdateTime(const CBlockIndex* pindexPrev)
     if (fTestNet)
         nBits = GetNextWorkRequired(pindexPrev, this);
 }
+
+
+
+
+
+
+
+
+
+
 
 const CTxOut &CTransaction::GetOutputFor(const CTxIn& input, CCoinsViewCache& view)
 {
@@ -1448,6 +1585,9 @@ bool CTransaction::CheckInputs(CValidationState &state, CCoinsViewCache &inputs,
 
     return true;
 }
+
+
+
 
 bool CBlock::DisconnectBlock(CValidationState &state, CBlockIndex *pindex, CCoinsViewCache &view, bool *pfClean)
 {
@@ -1947,6 +2087,7 @@ bool CBlock::AddToBlockIndex(CValidationState &state, const CDiskBlockPos &pos)
     return true;
 }
 
+
 bool FindBlockPos(CValidationState &state, CDiskBlockPos &pos, unsigned int nAddSize, unsigned int nHeight, uint64 nTime, bool fKnown = false)
 {
     bool fUpdatedLast = false;
@@ -2040,6 +2181,7 @@ bool FindUndoPos(CValidationState &state, int nFile, CDiskBlockPos &pos, unsigne
 
     return true;
 }
+
 
 bool CBlock::CheckBlock(CValidationState &state, bool fCheckPOW, bool fCheckMerkleRoot) const
 {
@@ -2303,6 +2445,13 @@ bool ProcessBlock(CValidationState &state, CNode* pfrom, CBlock* pblock, CDiskBl
     return true;
 }
 
+
+
+
+
+
+
+
 CMerkleBlock::CMerkleBlock(const CBlock& block, CBloomFilter& filter)
 {
     header = block.GetBlockHeader();
@@ -2328,6 +2477,13 @@ CMerkleBlock::CMerkleBlock(const CBlock& block, CBloomFilter& filter)
 
     txn = CPartialMerkleTree(vHashes, vMatch);
 }
+
+
+
+
+
+
+
 
 uint256 CPartialMerkleTree::CalcHash(int height, unsigned int pos, const std::vector<uint256> &vTxid) {
     if (height == 0) {
@@ -2442,6 +2598,12 @@ uint256 CPartialMerkleTree::ExtractMatches(std::vector<uint256> &vMatch) {
         return 0;
     return hashMerkleRoot;
 }
+
+
+
+
+
+
 
 bool AbortNode(const std::string &strMessage) {
     strMiscWarning = strMessage;
@@ -2689,6 +2851,7 @@ bool LoadBlockIndex()
     return true;
 }
 
+
 bool InitBlockIndex() {
     // Check whether we're already initialized
     if (pindexGenesisBlock != NULL)
@@ -2758,6 +2921,8 @@ bool InitBlockIndex() {
 
     return true;
 }
+
+
 
 void PrintBlockTree()
 {
@@ -2901,6 +3066,15 @@ bool LoadExternalBlockFile(FILE* fileIn, CDiskBlockPos *dbp)
     return nLoaded > 0;
 }
 
+
+
+
+
+
+
+
+
+
 //////////////////////////////////////////////////////////////////////////////
 //
 // CAlert
@@ -2957,6 +3131,13 @@ string GetWarnings(string strFor)
     return "error";
 }
 
+
+
+
+
+
+
+
 //////////////////////////////////////////////////////////////////////////////
 //
 // Messages
@@ -2984,6 +3165,9 @@ bool static AlreadyHave(const CInv& inv)
     // Don't know what it is, just say we already got one
     return true;
 }
+
+
+
 
 // The message start string is designed to be unlikely to occur in normal data.
 // The characters are rarely used upper ASCII, not valid as UTF-8, and produce
@@ -3845,6 +4029,7 @@ bool ProcessMessages(CNode* pfrom)
     return fOk;
 }
 
+
 bool SendMessages(CNode* pto, bool fSendTrickle)
 {
     TRY_LOCK(cs_main, lockMain);
@@ -4013,6 +4198,19 @@ bool SendMessages(CNode* pto, bool fSendTrickle)
     }
     return true;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 //////////////////////////////////////////////////////////////////////////////
 //
@@ -4372,6 +4570,7 @@ void IncrementExtraNonce(CBlock* pblock, CBlockIndex* pindexPrev, unsigned int& 
 
     pblock->hashMerkleRoot = pblock->BuildMerkleTree();
 }
+
 
 void FormatHashBuffers(CBlock* pblock, char* pmidstate, char* pdata, char* phash1)
 {
