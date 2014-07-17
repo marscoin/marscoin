@@ -49,7 +49,7 @@ win32:QMAKE_LFLAGS *= -Wl,--dynamicbase -Wl,--nxcompat
 # on Windows: enable GCC large address aware linker flag
 win32:QMAKE_LFLAGS *= -Wl,--large-address-aware
 # i686-w64-mingw32
-# win32:QMAKE_LFLAGS *= -static-libgcc -static-libstdc++
+win32:QMAKE_LFLAGS *= -static-libgcc -static-libstdc++
 
 # use: qmake "USE_QRCODE=1"
 # libqrencode (http://fukuchi.org/works/qrencode/index.en.html) must be installed for support
@@ -439,8 +439,8 @@ win32:!contains(MINGW_THREAD_BUGFIX, 0) {
 !win32:!macx {
     DEFINES += LINUX
     LIBS += -lrt
-    # _FILE_OFFSET_MARSS=64 lets 32-bit fopen transparently support large files.
-    DEFINES += _FILE_OFFSET_MARSS=64
+    # _FILE_OFFSET_BITS=64 lets 32-bit fopen transparently support large files.
+    DEFINES += _FILE_OFFSET_BITS=64
 }
 
 
