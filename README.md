@@ -14,20 +14,20 @@ What is Marscoin?
 
 Marscoin targets to become the first cryptocurrency on Mars, and functions as a proof of concept for incentivizing and privatizing space exploration funding.
 
-✔ scrypt Litecoin-based cryptocurrency
-✔ DarkGravityWave network protection
-✔ confirmation block every 2 Mars minutes (123 seconds)
-✔ difficulty retargets every 24 hours 39 minutes (Mars day or "sol")
-✔ subsidy halves every Mars year (668 sols)
-✔ 721 blocks per sol
-✔ 50 coins per block
-✔ 48 million total coins by 2024
-✔ 500k donation for non-profit MarsOne
-✔ 500k donation for The Mars Society
-✔ developed and supported by The Marscoin Foundation, Inc.
+- scrypt Litecoin-based cryptocurrency
+- DarkGravityWave network protection
+- confirmation block every 2 Mars minutes (123 seconds)
+- difficulty retargets every 24 hours 39 minutes (Mars day or "sol")
+- subsidy halves every Mars year (668 sols)
+- 721 blocks per sol
+- 50 coins per block
+- 48 million total coins by 2024
+- 500k donation for non-profit MarsOne
+- 500k donation for The Mars Society
+- developed and supported by The Marscoin Foundation, Inc.
 
 For more information, as well as an immediately useable, binary version of
-the Marscoin client sofware, see http://www.marscoin.org.
+the Marscoin client sofware, see http://www.marscoin.org and http://www.marscoinfoundation.org
 
 License
 -------
@@ -45,8 +45,7 @@ If it is a simple/trivial/non-controversial change, then one of the Marscoin
 development team members simply pulls it.
 
 If it is a *more complicated or potentially controversial* change, then the patch
-submitter will be asked to start a discussion (if they haven't already) on the
-[mailing list](http://sourceforge.net/mailarchive/forum.php?forum_name=bitcoin-development).
+submitter will be asked to start a discussion (if they haven't already).
 
 The patch will be accepted if there is broad consensus that it is a good thing.
 Developers should expect to rework and resubmit patches if the code doesn't
