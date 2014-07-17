@@ -14,21 +14,17 @@ What is Marscoin?
 
 Marscoin targets to become the first cryptocurrency on Mars, and functions as a proof of concept for incentivizing and privatizing space exploration funding.
 
-- Scrypt Litecoin-based CryptoCurrency
-
-- 1 block per 2 Mars minutes
-
-- 50 coins per block
-
-- 721 Blocks Per Mars Day
-
-- Difficulty retarget every 24 hours 39 Minutes (Mars day)
-
-- Subsidy halves every Mars Year
-
-- ~48 million total coins
-
-- 300k donation premined for non-profit MarsOne
+✔ scrypt Litecoin-based cryptocurrency
+✔ DarkGravityWave network protection
+✔ confirmation block every 2 Mars minutes (123 seconds)
+✔ difficulty retargets every 24 hours 39 minutes (Mars day or "sol")
+✔ subsidy halves every Mars year (668 sols)
+✔ 721 blocks per sol
+✔ 50 coins per block
+✔ 48 million total coins by 2024
+✔ 500k donation for non-profit MarsOne
+✔ 500k donation for The Mars Society
+✔ developed and supported by The Marscoin Foundation, Inc.
 
 For more information, as well as an immediately useable, binary version of
 the Marscoin client sofware, see http://www.marscoin.org.
