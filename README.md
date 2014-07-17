@@ -84,4 +84,4 @@ Unit tests for the GUI code are in `src/qt/test/`. To compile and run them:
 Screenshot
 ----------
 
-![alt tag](http://url/to/img.pnghttp://marscoinfoundation.org/assets/img/screenshot1.png)
+![alt tag](http://marscoinfoundation.org/assets/img/screenshot1.png)
