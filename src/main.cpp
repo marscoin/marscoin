@@ -1073,7 +1073,7 @@ int64 static GetBlockValue(int nHeight, int64 nFees)
 
 static int64 nTargetTimespan = 3.5 * 24 * 60 * 60; // 1 mars day retarget diff
 static int64 nTargetSpacing = 2.5 * 60; // Marscoin: (2 Mars minutes)
-static const int64 nInterval = nTargetTimespan / nTargetSpacing;
+static int64 nInterval = nTargetTimespan / nTargetSpacing;
 
 //
 // minimum amount of work that could possibly be required nTime after
@@ -1204,6 +1204,7 @@ unsigned int static GetNextWorkRequired_V1(const CBlockIndex* pindexLast, const 
       //printf("Retargeting to sol day");
       nTargetTimespan = 88775;
       nTargetSpacing = 123;
+      nInterval = nTargetTimespan / nTargetSpacing; 
     }
     // Only change once per interval
     if ((pindexLast->nHeight+1) % nInterval != 0)
