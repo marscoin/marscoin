@@ -50,6 +50,8 @@ public slots:
     void gotoAddressBookPage();
     /** Switch to chat window */
     void gotoChatWindow();
+    /** Switch to statistics page */
+    void gotoStatisticsPage();
     /** Switch to receive coins page */
     void gotoReceiveCoinsPage();
     /** Switch to send coins page */

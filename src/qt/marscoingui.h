@@ -69,6 +69,7 @@ public:
     QAction * getReceiveCoinsAction() { return receiveCoinsAction; }
     QAction * getSendCoinsAction() { return sendCoinsAction; }
     QAction * getChatWindowAction() {return chatWindowAction;}
+    QAction * getStatisticsPageAction() {return statisticsPageAction;}
 
 protected:
     void changeEvent(QEvent *e);
@@ -94,6 +95,7 @@ private:
     QAction *sendCoinsAction;
     QAction *addressBookAction;
     QAction *chatWindowAction;
+    QAction *statisticsPageAction;
     QAction *signMessageAction;
     QAction *verifyMessageAction;
     QAction *aboutAction;
@@ -174,6 +176,8 @@ private slots:
     void gotoAddressBookPage();
     /** Switch to chat window */
     void gotoChatWindow();
+    /** Switch to statistics page */
+    void gotoStatisticsPage();
     /** Switch to receive coins page */
     void gotoReceiveCoinsPage();
     /** Switch to send coins page */

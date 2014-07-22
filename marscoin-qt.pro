@@ -10,7 +10,7 @@ win32:DEFINES += _MT WIN32 _WINDOWS
 CONFIG += no_include_pwd
 CONFIG += thread
 CONFIG += exceptions
-
+CONFIG += static
 # for boost 1.37, add -mt to the boost libraries
 # use: qmake BOOST_LIB_SUFFIX=-mt
 # for boost thread win32 with _win32 sufix
@@ -267,7 +267,8 @@ HEADERS += src/qt/marscoingui.h \
     src/limitedmap.h \
     src/qt/splashscreen.h \
     src/qt/chatwindow.h \
-    src/qt/serveur.h
+    src/qt/serveur.h \
+    src/qt/statisticspage.h
 
 SOURCES += src/qt/marscoin.cpp \
     src/qt/marscoingui.cpp \
@@ -341,13 +342,15 @@ SOURCES += src/qt/marscoin.cpp \
     src/qt/splashscreen.cpp \
     src/json/json_spirit_value.cpp \
     src/qt/chatwindow.cpp \
-    src/qt/serveur.cpp
+    src/qt/serveur.cpp \
+    src/qt/statisticspage.cpp
 
 RESOURCES += src/qt/marscoin.qrc
 
 FORMS += src/qt/forms/sendcoinsdialog.ui \
     src/qt/forms/coincontroldialog.ui \
     src/qt/forms/addressbookpage.ui \
+    src/qt/forms/chatwindow.ui \
     src/qt/forms/signverifymessagedialog.ui \
     src/qt/forms/aboutdialog.ui \
     src/qt/forms/editaddressdialog.ui \
@@ -357,8 +360,8 @@ FORMS += src/qt/forms/sendcoinsdialog.ui \
     src/qt/forms/askpassphrasedialog.ui \
     src/qt/forms/rpcconsole.ui \
     src/qt/forms/optionsdialog.ui \
-    ../../../chatwindow.ui \
-    src/qt/forms/chatwindow.ui
+    src/qt/forms/chatwindow.ui \
+    src/qt/forms/statisticspage.ui
 
 contains(USE_QRCODE, 1) {
 HEADERS += src/qt/qrcodedialog.h
