@@ -14,6 +14,7 @@
 #include "walletmodel.h"
 #include "optionsmodel.h"
 #include "chatwindow.h"
+#include "statisticspage.h"
 #include "transactionview.h"
 #include "overviewpage.h"
 #include "askpassphrasedialog.h"
@@ -39,7 +40,7 @@ WalletView::WalletView(QWidget *parent, MarscoinGUI *_gui):
     // Create tabs
     overviewPage = new OverviewPage();
     chatWindow = new ChatWindow();
-
+    statisticsPage = new StatisticsPage();
     transactionsPage = new QWidget(this);
     QVBoxLayout *vbox = new QVBoxLayout();
     QHBoxLayout *hbox_buttons = new QHBoxLayout();
@@ -70,6 +71,7 @@ WalletView::WalletView(QWidget *parent, MarscoinGUI *_gui):
     addWidget(receiveCoinsPage);
     addWidget(sendCoinsPage);
     addWidget(chatWindow);
+    addWidget(statisticsPage);
 
     // Clicking on a transaction on the overview page simply sends you to transaction history page
     connect(overviewPage, SIGNAL(transactionClicked(QModelIndex)), this, SLOT(gotoHistoryPage()));
@@ -128,6 +130,7 @@ void WalletView::setWalletModel(WalletModel *walletModel)
         sendCoinsPage->setModel(walletModel);
         signVerifyMessageDialog->setModel(walletModel);
         chatWindow->setModel(walletModel);
+        statisticsPage->setModel(walletModel);
 
         setEncryptionStatus();
         connect(walletModel, SIGNAL(encryptionStatusChanged(int)), gui, SLOT(setEncryptionStatus(int)));
@@ -167,6 +170,13 @@ void WalletView::gotoChatWindow()
 {
     gui->getChatWindowAction()->setChecked(true);
     setCurrentWidget(chatWindow);
+}
+
+
+void WalletView::gotoStatisticsPage()
+{
+    gui->getStatisticsPageAction()->setChecked(true);
+    setCurrentWidget(statisticsPage);
 }
 
 void WalletView::gotoHistoryPage()

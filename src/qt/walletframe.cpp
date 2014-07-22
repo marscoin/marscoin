@@ -88,6 +88,11 @@ void WalletFrame::gotoChatWindow()
     walletStack->gotoChatWindow();
 }
 
+void WalletFrame::gotoStatisticsPage()
+{
+    walletStack->gotoStatisticsPage();
+}
+
 void WalletFrame::gotoHistoryPage()
 {
     walletStack->gotoHistoryPage();

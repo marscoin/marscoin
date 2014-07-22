@@ -15,6 +15,7 @@ class WalletModel;
 class TransactionView;
 class OverviewPage;
 class ChatWindow;
+class StatisticsPage;
 class AddressBookPage;
 class SendCoinsDialog;
 class SignVerifyMessageDialog;
@@ -61,6 +62,7 @@ private:
 
     OverviewPage *overviewPage;
     ChatWindow *chatWindow;
+    StatisticsPage *statisticsPage;
     QWidget *transactionsPage;
     AddressBookPage *addressBookPage;
     AddressBookPage *receiveCoinsPage;
@@ -82,6 +84,8 @@ public slots:
     void gotoSendCoinsPage(QString addr = "");
     /** Switch to chat window */
     void gotoChatWindow();
+    /** Switch to statistics page */
+    void gotoStatisticsPage();
     /** Show Sign/Verify Message dialog and switch to sign message tab */
     void gotoSignMessageTab(QString addr = "");
     /** Show Sign/Verify Message dialog and switch to verify message tab */
