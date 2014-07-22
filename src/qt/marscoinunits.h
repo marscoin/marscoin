@@ -15,13 +15,13 @@ public:
     explicit MarscoinUnits(QObject *parent);
 
     /** Marscoin units.
-      @note Source: https://en.marscoin.it/wiki/Units . Please add only sensible ones
+      @note Source: https://marscoin.org/faq#Units . Please add only sensible ones
      */
     enum Unit
     {
-        MRS,
-        mMRS,
-        uMRS
+        MARS,
+        mMARS,
+        uMARS
     };
 
     //! @name Static API

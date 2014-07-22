@@ -128,7 +128,7 @@ QString TransactionDesc::toHTML(CWallet *wallet, CWalletTx &wtx)
                 nUnmatured += wallet->GetCredit(txout);
             strHTML += "<b>" + tr("Credit") + ":</b> ";
             if (wtx.IsInMainChain())
-                strHTML += MarscoinUnits::formatWithUnit(MarscoinUnits::MRS, nUnmatured)+ " (" + tr("matures in %n more block(s)", "", wtx.GetBlocksToMaturity()) + ")";
+                strHTML += MarscoinUnits::formatWithUnit(MarscoinUnits::MARS, nUnmatured)+ " (" + tr("matures in %n more block(s)", "", wtx.GetBlocksToMaturity()) + ")";
             else
                 strHTML += "(" + tr("not accepted") + ")";
             strHTML += "<br>";
@@ -138,7 +138,7 @@ QString TransactionDesc::toHTML(CWallet *wallet, CWalletTx &wtx)
             //
             // Credit
             //
-            strHTML += "<b>" + tr("Credit") + ":</b> " + MarscoinUnits::formatWithUnit(MarscoinUnits::MRS, nNet) + "<br>";
+            strHTML += "<b>" + tr("Credit") + ":</b> " + MarscoinUnits::formatWithUnit(MarscoinUnits::MARS, nNet) + "<br>";
         }
         else
         {
@@ -174,7 +174,7 @@ QString TransactionDesc::toHTML(CWallet *wallet, CWalletTx &wtx)
                         }
                     }
 
-                    strHTML += "<b>" + tr("Debit") + ":</b> " + MarscoinUnits::formatWithUnit(MarscoinUnits::MRS, -txout.nValue) + "<br>";
+                    strHTML += "<b>" + tr("Debit") + ":</b> " + MarscoinUnits::formatWithUnit(MarscoinUnits::MARS, -txout.nValue) + "<br>";
                 }
 
                 if (fAllToMe)
@@ -182,13 +182,13 @@ QString TransactionDesc::toHTML(CWallet *wallet, CWalletTx &wtx)
                     // Payment to self
                     int64 nChange = wtx.GetChange();
                     int64 nValue = nCredit - nChange;
-                    strHTML += "<b>" + tr("Debit") + ":</b> " + MarscoinUnits::formatWithUnit(MarscoinUnits::MRS, -nValue) + "<br>";
-                    strHTML += "<b>" + tr("Credit") + ":</b> " + MarscoinUnits::formatWithUnit(MarscoinUnits::MRS, nValue) + "<br>";
+                    strHTML += "<b>" + tr("Debit") + ":</b> " + MarscoinUnits::formatWithUnit(MarscoinUnits::MARS, -nValue) + "<br>";
+                    strHTML += "<b>" + tr("Credit") + ":</b> " + MarscoinUnits::formatWithUnit(MarscoinUnits::MARS, nValue) + "<br>";
                 }
 
                 int64 nTxFee = nDebit - wtx.GetValueOut();
                 if (nTxFee > 0)
-                    strHTML += "<b>" + tr("Transaction fee") + ":</b> " + MarscoinUnits::formatWithUnit(MarscoinUnits::MRS, -nTxFee) + "<br>";
+                    strHTML += "<b>" + tr("Transaction fee") + ":</b> " + MarscoinUnits::formatWithUnit(MarscoinUnits::MARS, -nTxFee) + "<br>";
             }
             else
             {
@@ -197,14 +197,14 @@ QString TransactionDesc::toHTML(CWallet *wallet, CWalletTx &wtx)
                 //
                 BOOST_FOREACH(const CTxIn& txin, wtx.vin)
                     if (wallet->IsMine(txin))
-                        strHTML += "<b>" + tr("Debit") + ":</b> " + MarscoinUnits::formatWithUnit(MarscoinUnits::MRS, -wallet->GetDebit(txin)) + "<br>";
+                        strHTML += "<b>" + tr("Debit") + ":</b> " + MarscoinUnits::formatWithUnit(MarscoinUnits::MARS, -wallet->GetDebit(txin)) + "<br>";
                 BOOST_FOREACH(const CTxOut& txout, wtx.vout)
                     if (wallet->IsMine(txout))
-                        strHTML += "<b>" + tr("Credit") + ":</b> " + MarscoinUnits::formatWithUnit(MarscoinUnits::MRS, wallet->GetCredit(txout)) + "<br>";
+                        strHTML += "<b>" + tr("Credit") + ":</b> " + MarscoinUnits::formatWithUnit(MarscoinUnits::MARS, wallet->GetCredit(txout)) + "<br>";
             }
         }
 
-        strHTML += "<b>" + tr("Net amount") + ":</b> " + MarscoinUnits::formatWithUnit(MarscoinUnits::MRS, nNet, true) + "<br>";
+        strHTML += "<b>" + tr("Net amount") + ":</b> " + MarscoinUnits::formatWithUnit(MarscoinUnits::MARS, nNet, true) + "<br>";
 
         //
         // Message
@@ -227,10 +227,10 @@ QString TransactionDesc::toHTML(CWallet *wallet, CWalletTx &wtx)
             strHTML += "<hr><br>" + tr("Debug information") + "<br><br>";
             BOOST_FOREACH(const CTxIn& txin, wtx.vin)
                 if(wallet->IsMine(txin))
-                    strHTML += "<b>" + tr("Debit") + ":</b> " + MarscoinUnits::formatWithUnit(MarscoinUnits::MRS, -wallet->GetDebit(txin)) + "<br>";
+                    strHTML += "<b>" + tr("Debit") + ":</b> " + MarscoinUnits::formatWithUnit(MarscoinUnits::MARS, -wallet->GetDebit(txin)) + "<br>";
             BOOST_FOREACH(const CTxOut& txout, wtx.vout)
                 if(wallet->IsMine(txout))
-                    strHTML += "<b>" + tr("Credit") + ":</b> " + MarscoinUnits::formatWithUnit(MarscoinUnits::MRS, wallet->GetCredit(txout)) + "<br>";
+                    strHTML += "<b>" + tr("Credit") + ":</b> " + MarscoinUnits::formatWithUnit(MarscoinUnits::MARS, wallet->GetCredit(txout)) + "<br>";
 
             strHTML += "<br><b>" + tr("Transaction") + ":</b><br>";
             strHTML += GUIUtil::HtmlEscape(wtx.ToString(), true);
@@ -258,7 +258,7 @@ QString TransactionDesc::toHTML(CWallet *wallet, CWalletTx &wtx)
                                     strHTML += GUIUtil::HtmlEscape(wallet->mapAddressBook[address]) + " ";
                                 strHTML += QString::fromStdString(CMarscoinAddress(address).ToString());
                             }
-                            strHTML = strHTML + " " + tr("Amount") + "=" + MarscoinUnits::formatWithUnit(MarscoinUnits::MRS, vout.nValue);
+                            strHTML = strHTML + " " + tr("Amount") + "=" + MarscoinUnits::formatWithUnit(MarscoinUnits::MARS, vout.nValue);
                             strHTML = strHTML + " IsMine=" + (wallet->IsMine(vout) ? tr("true") : tr("false")) + "</li>";
                         }
                     }

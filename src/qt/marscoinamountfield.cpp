@@ -145,7 +145,7 @@ void MarscoinAmountField::unitChanged(int idx)
     amount->setDecimals(MarscoinUnits::decimals(currentUnit));
     amount->setMaximum(qPow(10, MarscoinUnits::amountDigits(currentUnit)) - qPow(10, -amount->decimals()));
 
-    if(currentUnit == MarscoinUnits::uMRS)
+    if(currentUnit == MarscoinUnits::uMARS)
         amount->setSingleStep(0.01);
     else
         amount->setSingleStep(0.001);

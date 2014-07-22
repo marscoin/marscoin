@@ -50,9 +50,9 @@ static const unsigned int UNDOFILE_CHUNK_SIZE = 0x100000; // 1 MiB
 /** Fake height value used in CCoins to signify they are only in the memory pool (since 0.8) */
 static const unsigned int MEMPOOL_HEIGHT = 0x7FFFFFFF;
 /** Dust Soft Limit, allowed with additional fee per output */
-static const int64 DUST_SOFT_LIMIT = 100000; // 0.001 MRS
+static const int64 DUST_SOFT_LIMIT = 100000; // 0.001 MARS
 /** Dust Hard Limit, ignored as wallet inputs (mininput default) */
-static const int64 DUST_HARD_LIMIT = 1000;   // 0.00001 MRS mininput
+static const int64 DUST_HARD_LIMIT = 1000;   // 0.00001 MARS mininput
 /** No amount larger than this (in satoshi) is valid */
 static const int64 MAX_MONEY = 48256000 * COIN;
 inline bool MoneyRange(int64 nValue) { return (nValue >= 0 && nValue <= MAX_MONEY); }
@@ -867,7 +867,7 @@ public:
  *    - code = 4 (vout[1] is not spent, and 0 non-zero bytes of bitvector follow)
  *    - unspentness bitvector: as 0 non-zero bytes follow, it has length 0
  *    - vout[1]: 835800816115944e077fe7c803cfa57f29b36bf87c1d35
- *               * 8358: compact amount representation for 60000000000 (600 MRS)
+ *               * 8358: compact amount representation for 60000000000 (600 MARS)
  *               * 00: special txout type pay-to-pubkey-hash
  *               * 816115944e077fe7c803cfa57f29b36bf87c1d35: address uint160
  *    - height = 203998
@@ -883,11 +883,11 @@ public:
  *                2 (1, +1 because both bit 2 and bit 4 are unset) non-zero bitvector bytes follow)
  *  - unspentness bitvector: bits 2 (0x04) and 14 (0x4000) are set, so vout[2+2] and vout[14+2] are unspent
  *  - vout[4]: 86ef97d5790061b01caab50f1b8e9c50a5057eb43c2d9563a4ee
- *             * 86ef97d579: compact amount representation for 234925952 (2.35 MRS)
+ *             * 86ef97d579: compact amount representation for 234925952 (2.35 MARS)
  *             * 00: special txout type pay-to-pubkey-hash
  *             * 61b01caab50f1b8e9c50a5057eb43c2d9563a4ee: address uint160
  *  - vout[16]: bbd123008c988f1a4a4de2161e0f50aac7f17e7f9555caa4
- *              * bbd123: compact amount representation for 110397 (0.001 MRS)
+ *              * bbd123: compact amount representation for 110397 (0.001 MARS)
  *              * 00: special txout type pay-to-pubkey-hash
  *              * 8c988f1a4a4de2161e0f50aac7f17e7f9555caa4: address uint160
  *  - height = 120891
