@@ -201,6 +201,13 @@ void MarscoinGUI::createActions()
     addressBookAction->setShortcut(QKeySequence(Qt::ALT + Qt::Key_5));
     tabGroup->addAction(addressBookAction);
 
+    chatWindowAction = new QAction(QIcon(":/icons/chat"), tr("&Chat"), this);
+    chatWindowAction->setStatusTip(tr("chat with other MARS fans"));
+    chatWindowAction->setToolTip(chatWindowAction->statusTip());
+    chatWindowAction->setCheckable(true);
+    chatWindowAction->setShortcut(QKeySequence(Qt::ALT + Qt::Key_6));
+    tabGroup->addAction(chatWindowAction);
+
     connect(overviewAction, SIGNAL(triggered()), this, SLOT(showNormalIfMinimized()));
     connect(overviewAction, SIGNAL(triggered()), this, SLOT(gotoOverviewPage()));
     connect(sendCoinsAction, SIGNAL(triggered()), this, SLOT(showNormalIfMinimized()));
@@ -211,6 +218,7 @@ void MarscoinGUI::createActions()
     connect(historyAction, SIGNAL(triggered()), this, SLOT(gotoHistoryPage()));
     connect(addressBookAction, SIGNAL(triggered()), this, SLOT(showNormalIfMinimized()));
     connect(addressBookAction, SIGNAL(triggered()), this, SLOT(gotoAddressBookPage()));
+    connect(chatWindowAction, SIGNAL(triggered()), this, SLOT(gotoChatWindow()));
 
     quitAction = new QAction(QIcon(":/icons/quit"), tr("E&xit"), this);
     quitAction->setStatusTip(tr("Quit application"));
@@ -295,6 +303,7 @@ void MarscoinGUI::createToolBars()
     toolbar->addAction(receiveCoinsAction);
     toolbar->addAction(historyAction);
     toolbar->addAction(addressBookAction);
+    toolbar->addAction(chatWindowAction);
 }
 
 void MarscoinGUI::setClientModel(ClientModel *clientModel)
@@ -485,6 +494,11 @@ void MarscoinGUI::gotoHistoryPage()
 void MarscoinGUI::gotoAddressBookPage()
 {
     if (walletFrame) walletFrame->gotoAddressBookPage();
+}
+
+void MarscoinGUI::gotoChatWindow()
+{
+    if (walletFrame) walletFrame->gotoChatWindow();
 }
 
 void MarscoinGUI::gotoReceiveCoinsPage()

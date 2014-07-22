@@ -13,6 +13,7 @@ class WalletModel;
 class WalletStack;
 class TransactionView;
 class OverviewPage;
+class ChatWindow;
 class AddressBookPage;
 class SendCoinsDialog;
 class SignVerifyMessageDialog;
@@ -67,6 +68,7 @@ public:
     QAction * getAddressBookAction() { return addressBookAction; }
     QAction * getReceiveCoinsAction() { return receiveCoinsAction; }
     QAction * getSendCoinsAction() { return sendCoinsAction; }
+    QAction * getChatWindowAction() {return chatWindowAction;}
 
 protected:
     void changeEvent(QEvent *e);
@@ -91,6 +93,7 @@ private:
     QAction *quitAction;
     QAction *sendCoinsAction;
     QAction *addressBookAction;
+    QAction *chatWindowAction;
     QAction *signMessageAction;
     QAction *verifyMessageAction;
     QAction *aboutAction;
@@ -169,6 +172,8 @@ private slots:
     void gotoHistoryPage();
     /** Switch to address book page */
     void gotoAddressBookPage();
+    /** Switch to chat window */
+    void gotoChatWindow();
     /** Switch to receive coins page */
     void gotoReceiveCoinsPage();
     /** Switch to send coins page */

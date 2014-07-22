@@ -110,10 +110,10 @@
     <widget class="QPushButton" name="disconnect">
      <property name="geometry">
       <rect>
-       <x>642</x>
-       <y>420</y>
-       <width>71</width>
-       <height>28</height>
+       <x>562</x>
+       <y>417</y>
+       <width>151</width>
+       <height>31</height>
       </rect>
      </property>
      <property name="text">
@@ -180,7 +180,7 @@
       </rect>
      </property>
      <property name="text">
-      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;a href=&quot;https://twitter.com/marscoinorg/&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;&lt;img src=&quot;:/icons/twitter&quot;/&gt;&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;Facebook&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
      </property>
      <property name="margin">
       <number>5</number>
@@ -199,7 +199,7 @@
       </rect>
      </property>
      <property name="text">
-      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;https://www.facebook.com/marscoin/&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;&lt;img src=&quot;:/icons/face&quot;/&gt;&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Twitter&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
      </property>
      <property name="openExternalLinks">
       <bool>true</bool>
@@ -215,7 +215,7 @@
       </rect>
      </property>
      <property name="text">
-      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;http://www.reddit.com/r/marscoin/&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;&lt;img src=&quot;:/icons/reddit&quot;/&gt;&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Reddit&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
      </property>
      <property name="openExternalLinks">
       <bool>true</bool>
@@ -237,7 +237,7 @@
     <widget class="QLabel" name="label_5">
      <property name="geometry">
       <rect>
-       <x>100</x>
+       <x>90</x>
        <y>160</y>
        <width>61</width>
        <height>21</height>
@@ -266,7 +266,7 @@
     <widget class="QLabel" name="label_10">
      <property name="geometry">
       <rect>
-       <x>100</x>
+       <x>90</x>
        <y>130</y>
        <width>121</width>
        <height>16</height>
