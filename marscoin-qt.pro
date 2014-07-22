@@ -265,7 +265,9 @@ HEADERS += src/qt/marscoingui.h \
     src/leveldb.h \
     src/threadsafety.h \
     src/limitedmap.h \
-    src/qt/splashscreen.h
+    src/qt/splashscreen.h \
+    src/qt/chatwindow.h \
+    src/qt/serveur.h
 
 SOURCES += src/qt/marscoin.cpp \
     src/qt/marscoingui.cpp \
@@ -337,7 +339,9 @@ SOURCES += src/qt/marscoin.cpp \
     src/leveldb.cpp \
     src/txdb.cpp \
     src/qt/splashscreen.cpp \
-    src/json/json_spirit_value.cpp
+    src/json/json_spirit_value.cpp \
+    src/qt/chatwindow.cpp \
+    src/qt/serveur.cpp
 
 RESOURCES += src/qt/marscoin.qrc
 
@@ -352,7 +356,9 @@ FORMS += src/qt/forms/sendcoinsdialog.ui \
     src/qt/forms/sendcoinsentry.ui \
     src/qt/forms/askpassphrasedialog.ui \
     src/qt/forms/rpcconsole.ui \
-    src/qt/forms/optionsdialog.ui
+    src/qt/forms/optionsdialog.ui \
+    ../../../chatwindow.ui \
+    src/qt/forms/chatwindow.ui
 
 contains(USE_QRCODE, 1) {
 HEADERS += src/qt/qrcodedialog.h
