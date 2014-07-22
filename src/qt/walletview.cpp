@@ -13,6 +13,7 @@
 #include "clientmodel.h"
 #include "walletmodel.h"
 #include "optionsmodel.h"
+#include "chatwindow.h"
 #include "transactionview.h"
 #include "overviewpage.h"
 #include "askpassphrasedialog.h"
@@ -37,6 +38,7 @@ WalletView::WalletView(QWidget *parent, MarscoinGUI *_gui):
 {
     // Create tabs
     overviewPage = new OverviewPage();
+    chatWindow = new ChatWindow();
 
     transactionsPage = new QWidget(this);
     QVBoxLayout *vbox = new QVBoxLayout();
@@ -48,6 +50,7 @@ WalletView::WalletView(QWidget *parent, MarscoinGUI *_gui):
 #ifndef Q_OS_MAC // Icons on push buttons are very uncommon on Mac
     exportButton->setIcon(QIcon(":/icons/export"));
 #endif
+
     hbox_buttons->addStretch();
     hbox_buttons->addWidget(exportButton);
     vbox->addLayout(hbox_buttons);
@@ -66,6 +69,7 @@ WalletView::WalletView(QWidget *parent, MarscoinGUI *_gui):
     addWidget(addressBookPage);
     addWidget(receiveCoinsPage);
     addWidget(sendCoinsPage);
+    addWidget(chatWindow);
 
     // Clicking on a transaction on the overview page simply sends you to transaction history page
     connect(overviewPage, SIGNAL(transactionClicked(QModelIndex)), this, SLOT(gotoHistoryPage()));
@@ -82,6 +86,8 @@ WalletView::WalletView(QWidget *parent, MarscoinGUI *_gui):
     connect(receiveCoinsPage, SIGNAL(signMessage(QString)), this, SLOT(gotoSignMessageTab(QString)));
     // Clicking on "Export" allows to export the transaction list
     connect(exportButton, SIGNAL(clicked()), transactionView, SLOT(exportClicked()));
+
+    //connect(chatWindow, SIGNAL(clicked()), chatWindow, SLOT(gotoChatWindow()));
 
     gotoOverviewPage();
 }
@@ -121,6 +127,7 @@ void WalletView::setWalletModel(WalletModel *walletModel)
         receiveCoinsPage->setModel(walletModel->getAddressTableModel());
         sendCoinsPage->setModel(walletModel);
         signVerifyMessageDialog->setModel(walletModel);
+        chatWindow->setModel(walletModel);
 
         setEncryptionStatus();
         connect(walletModel, SIGNAL(encryptionStatusChanged(int)), gui, SLOT(setEncryptionStatus(int)));
@@ -154,6 +161,12 @@ void WalletView::gotoOverviewPage()
 {
     gui->getOverviewAction()->setChecked(true);
     setCurrentWidget(overviewPage);
+}
+
+void WalletView::gotoChatWindow()
+{
+    gui->getChatWindowAction()->setChecked(true);
+    setCurrentWidget(chatWindow);
 }
 
 void WalletView::gotoHistoryPage()

@@ -192,7 +192,7 @@ void ChatWindow::closeEvent(QCloseEvent *event)
         }
     }
 }
-void ChatWindow ::setModel(ClientModel *model)
+void ChatWindow ::setModel(WalletModel *model)
 {
     this->model = model;
 }

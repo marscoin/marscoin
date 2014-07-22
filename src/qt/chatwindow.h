@@ -29,6 +29,8 @@ namespace Ui
     class ChatWindowClass;
 }
 
+class WalletModel;
+
 class ChatWindow : public QWidget
 {
     Q_OBJECT
@@ -36,7 +38,7 @@ class ChatWindow : public QWidget
 public:
     ChatWindow(QWidget *parent = 0);
     ~ChatWindow();
-    void setModel(ClientModel *model);
+    void setModel(WalletModel *model);
     Serveur * currentTab();
     signals:
         void changeTab();
@@ -56,7 +58,7 @@ public:
 
 private:
     Ui::ChatWindowClass *ui;
-    ClientModel *model;
+    WalletModel *model;
     QMap<QString,Serveur *> serveurs;
     bool joining;
     void closeEvent(QCloseEvent *event);
