@@ -46,7 +46,7 @@ void QRCodeDialog::setModel(OptionsModel *model)
     if (model)
         connect(model, SIGNAL(displayUnitChanged(int)), this, SLOT(updateDisplayUnit()));
 
-    // update the display unit, to not use the default ("MRS")
+    // update the display unit, to not use the default ("MARS")
     updateDisplayUnit();
 }
 
@@ -94,8 +94,8 @@ QString QRCodeDialog::getURI()
     {
         if (ui->lnReqAmount->validate())
         {
-            // even if we allow a non MRS unit input in lnReqAmount, we generate the URI with MRS as unit (as defined in BIP21)
-            ret += QString("?amount=%1").arg(MarscoinUnits::format(MarscoinUnits::MRS, ui->lnReqAmount->value()));
+            // even if we allow a non MARS unit input in lnReqAmount, we generate the URI with MARS as unit (as defined in BIP21)
+            ret += QString("?amount=%1").arg(MarscoinUnits::format(MarscoinUnits::MARS, ui->lnReqAmount->value()));
             paramCount++;
         }
         else

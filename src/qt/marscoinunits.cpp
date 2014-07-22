@@ -11,9 +11,9 @@ MarscoinUnits::MarscoinUnits(QObject *parent):
 QList<MarscoinUnits::Unit> MarscoinUnits::availableUnits()
 {
     QList<MarscoinUnits::Unit> unitlist;
-    unitlist.append(MRS);
-    unitlist.append(mMRS);
-    unitlist.append(uMRS);
+    unitlist.append(MARS);
+    unitlist.append(mMARS);
+    unitlist.append(uMARS);
     return unitlist;
 }
 
@@ -21,9 +21,9 @@ bool MarscoinUnits::valid(int unit)
 {
     switch(unit)
     {
-    case MRS:
-    case mMRS:
-    case uMRS:
+    case MARS:
+    case mMARS:
+    case uMARS:
         return true;
     default:
         return false;
@@ -34,9 +34,9 @@ QString MarscoinUnits::name(int unit)
 {
     switch(unit)
     {
-    case MRS: return QString("MRS");
-    case mMRS: return QString("mMRS");
-    case uMRS: return QString::fromUtf8("μMRS");
+    case MARS: return QString("MARS");
+    case mMARS: return QString("mMARS");
+    case uMARS: return QString::fromUtf8("μMARS");
     default: return QString("???");
     }
 }
@@ -45,9 +45,9 @@ QString MarscoinUnits::description(int unit)
 {
     switch(unit)
     {
-    case MRS: return QString("Marscoins");
-    case mMRS: return QString("Milli-Marscoins (1 / 1,000)");
-    case uMRS: return QString("Micro-Marscoins (1 / 1,000,000)");
+    case MARS: return QString("Marscoins");
+    case mMARS: return QString("Milli-Marscoins (1 / 1,000)");
+    case uMARS: return QString("Micro-Marscoins (1 / 1,000,000)");
     default: return QString("???");
     }
 }
@@ -56,9 +56,9 @@ qint64 MarscoinUnits::factor(int unit)
 {
     switch(unit)
     {
-    case MRS:  return 100000000;
-    case mMRS: return 100000;
-    case uMRS: return 100;
+    case MARS:  return 100000000;
+    case mMARS: return 100000;
+    case uMARS: return 100;
     default:   return 100000000;
     }
 }
@@ -67,9 +67,9 @@ int MarscoinUnits::amountDigits(int unit)
 {
     switch(unit)
     {
-    case MRS: return 8; // 21,000,000 (# digits, without commas)
-    case mMRS: return 11; // 21,000,000,000
-    case uMRS: return 14; // 21,000,000,000,000
+    case MARS: return 8; // 21,000,000 (# digits, without commas)
+    case mMARS: return 11; // 21,000,000,000
+    case uMARS: return 14; // 21,000,000,000,000
     default: return 0;
     }
 }
@@ -78,9 +78,9 @@ int MarscoinUnits::decimals(int unit)
 {
     switch(unit)
     {
-    case MRS: return 8;
-    case mMRS: return 5;
-    case uMRS: return 2;
+    case MARS: return 8;
+    case mMARS: return 5;
+    case uMARS: return 2;
     default: return 0;
     }
 }

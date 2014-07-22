@@ -563,7 +563,7 @@ void CoinControlDialog::updateLabels(WalletModel *model, QDialog* dialog)
     }
     
     // actually update labels
-    int nDisplayUnit = MarscoinUnits::MRS;
+    int nDisplayUnit = MarscoinUnits::MARS;
     if (model && model->getOptionsModel())
         nDisplayUnit = model->getOptionsModel()->getDisplayUnit();
             
@@ -596,7 +596,7 @@ void CoinControlDialog::updateLabels(WalletModel *model, QDialog* dialog)
     l5->setStyleSheet((nBytes >= 5000) ? "color:red;" : "");               // Bytes >= 5000
     l6->setStyleSheet((!CTransaction::AllowFree(dPriority)) ? "color:red;" : "");         // Priority < "medium"
     l7->setStyleSheet((fLowOutput) ? "color:red;" : "");                    // Low Output = "yes"
-    l8->setStyleSheet((nChange > 0 && nChange < CENT) ? "color:red;" : ""); // Change < 0.01MRS
+    l8->setStyleSheet((nChange > 0 && nChange < CENT) ? "color:red;" : ""); // Change < 0.01MARS
         
     // tool tips
     l5->setToolTip(tr("This label turns red, if the transaction size is bigger than 5000 bytes.\n\n This means a fee of at least %1 per kb is required.\n\n Can vary +/- 1 Byte per input.").arg(MarscoinUnits::formatWithUnit(nDisplayUnit, CTransaction::nMinTxFee)));
@@ -624,7 +624,7 @@ void CoinControlDialog::updateView()
     QFlags<Qt::ItemFlag> flgCheckbox=Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsUserCheckable;
     QFlags<Qt::ItemFlag> flgTristate=Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsUserCheckable | Qt::ItemIsTristate;    
     
-    int nDisplayUnit = MarscoinUnits::MRS;
+    int nDisplayUnit = MarscoinUnits::MARS;
     if (model && model->getOptionsModel())
         nDisplayUnit = model->getOptionsModel()->getDisplayUnit();
         

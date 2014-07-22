@@ -115,7 +115,7 @@ bool parseMarscoinURI(const QUrl &uri, SendCoinsRecipient *out)
         {
             if(!i->second.isEmpty())
             {
-                if(!MarscoinUnits::parse(MarscoinUnits::MRS, i->second, &rv.amount))
+                if(!MarscoinUnits::parse(MarscoinUnits::MARS, i->second, &rv.amount))
                 {
                     return false;
                 }

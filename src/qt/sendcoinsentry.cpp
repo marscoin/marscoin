@@ -89,7 +89,7 @@ void SendCoinsEntry::clear()
     ui->addAsLabel->clear();
     ui->payAmount->clear();
     ui->payTo->setFocus();
-    // update the display unit, to not use the default ("MRS")
+    // update the display unit, to not use the default ("MARS")
     updateDisplayUnit();
 }
 
