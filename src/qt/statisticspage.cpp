@@ -35,16 +35,58 @@ int stakemaxPrevious = -1;
 QString stakecPrevious = "";
 QString rewardPrevious = "";
 
+
+// Return average network hashes per second based on the last 'lookup' blocks,
+// or from the last difficulty change if 'lookup' is nonpositive.
+// If 'height' is nonnegative, compute the estimate at the time when a given block was found.
+uint64_t GetNetworkHashPSL(int lookup, int height) {
+    CBlockIndex *pb = pindexBest;
+
+    if (height >= 0 && height < nBestHeight)
+        pb = FindBlockByHeight(height);
+
+    if (pb == NULL || !pb->nHeight)
+        return 0;
+
+    // If lookup is -1, then use blocks since last difficulty change.
+    if (lookup <= 0)
+        lookup = pb->nHeight % 2016 + 1;
+
+    // If lookup is larger than chain, then set it to chain length.
+    if (lookup > pb->nHeight)
+        lookup = pb->nHeight;
+
+    CBlockIndex *pb0 = pb;
+    int64 minTime = pb0->GetBlockTime();
+    int64 maxTime = minTime;
+    for (int i = 0; i < lookup; i++) {
+        pb0 = pb0->pprev;
+        int64 time = pb0->GetBlockTime();
+        minTime = std::min(time, minTime);
+        maxTime = std::max(time, maxTime);
+    }
+
+    // In case there's a situation where minTime == maxTime, we don't want a divide by zero exception.
+    if (minTime == maxTime)
+        return 0;
+
+    uint256 workDiff = pb->nChainWork - pb0->nChainWork;
+    int64 timeDiff = maxTime - minTime;
+
+    return (boost::int64_t)(workDiff.getdouble() / timeDiff);
+}
+
 void StatisticsPage::updateStatistics()
 {
     double pHardness = GetDifficulty();
-    int pPawrate = 0; //GetPoWMHashPS();
     double pPawrate2 = 0.000;
     int nHeight = pindexBest->nHeight;
     uint64_t nMinWeight = 0;
     int64_t volume = 0; //((pindexBest->nMoneySupply)/100000000);
     int peers = 0;//this->model->getNumConnections();
+    uint64_t pPawrate = GetNetworkHashPSL(120, nHeight);
     pPawrate2 = (double)pPawrate;
+
     QString height = QString::number(nHeight);
     QString phase = "";
     QString subsidy = "";
