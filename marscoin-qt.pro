@@ -361,7 +361,8 @@ FORMS += src/qt/forms/sendcoinsdialog.ui \
     src/qt/forms/rpcconsole.ui \
     src/qt/forms/optionsdialog.ui \
     src/qt/forms/chatwindow.ui \
-    src/qt/forms/statisticspage.ui
+    src/qt/forms/statisticspage.ui \
+    src/qt/forms/tradepage.ui
 
 contains(USE_QRCODE, 1) {
 HEADERS += src/qt/qrcodedialog.h
