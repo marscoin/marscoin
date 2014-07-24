@@ -18,7 +18,7 @@ StatisticsPage::StatisticsPage(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    setFixedSize(400, 420);
+   // setFixedSize(400, 420);
 
     connect(ui->startButton, SIGNAL(pressed()), this, SLOT(updateStatistics()));
 }
@@ -73,7 +73,7 @@ uint64_t GetNetworkHashPSL(int lookup, int height) {
     uint256 workDiff = pb->nChainWork - pb0->nChainWork;
     int64 timeDiff = maxTime - minTime;
 
-    return (boost::int64_t)(workDiff.getdouble() / timeDiff);
+    return ((boost::int64_t)(workDiff.getdouble() / timeDiff)/ 1000000 );
 }
 
 void StatisticsPage::updateStatistics()
@@ -96,7 +96,7 @@ void StatisticsPage::updateStatistics()
     QString pawrate = QString::number(pPawrate2, 'f', 3);
     QString Qlpawrate = "";//model->getLastBlockDate().toString();
 
-    QString QPeers = QString::number(peers);
+    QString QPeers = QString::number(vNodes.size());
     QString qVolume = QString::number(volume);
 
     if(nHeight > heightPrevious)

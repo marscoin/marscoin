@@ -463,7 +463,7 @@ void MarscoinGUI::restoreWindowGeometry()
 {
     QSettings settings;
     QPoint pos = settings.value("nWindowPos").toPoint();
-    QSize size = settings.value("nWindowSize", QSize(850, 550)).toSize();
+    QSize size = settings.value("nWindowSize", QSize(550, 550)).toSize();
     if (!pos.x() && !pos.y())
     {
         QRect screen = QApplication::desktop()->screenGeometry();
@@ -471,6 +471,7 @@ void MarscoinGUI::restoreWindowGeometry()
         pos.setY((screen.height()-size.height())/2);
     }
     resize(size);
+    setFixedSize(700,500);
     move(pos);
 }
 

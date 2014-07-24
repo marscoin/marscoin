@@ -39,8 +39,8 @@
       <rect>
        <x>10</x>
        <y>0</y>
-       <width>541</width>
-       <height>451</height>
+       <width>431</width>
+       <height>351</height>
       </rect>
      </property>
      <property name="styleSheet">
@@ -70,8 +70,8 @@
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>460</y>
-       <width>701</width>
+       <y>360</y>
+       <width>430</width>
        <height>30</height>
       </rect>
      </property>
@@ -91,10 +91,10 @@
     <widget class="QListView" name="userView">
      <property name="geometry">
       <rect>
-       <x>560</x>
+       <x>460</x>
        <y>20</y>
        <width>161</width>
-       <height>391</height>
+       <height>331</height>
       </rect>
      </property>
      <property name="minimumSize">
@@ -110,8 +110,8 @@
     <widget class="QPushButton" name="disconnect">
      <property name="geometry">
       <rect>
-       <x>562</x>
-       <y>417</y>
+       <x>462</x>
+       <y>357</y>
        <width>151</width>
        <height>31</height>
       </rect>
@@ -120,6 +120,11 @@
       <string>Disconnect</string>
      </property>
     </widget>
+    <zorder>tab</zorder>
+    <zorder>lineEdit</zorder>
+    <zorder>userView</zorder>
+    <zorder>disconnect</zorder>
+    <zorder>hide3</zorder>
    </widget>
    <widget class="QWidget" name="hide3" native="true">
     <property name="geometry">
