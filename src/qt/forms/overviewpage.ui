@@ -190,7 +190,16 @@
         </widget>
        </item>
        <item>
-        <widget class="QGraphicsView" name="graphicsView"/>
+        <widget class="QWebView" name="webView">
+         <property name="autoFillBackground">
+          <bool>false</bool>
+         </property>
+         <property name="url">
+          <url>
+           <string>http://marscoin.org/img/output_s2kcsc.gif</string>
+          </url>
+         </property>
+        </widget>
        </item>
        <item>
         <spacer name="verticalSpacer">
@@ -299,6 +308,13 @@
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>QWebView</class>
+   <extends>QWidget</extends>
+   <header>QtWebKit/QWebView</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

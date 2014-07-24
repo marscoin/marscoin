@@ -82,7 +82,7 @@ font-family:'Open Sans,sans-serif';</string>
        <string/>
       </property>
       <property name="pixmap">
-       <pixmap>:/icons/coinbg</pixmap>
+       <pixmap resource="../marscoin.qrc">:/images/coinbg</pixmap>
       </property>
       <property name="scaledContents">
        <bool>true</bool>
@@ -277,6 +277,8 @@ font-family:'Open Sans,sans-serif';</string>
   </layout>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
- <resources/>
+ <resources>
+  <include location="../marscoin.qrc"/>
+ </resources>
  <connections/>
 </ui>
