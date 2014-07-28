@@ -19,7 +19,6 @@ Marscoin targets to become the first cryptocurrency on Mars, and functions as a 
 - scrypt Litecoin-based cryptocurrency
 - DarkGravityWave network protection
 - confirmation block every 2 Mars minutes (123 seconds)
-- difficulty retargets every 24 hours 39 minutes (Mars day or "sol")
 - subsidy halves every Mars year (668 sols)
 - 721 blocks per sol
 - 50 coins per block
