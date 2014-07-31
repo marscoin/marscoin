@@ -916,6 +916,25 @@ int CMerkleTx::GetDepthInMainChain(CBlockIndex* &pindexRet) const
     return pindexBest->nHeight - pindex->nHeight + 1;
 }
 
+double ConvertBitsToDouble(unsigned int nBits){
+    int nShift = (nBits >> 24) & 0xff;
+
+    double dDiff =
+        (double)0x0000ffff / (double)(nBits & 0x00ffffff);
+
+    while (nShift < 29)
+    {
+        dDiff *= 256.0;
+        nShift++;
+    }
+    while (nShift > 29)
+    {
+        dDiff /= 256.0;
+        nShift--;
+    }
+
+    return dDiff;
+}
 
 int CMerkleTx::GetBlocksToMaturity() const
 {
@@ -1181,6 +1200,69 @@ unsigned int static DarkGravityWave2(const CBlockIndex* pindexLast, const CBlock
     return bnNew.GetCompact();
 }
 
+
+
+unsigned int static DarkGravityWave3(const CBlockIndex* pindexLast, const CBlockHeader *pblock) {
+    /* current difficulty formula, darkcoin - DarkGravity v3, written by Evan Duffield - evan@darkcoin.io */
+    const CBlockIndex *BlockLastSolved = pindexLast;
+    const CBlockIndex *BlockReading = pindexLast;
+    const CBlockHeader *BlockCreating = pblock;
+    BlockCreating = BlockCreating;
+    int64 nActualTimespan = 0;
+    int64 LastBlockTime = 0;
+    int64 PastBlocksMin = 24;
+    int64 PastBlocksMax = 24;
+    int64 CountBlocks = 0;
+    CBigNum PastDifficultyAverage;
+    CBigNum PastDifficultyAveragePrev;
+    printf("GravityWave v3\n");
+    nTargetTimespan = 88775; //Marscoin: 1 Mars-day has 88775 seconds
+    nTargetSpacing = 123; //Marscoin: 2 Mars-minutes. 1 Mars-second is 61.649486615 seconds
+
+    if (BlockLastSolved == NULL || BlockLastSolved->nHeight == 0 || BlockLastSolved->nHeight < PastBlocksMin) {
+        return bnProofOfWorkLimit.GetCompact();
+    }
+
+    for (unsigned int i = 1; BlockReading && BlockReading->nHeight > 0; i++) {
+        if (PastBlocksMax > 0 && i > PastBlocksMax) { break; }
+        CountBlocks++;
+
+        if(CountBlocks <= PastBlocksMin) {
+            if (CountBlocks == 1) { PastDifficultyAverage.SetCompact(BlockReading->nBits); }
+            else { PastDifficultyAverage = ((PastDifficultyAveragePrev * CountBlocks)+(CBigNum().SetCompact(BlockReading->nBits))) / (CountBlocks+1); }
+            PastDifficultyAveragePrev = PastDifficultyAverage;
+        }
+
+        if(LastBlockTime > 0){
+            int64 Diff = (LastBlockTime - BlockReading->GetBlockTime());
+            nActualTimespan += Diff;
+        }
+        LastBlockTime = BlockReading->GetBlockTime();
+
+        if (BlockReading->pprev == NULL) { assert(BlockReading); break; }
+        BlockReading = BlockReading->pprev;
+    }
+
+    CBigNum bnNew(PastDifficultyAverage);
+
+    int64 nTargetTimespan = CountBlocks*nTargetSpacing;
+
+    if (nActualTimespan < nTargetTimespan/3)
+        nActualTimespan = nTargetTimespan/3;
+    if (nActualTimespan > nTargetTimespan*3)
+        nActualTimespan = nTargetTimespan*3;
+
+    // Retarget
+    bnNew *= nActualTimespan;
+    bnNew /= nTargetTimespan;
+
+    if (bnNew > bnProofOfWorkLimit){
+        bnNew = bnProofOfWorkLimit;
+    }
+
+    return bnNew.GetCompact();
+}
+
 unsigned int static GetNextWorkRequired_V1(const CBlockIndex* pindexLast, const CBlockHeader *pblock)
 {
     unsigned int nProofOfWorkLimit = bnProofOfWorkLimit.GetCompact();
@@ -1276,11 +1358,13 @@ unsigned int static GetNextWorkRequired(const CBlockIndex* pindexLast, const CBl
         }
         else {
                 if (pindexLast->nHeight+1 >= 120000) { DiffMode = 4; }
+                if (pindexLast->nHeight+1 >= 126000) { DiffMode = 5; }
         }
 
         if (DiffMode == 1) { return GetNextWorkRequired_V1(pindexLast, pblock); }
         else if (DiffMode == 4) { return DarkGravityWave2(pindexLast, pblock); }
-        return DarkGravityWave2(pindexLast, pblock);
+        else if (DiffMode == 5) { return DarkGravityWave3(pindexLast, pblock); }
+        return DarkGravityWave3(pindexLast, pblock);
 }
 
 
@@ -2275,9 +2359,23 @@ bool CBlock::AcceptBlock(CValidationState &state, CDiskBlockPos *dbp)
         pindexPrev = (*mi).second;
         nHeight = pindexPrev->nHeight+1;
 
-        // Check proof of work
-        if (nBits != GetNextWorkRequired(pindexPrev, this))
-            return state.DoS(100, error("AcceptBlock() : incorrect proof of work"));
+        if(fTestNet) {
+            if (nBits != GetNextWorkRequired(pindexPrev, this))
+                return state.DoS(100, error("AcceptBlock() : incorrect proof of work"));
+        } else {
+            // Check proof of work (Here for the architecture issues with DGW v1 and v2)
+            if(nHeight <= 126000){
+                unsigned int nBitsNext = GetNextWorkRequired(pindexPrev, this);
+                double n1 = ConvertBitsToDouble(nBits);
+                double n2 = ConvertBitsToDouble(nBitsNext);
+
+                if (abs(n1-n2) > n1*0.2)
+                    return state.DoS(100, error("AcceptBlock() : incorrect proof of work (DGW pre-fork)"));
+            } else {
+                if (nBits != GetNextWorkRequired(pindexPrev, this))
+                    return state.DoS(100, error("AcceptBlock() : incorrect proof of work"));
+            }
+        }
 
         // Check timestamp against prev
         if (GetBlockTime() <= pindexPrev->GetMedianTimePast())
