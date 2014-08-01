@@ -3,7 +3,6 @@
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 #ifndef MARSCOIN_NETBASE_H
 #define MARSCOIN_NETBASE_H
-#define MSG_NOSIGNAL        0
 
 #include <string>
 #include <vector>
