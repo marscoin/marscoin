@@ -84,7 +84,7 @@ void StatisticsPage::updateStatistics()
     uint64_t nMinWeight = 0;
     int64_t volume = 0; //((pindexBest->nMoneySupply)/100000000);
     int peers = 0;//this->model->getNumConnections();
-    uint64_t pPawrate = GetNetworkHashPSL(120, nHeight);
+    uint64_t pPawrate = GetNetworkHashPSL(590, nHeight);
     pPawrate2 = (double)pPawrate;
 
     QString height = QString::number(nHeight);
