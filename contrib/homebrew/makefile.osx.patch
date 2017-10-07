@@ -1,48 +1,64 @@
-diff --git a/src/makefile.osx b/src/makefile.osx
-index bef0ef3..07ef8d3 100644
---- a/src/makefile.osx
-+++ b/src/makefile.osx
-@@ -7,17 +7,21 @@
- # Originally by Laszlo Hanyecz (solar@heliacal.net)
+--- /Users/imho/mrs/marscoin/src/makefile.osx	2017-10-07 21:12:07.000000000 +0300
++++ src/makefile.osx	2017-10-07 20:25:00.000000000 +0300
+@@ -9,17 +9,22 @@
+ CXX=c++
  
- CXX=llvm-g++
--DEPSDIR=/opt/local
-+DEPSDIR=/usr/local
+ DEPSDIR=/usr/local
+-
 +DB4DIR=/usr/local/opt/berkeley-db4
 +OPENSSLDIR=/usr/local/opt/openssl
  
  INCLUDEPATHS= \
   -I"$(CURDIR)" \
 - -I"$(CURDIR)"/obj \
+- -I"$(DEPSDIR)/include" 
 + -I"$(CURDIR)/obj" \
-  -I"$(DEPSDIR)/include" \
-- -I"$(DEPSDIR)/include/db48"
++ -I"$(DEPSDIR)/include" \
 + -I"$(DB4DIR)/include" \
 + -I"$(OPENSSLDIR)/include"
  
  LIBPATHS= \
-  -L"$(DEPSDIR)/lib" \
-- -L"$(DEPSDIR)/lib/db48"
+- -L"$(DEPSDIR)/lib" 
++ -L"$(DEPSDIR)/lib" \
 + -L"$(DB4DIR)/lib" \
 + -L"$(OPENSSLDIR)/lib"
  
- USE_UPNP:=1
+-USE_UPNP:=1
++USE_UPNP:=0
  USE_IPV6:=1
-@@ -31,14 +35,14 @@ ifdef STATIC
- TESTLIBS += \
-  $(DEPSDIR)/lib/libboost_unit_test_framework-mt.a
+ 
+ LIBS= -dead_strip
+@@ -28,18 +33,18 @@
+ 
+ ifdef STATIC
+ # Build STATIC if you are redistributing the marscoind binary
+-TESTLIBS += \
+- $(DEPSDIR)/lib/libboost_unit_test_framework-mt.a
++ TESTLIBS += \
++  $(DEPSDIR)/lib/libboost_unit_test_framework-mt.a
  LIBS += \
-- $(DEPSDIR)/lib/db48/libdb_cxx-4.8.a \
+- $(DEPSDIR)/lib/libdb_cxx.a \
 + $(DB4DIR)/lib/libdb_cxx-4.8.a \
   $(DEPSDIR)/lib/libboost_system-mt.a \
   $(DEPSDIR)/lib/libboost_filesystem-mt.a \
   $(DEPSDIR)/lib/libboost_program_options-mt.a \
   $(DEPSDIR)/lib/libboost_thread-mt.a \
   $(DEPSDIR)/lib/libboost_chrono-mt.a \
-- $(DEPSDIR)/lib/libssl.a \
-- $(DEPSDIR)/lib/libcrypto.a \
+- -lssl \
+- -lcrypto \
+- -lz
 + $(OPENSSLDIR)/lib/libssl.a \
 + $(OPENSSLDIR)/lib/libcrypto.a \
-  -lz
++  -lz
  else
  TESTLIBS += \
+  -lboost_unit_test_framework-mt
+@@ -62,7 +67,7 @@
+ # Compile for maximum compatibility and smallest size.
+ # This requires that dependencies are compiled
+ # the same way.
+-CFLAGS = -mmacosx-version-min=10.5 -O3
++CFLAGS = -mmacosx-version-min=10.10 -O3
+ else
+ DEBUGFLAGS = -g
+ endif
