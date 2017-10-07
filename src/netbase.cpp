@@ -7,6 +7,7 @@
 #include "util.h"
 #include "sync.h"
 #include "hash.h"
+#define MSG_NOSIGNAL 0
 
 #ifndef WIN32
 #include <sys/fcntl.h>

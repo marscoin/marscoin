@@ -1,7 +1,7 @@
 TEMPLATE = app
 TARGET = marscoin-qt
-macx:TARGET = "Marscoin-Qt"
-VERSION = 1.0.0.1
+macx:TARGET = "Marscoin-Qt-1.0.4"
+VERSION = 1.0.4
 INCLUDEPATH += src src/json src/qt
 QT += core gui network webkit
 win32:QT += core gui network
@@ -29,7 +29,7 @@ UI_DIR = build
 # use: qmake "RELEASE=1"
 contains(RELEASE, 1) {
     # Mac: compile for maximum compatibility (10.6, 64-bit)
-    macx:QMAKE_MACOSX_DEPLOYMENT_TARGET=10.6
+    macx:QMAKE_MACOSX_DEPLOYMENT_TARGET=10.5
     !win32:!macx {
         # Linux: static link and extra security (see: https://wiki.debian.org/Hardening)
         LIBS += -Wl,-Bstatic -Wl,-z,relro -Wl,-z,now
@@ -44,7 +44,7 @@ contains(RELEASE, 1) {
     # This can be enabled for Windows, when we switch to MinGW >= 4.4.x.
 }
 # for extra security (see: https://wiki.debian.org/Hardening): this flag is GCC compiler-specific
-QMAKE_CXXFLAGS *= -D_FORTIFY_SOURCE=2
+QMAKE_CXXFLAGS *= -D_FORTIFY_SOURCE=2 -DWITH_QT4=OFF
 # for extra security on Windows: enable ASLR and DEP via GCC linker flags
 win32:QMAKE_LFLAGS *= -Wl,--dynamicbase -Wl,--nxcompat
 # on Windows: enable GCC large address aware linker flag
@@ -471,10 +471,10 @@ win32:!contains(MINGW_THREAD_BUGFIX, 0) {
 
 
 # Set libraries and includes at end, to use platform-defined defaults if not overridden
-INCLUDEPATH += $$BOOST_INCLUDE_PATH $$BDB_INCLUDE_PATH $$OPENSSL_INCLUDE_PATH $$QRENCODE_INCLUDE_PATH
+INCLUDEPATH += $$BOOST_INCLUDE_PATH $$BDB_INCLUDE_PATH $$OPENSSL_INCLUDE_PATH $$QRENCODE_INCLUDE_PATH "/usr/local/opt/openssl/include" "/usr/local/opt/berkeley-db4/include"
 LIBS += $$join(BOOST_LIB_PATH,,-L,) $$join(BDB_LIB_PATH,,-L,) $$join(OPENSSL_LIB_PATH,,-L,) $$join(QRENCODE_LIB_PATH,,-L,)
-LIBS += -lssl -lcrypto
-# -lgdi32 has to happen after -lcrypto (see  #681)
+LIBS += -L"/usr/local/opt/openssl/lib" 
+
 !macx {
     LIBS += -lboost_system$$BOOST_LIB_SUFFIX -lboost_filesystem$$BOOST_LIB_SUFFIX -lboost_program_options$$BOOST_LIB_SUFFIX
     LIBS += -lboost_thread$$BOOST_THREAD_LIB_SUFFIX -lboost_chrono$$BOOST_LIB_SUFFIX -ldb_cxx$$BDB_LIB_SUFFIX

@@ -9,6 +9,7 @@
 #include "addrman.h"
 #include "ui_interface.h"
 #include "script.h"
+#define MSG_NOSIGNAL 0
 
 #ifdef WIN32
 #include <string.h>
