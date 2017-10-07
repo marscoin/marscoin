@@ -1,5 +1,7 @@
---- /Users/imho/mrs/marscoin/src/makefile.osx	2017-10-07 21:12:07.000000000 +0300
-+++ src/makefile.osx	2017-10-07 20:25:00.000000000 +0300
+diff --git a/src/makefile.osx b/src/makefile.osx
+index bef0ef3..07ef8d3 100644
+--- a/src/makefile.osx
++++ b/src/makefile.osx
 @@ -9,17 +9,22 @@
  CXX=c++
  
