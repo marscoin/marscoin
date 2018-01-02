@@ -6,26 +6,24 @@ http://www.marscoin.org
 http://www.marscoinfoundation.org
 
 Copyright (c) 2009-2013 Bitcoin Developers
-
 Copyright (c) 2011-2013 Litecoin Developers
-
-Copyright (c) 2013-2014 Marscoin Developers
+Copyright (c) 2013-2018 Marscoin Developers
 
 What is Marscoin?
 ----------------
 
-Marscoin targets to become the first cryptocurrency on Mars, and functions as a proof of concept for incentivizing and privatizing space exploration funding.
+Marscoin targets to become the blockchain for Mars, and functions as a proof of concept for incentivizing and privatizing space exploration funding.
 
 - scrypt Litecoin-based cryptocurrency
 - DarkGravityWave network protection
 - confirmation block every 2 Mars minutes (123 seconds)
 - subsidy halves every Mars year (668 sols)
 - 721 blocks per sol
-- 50 coins per block
+- 12.5 coins per block
 - 48 million total coins by 2024
 - 500k donation for non-profit MarsOne
 - 500k donation for The Mars Society
-- developed and supported by The Marscoin Foundation, Inc.
+- developed and supported by The Marscoin Foundation, LLC (a non-profit).
 
 For more information, as well as an immediately useable, binary version of
 the Marscoin client sofware, see http://www.marscoin.org and http://www.marscoinfoundation.org
