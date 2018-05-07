@@ -1,5 +1,5 @@
 // Copyright (c) 2009-2010 Satoshi Nakamoto
-// Copyright (c) 2009-2012 The Marscoin developers
+// Copyright (c) 2009-2019 The Bitcoin/Marscoin developers
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 #include <boost/foreach.hpp>
@@ -243,7 +243,7 @@ bool IsCanonicalPubKey(const valtype &vchPubKey) {
 }
 
 bool IsCanonicalSignature(const valtype &vchSig) {
-    // See https://marscointalk.org/index.php?topic=8392.msg127623#msg127623
+    // See https://bitcointalk.org/index.php?topic=8392.msg127623#msg127623
     // A canonical signature exists of: <30> <total len> <02> <len R> <R> <02> <len S> <S> <hashtype>
     // Where R and S are not negative (their first byte has its highest bit not set), and not
     // excessively padded (do not start with a 0 byte, unless an otherwise negative number follows,
@@ -1133,7 +1133,7 @@ bool Solver(const CScript& scriptPubKey, txnouttype& typeRet, vector<vector<unsi
         // Standard tx, sender provides pubkey, receiver adds signature
         mTemplates.insert(make_pair(TX_PUBKEY, CScript() << OP_PUBKEY << OP_CHECKSIG));
 
-        // Marscoin address tx, sender provides hash of pubkey, receiver provides signature and pubkey
+        // Bitcoin address tx, sender provides hash of pubkey, receiver provides signature and pubkey
         mTemplates.insert(make_pair(TX_PUBKEYHASH, CScript() << OP_DUP << OP_HASH160 << OP_PUBKEYHASH << OP_EQUALVERIFY << OP_CHECKSIG));
 
         // Sender provides N pubkeys, receivers provides M signatures
@@ -1738,6 +1738,33 @@ bool CScript::IsPayToScriptHash() const
             this->at(0) == OP_HASH160 &&
             this->at(1) == 0x14 &&
             this->at(22) == OP_EQUAL);
+}
+
+bool CScript::HasCanonicalPushes() const
+{
+    const_iterator pc = begin();
+    while (pc < end())
+    {
+        opcodetype opcode;
+        std::vector<unsigned char> data;
+        if (!GetOp(pc, opcode, data))
+            return false;
+        if (opcode > OP_16)
+            continue;
+        if (opcode < OP_PUSHDATA1 && opcode > OP_0 && (data.size() == 1 && data[0] <= 16))
+            // Could have used an OP_n code, rather than a 1-byte push.
+            return false;
+        if (opcode == OP_PUSHDATA1 && data.size() < OP_PUSHDATA1)
+            // Could have used a normal n-byte push, rather than OP_PUSHDATA1.
+            return false;
+        if (opcode == OP_PUSHDATA2 && data.size() <= 0xFF)
+            // Could have used an OP_PUSHDATA1.
+            return false;
+        if (opcode == OP_PUSHDATA4 && data.size() <= 0xFFFF)
+            // Could have used an OP_PUSHDATA2.
+            return false;
+    }
+    return true;
 }
 
 class CScriptVisitor : public boost::static_visitor<bool>

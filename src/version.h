@@ -1,4 +1,4 @@
-// Copyright (c) 2012 The Marscoin developers
+// Copyright (c) 2012-2019 The Bitcoin/Marscoin developers
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 #ifndef MARSCOIN_VERSION_H
@@ -25,13 +25,13 @@ extern const std::string CLIENT_DATE;
 // network protocol versioning
 //
 
-static const int PROTOCOL_VERSION = 70020;
+static const int PROTOCOL_VERSION = 70022;
 
 // intial proto version, to be increased after version/verack negotiation
 static const int INIT_PROTO_VERSION = 209;
 
 // disconnect from peers older than this proto version
-static const int MIN_PEER_PROTO_VERSION = 70020;
+static const int MIN_PEER_PROTO_VERSION = 70022;
 
 // nTime field added to CAddress, starting with this version;
 // if possible, avoid requesting addresses nodes older than this

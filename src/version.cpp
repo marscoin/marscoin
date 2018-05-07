@@ -1,4 +1,4 @@
-// Copyright (c) 2012 The Marscoin developers
+// Copyright (c) 2012-2019 The Bitcoin/Marscoin developers
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 #include <string>
@@ -6,12 +6,12 @@
 #include "version.h"
 
 // Name of client reported in the 'version' message. Report the same name
-// for both marscoind and marscoin-qt, to make it harder for attackers to
+// for both bitcoind and marscoin-qt, to make it harder for attackers to
 // target servers or GUI users specifically.
-const std::string CLIENT_NAME("MarsCoin");
+const std::string CLIENT_NAME("Marscoin");
 
 // Client version number
-#define CLIENT_VERSION_SUFFIX   "-release"
+#define CLIENT_VERSION_SUFFIX   "-beta"
 
 
 // The following part of the code determines the CLIENT_BUILD variable.
