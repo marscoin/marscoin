@@ -1,5 +1,5 @@
 // Copyright (c) 2010 Satoshi Nakamoto
-// Copyright (c) 2009-2012 The Marscoin developers
+// Copyright (c) 2009-2019 The Bitcoin/Marscoin developers
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -56,7 +56,7 @@ Value getnetworkhashps(const Array& params, bool fHelp)
     if (fHelp || params.size() > 2)
         throw runtime_error(
             "getnetworkhashps [blocks] [height]\n"
-            "Returns the estimated network hashes per second based on the last 590 blocks.\n"
+            "Returns the estimated network hashes per second based on the last 590 blocks.\n" 
             "Pass in [blocks] to override # of blocks, -1 specifies since last difficulty change.\n"
             "Pass in [height] to estimate the network speed at the time when a certain block was found.");
 
@@ -432,7 +432,7 @@ Value getblocktemplate(const Array& params, bool fHelp)
             "  \"sizelimit\" : limit of block size\n"
             "  \"bits\" : compressed target of next block\n"
             "  \"height\" : height of the next block\n"
-            "See https://en.marscoin.it/wiki/BIP_0022 for full specification.");
+            "See https://en.bitcoin.it/wiki/BIP_0022 for full specification.");
 
     std::string strMode = "template";
     if (params.size() > 0)
@@ -567,7 +567,7 @@ Value submitblock(const Array& params, bool fHelp)
             "submitblock <hex data> [optional-params-obj]\n"
             "[optional-params-obj] parameter is currently ignored.\n"
             "Attempts to submit new block to network.\n"
-            "See https://en.marscoin.it/wiki/BIP_0022 for full specification.");
+            "See https://en.bitcoin.it/wiki/BIP_0022 for full specification.");
 
     vector<unsigned char> blockData(ParseHex(params[0].get_str()));
     CDataStream ssBlock(blockData, SER_NETWORK, PROTOCOL_VERSION);
