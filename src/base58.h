@@ -1,5 +1,5 @@
 // Copyright (c) 2009-2010 Satoshi Nakamoto
-// Copyright (c) 2009-2012 The Marscoin Developers
+// Copyright (c) 2009-2019 The Bitcoin/Marscoin developers
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -272,7 +272,7 @@ class CMarscoinAddress : public CBase58Data
 public:
     enum
     {
-        PUBKEY_ADDRESS = 50, // Marscoin addresses start with M
+        PUBKEY_ADDRESS = 50, // Marscoin addresses start with L
         SCRIPT_ADDRESS = 5,
         PUBKEY_ADDRESS_TEST = 111,
         SCRIPT_ADDRESS_TEST = 196,

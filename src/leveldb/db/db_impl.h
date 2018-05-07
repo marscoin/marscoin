@@ -78,8 +78,7 @@ class DBImpl : public DB {
   // Recover the descriptor from persistent storage.  May do a significant
   // amount of work to recover recently logged updates.  Any changes to
   // be made to the descriptor are added to *edit.
-  Status Recover(VersionEdit* edit, bool* save_manifest)
-      EXCLUSIVE_LOCKS_REQUIRED(mutex_);
+  Status Recover(VersionEdit* edit) EXCLUSIVE_LOCKS_REQUIRED(mutex_);
 
   void MaybeIgnoreError(Status* s) const;
 
@@ -88,11 +87,12 @@ class DBImpl : public DB {
 
   // Compact the in-memory write buffer to disk.  Switches to a new
   // log-file/memtable and writes a new descriptor iff successful.
-  // Errors are recorded in bg_error_.
-  void CompactMemTable() EXCLUSIVE_LOCKS_REQUIRED(mutex_);
+  Status CompactMemTable()
+      EXCLUSIVE_LOCKS_REQUIRED(mutex_);
 
-  Status RecoverLogFile(uint64_t log_number, bool last_log, bool* save_manifest,
-                        VersionEdit* edit, SequenceNumber* max_sequence)
+  Status RecoverLogFile(uint64_t log_number,
+                        VersionEdit* edit,
+                        SequenceNumber* max_sequence)
       EXCLUSIVE_LOCKS_REQUIRED(mutex_);
 
   Status WriteLevel0Table(MemTable* mem, VersionEdit* edit, Version* base)
@@ -102,12 +102,10 @@ class DBImpl : public DB {
       EXCLUSIVE_LOCKS_REQUIRED(mutex_);
   WriteBatch* BuildBatchGroup(Writer** last_writer);
 
-  void RecordBackgroundError(const Status& s);
-
   void MaybeScheduleCompaction() EXCLUSIVE_LOCKS_REQUIRED(mutex_);
   static void BGWork(void* db);
   void BackgroundCall();
-  void  BackgroundCompaction() EXCLUSIVE_LOCKS_REQUIRED(mutex_);
+  Status BackgroundCompaction() EXCLUSIVE_LOCKS_REQUIRED(mutex_);
   void CleanupCompaction(CompactionState* compact)
       EXCLUSIVE_LOCKS_REQUIRED(mutex_);
   Status DoCompactionWork(CompactionState* compact)
@@ -172,6 +170,7 @@ class DBImpl : public DB {
 
   // Have we encountered a background error in paranoid mode?
   Status bg_error_;
+  int consecutive_compaction_errors_;
 
   // Per level compaction stats.  stats_[level] stores the stats for
   // compactions that produced data for the specified "level".
