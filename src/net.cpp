@@ -1,5 +1,5 @@
 // Copyright (c) 2009-2010 Satoshi Nakamoto
-// Copyright (c) 2009-2012 The Marscoin developers
+// Copyright (c) 2009-2019 The Bitcoin/Marscoin developers
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -9,7 +9,6 @@
 #include "addrman.h"
 #include "ui_interface.h"
 #include "script.h"
-#define MSG_NOSIGNAL 0
 
 #ifdef WIN32
 #include <string.h>
@@ -1083,14 +1082,10 @@ void ThreadMapPort()
 #ifndef UPNPDISCOVER_SUCCESS
     /* miniupnpc 1.5 */
     devlist = upnpDiscover(2000, multicastif, minissdpdpath, 0);
-#elif MINIUPNPC_API_VERSION < 14
+#else
     /* miniupnpc 1.6 */
     int error = 0;
     devlist = upnpDiscover(2000, multicastif, minissdpdpath, 0, 0, &error);
-#else
-    /* miniupnpc 1.9.20150730 */
-    int error = 0;
-    devlist = upnpDiscover(2000, multicastif, minissdpdpath, 0, 0, 2, &error);
 #endif
 
     struct UPNPUrls urls;
@@ -1197,15 +1192,16 @@ void MapPort(bool)
 // The first name is used as information source for addrman.
 // The second name should resolve to a list of seed addresses.
 static const char *strMainNetDNSSeed[][2] = {
-    {"marscoin.ru", "dnsseed.marscoin.ru"},
-    {"marscoin.org", "dnsseed.marscoin.org"},
-    {"marsbiotech.com", "dnsseed.marsbiotech.com"},
+    {"marscoin.ru", "dnsseed.marscoin.ru"}, 
+    {"marscoin.org", "dnsseed.marscoin.org"}, 
+    {"marsbiotech.com", "dnsseed.marsbiotech.com"}, 
     {NULL, NULL}
 };
 
 static const char *strTestNetDNSSeed[][2] = {
-    {"marscoin.ru", "dnsseed.marscoin.ru"},
-    {"marscointools.com", "testnet-seed.marscointools.com"},
+    {"marscoin.ru", "testnet-dnsseed.marscoin.ru"}, 
+    {"marscoin.org", "testnet-dnsseed.marscoin.org"}, 
+    {"marsbiotech.com", "testnet-dnsseed.marsbiotech.com"}, 
     {NULL, NULL}
 };
 

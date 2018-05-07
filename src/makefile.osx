@@ -1,23 +1,23 @@
 # -*- mode: Makefile; -*-
 # Copyright (c) 2011 Bitcoin Developers
-# Copyright (c) 2013-2014 Marscoin Developers
 # Distributed under the MIT/X11 software license, see the accompanying
 # file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-# Mac OS X makefile for Marscoin
+# Mac OS X makefile for bitcoin
+# Originally by Laszlo Hanyecz (solar@heliacal.net)
 
-CXX=c++
-
-DEPSDIR=/usr/local
-
+CXX=llvm-g++
+DEPSDIR=/opt/local
 
 INCLUDEPATHS= \
  -I"$(CURDIR)" \
  -I"$(CURDIR)"/obj \
- -I"$(DEPSDIR)/include" 
+ -I"$(DEPSDIR)/include" \
+ -I"$(DEPSDIR)/include/db48"
 
 LIBPATHS= \
- -L"$(DEPSDIR)/lib" 
+ -L"$(DEPSDIR)/lib" \
+ -L"$(DEPSDIR)/lib/db48"
 
 USE_UPNP:=1
 USE_IPV6:=1
@@ -27,24 +27,24 @@ LIBS= -dead_strip
 TESTDEFS = -DTEST_DATA_DIR=$(abspath test/data)
 
 ifdef STATIC
-# Build STATIC if you are redistributing the marscoind binary
+# Build STATIC if you are redistributing the bitcoind binary
 TESTLIBS += \
  $(DEPSDIR)/lib/libboost_unit_test_framework-mt.a
 LIBS += \
- $(DEPSDIR)/lib/libdb_cxx.a \
+ $(DEPSDIR)/lib/db48/libdb_cxx-4.8.a \
  $(DEPSDIR)/lib/libboost_system-mt.a \
  $(DEPSDIR)/lib/libboost_filesystem-mt.a \
  $(DEPSDIR)/lib/libboost_program_options-mt.a \
  $(DEPSDIR)/lib/libboost_thread-mt.a \
  $(DEPSDIR)/lib/libboost_chrono-mt.a \
- -lssl \
- -lcrypto \
+ $(DEPSDIR)/lib/libssl.a \
+ $(DEPSDIR)/lib/libcrypto.a \
  -lz
 else
 TESTLIBS += \
  -lboost_unit_test_framework-mt
 LIBS += \
- -ldb_cxx \
+ -ldb_cxx-4.8 \
  -lboost_system-mt \
  -lboost_filesystem-mt \
  -lboost_program_options-mt \
@@ -62,13 +62,13 @@ ifdef RELEASE
 # Compile for maximum compatibility and smallest size.
 # This requires that dependencies are compiled
 # the same way.
-CFLAGS = -mmacosx-version-min=10.5 -O3
+CFLAGS = -mmacosx-version-min=10.5 -arch i386 -O3
 else
 DEBUGFLAGS = -g
 endif
 
 # osx 10.9 has changed the stdlib default to libc++. To prevent some link error, you may need to use libstdc++
-#CFLAGS += -stdlib=libc++
+CFLAGS += -stdlib=libstdc++
 
 # ppc doesn't work because we don't support big-endian
 CFLAGS += -Wall -Wextra -Wformat -Wformat-security -Wno-unused-parameter \
@@ -76,7 +76,6 @@ CFLAGS += -Wall -Wextra -Wformat -Wformat-security -Wno-unused-parameter \
 
 OBJS= \
     leveldb/libleveldb.a \
-    json/json_spirit_value.o \
     obj/alert.o \
     obj/version.o \
     obj/checkpoints.o \
@@ -143,7 +142,7 @@ LIBS += $(CURDIR)/leveldb/libleveldb.a $(CURDIR)/leveldb/libmemenv.a
 DEFS += $(addprefix -I,$(CURDIR)/leveldb/include)
 DEFS += $(addprefix -I,$(CURDIR)/leveldb/helpers)
 leveldb/libleveldb.a:
-	@echo "Building LevelDB ..." && cd leveldb && chmod +x build_detect_platform && $(MAKE) CC=$(CC) CXX=$(CXX) OPT="$(CFLAGS)" libleveldb.a libmemenv.a && cd ..
+	@echo "Building LevelDB ..." && cd leveldb && $(MAKE) CC=$(CC) CXX=$(CXX) OPT="$(CFLAGS)" libleveldb.a libmemenv.a && cd ..
 
 # auto-generated dependencies:
 -include obj/*.P
