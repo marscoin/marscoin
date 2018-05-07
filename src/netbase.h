@@ -1,4 +1,4 @@
-// Copyright (c) 2009-2012 The Marscoin developers
+// Copyright (c) 2009-2019 The Bitcoin/Marscoin developers
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 #ifndef MARSCOIN_NETBASE_H
@@ -50,7 +50,7 @@ class CNetAddr
         bool IsRFC3849() const; // IPv6 documentation address (2001:0DB8::/32)
         bool IsRFC3927() const; // IPv4 autoconfig (169.254.0.0/16)
         bool IsRFC3964() const; // IPv6 6to4 tunnelling (2002::/16)
-        bool IsRFC4193() const; // IPv6 unique local (FC00::/15)
+        bool IsRFC4193() const; // IPv6 unique local (FC00::/7)
         bool IsRFC4380() const; // IPv6 Teredo tunnelling (2001::/32)
         bool IsRFC4843() const; // IPv6 ORCHID (2001:10::/28)
         bool IsRFC4862() const; // IPv6 autoconfig (FE80::/64)
