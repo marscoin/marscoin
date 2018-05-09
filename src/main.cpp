@@ -2406,11 +2406,6 @@ bool CBlock::AcceptBlock(CValidationState &state, CDiskBlockPos *dbp)
             } 
         } 
 
-
-        // Check proof of work
-        if (nBits != GetNextWorkRequired(pindexPrev, this))
-            return state.DoS(100, error("AcceptBlock() : incorrect proof of work"));
-
         // Check timestamp against prev
         if (GetBlockTime() <= pindexPrev->GetMedianTimePast())
             return state.Invalid(error("AcceptBlock() : block's timestamp is too early"));
@@ -3017,7 +3012,7 @@ bool InitBlockIndex() {
         block.nVersion = 1;
         block.nTime    = 1388590627; 
         block.nBits    = 0x1e0ffff0;
-        block.nNonce   = 2084524493; 
+        block.nNonce   = 638933;
 
         if (fTestNet)
         {
