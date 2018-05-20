@@ -56,11 +56,9 @@ Value getnetworkhashps(const Array& params, bool fHelp)
     if (fHelp || params.size() > 2)
         throw runtime_error(
             "getnetworkhashps [blocks] [height]\n"
-            "Returns the estimated network hashes per second based on the last 590 blocks.\n" 
             "Pass in [blocks] to override # of blocks, -1 specifies since last difficulty change.\n"
             "Pass in [height] to estimate the network speed at the time when a certain block was found.");
 
-    return GetNetworkHashPS(params.size() > 0 ? params[0].get_int() : 590, params.size() > 1 ? params[1].get_int() : -1);
 }
 
 
@@ -121,7 +119,6 @@ Value setgenerate(const Array& params, bool fHelp)
     mapArgs["-gen"] = (fGenerate ? "1" : "0");
 
     assert(pwalletMain != NULL);
-    GenerateMarscoins(fGenerate, pwalletMain);
     return Value::null;
 }
 
@@ -171,10 +168,8 @@ Value getworkex(const Array& params, bool fHelp)
         );
 
     if (vNodes.empty())
-        throw JSONRPCError(RPC_CLIENT_NOT_CONNECTED, "Marscoin is not connected!");
 
     if (IsInitialBlockDownload())
-        throw JSONRPCError(RPC_CLIENT_IN_INITIAL_DOWNLOAD, "Marscoin is downloading blocks...");
 
     typedef map<uint256, pair<CBlock*, CScript> > mapNewBlock_t;
     static mapNewBlock_t mapNewBlock;    // FIXME: thread safety
@@ -311,10 +306,8 @@ Value getwork(const Array& params, bool fHelp)
             "If [data] is specified, tries to solve the block and returns true if it was successful.");
 
     if (vNodes.empty())
-        throw JSONRPCError(RPC_CLIENT_NOT_CONNECTED, "Marscoin is not connected!");
 
     if (IsInitialBlockDownload())
-        throw JSONRPCError(RPC_CLIENT_IN_INITIAL_DOWNLOAD, "Marscoin is downloading blocks...");
 
     typedef map<uint256, pair<CBlock*, CScript> > mapNewBlock_t;
     static mapNewBlock_t mapNewBlock;    // FIXME: thread safety
@@ -453,10 +446,8 @@ Value getblocktemplate(const Array& params, bool fHelp)
         throw JSONRPCError(RPC_INVALID_PARAMETER, "Invalid mode");
 
     if (vNodes.empty())
-        throw JSONRPCError(RPC_CLIENT_NOT_CONNECTED, "Marscoin is not connected!");
 
     if (IsInitialBlockDownload())
-        throw JSONRPCError(RPC_CLIENT_IN_INITIAL_DOWNLOAD, "Marscoin is downloading blocks...");
 
     // Update block
     static unsigned int nTransactionsUpdatedLast;
