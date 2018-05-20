@@ -1,4 +1,4 @@
-// Copyright (c) 2009-2019 Bitcoin/Marscoin Developers 
+// Copyright (c) 2009-2019 Bitcoin/Marscoin Developers
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
