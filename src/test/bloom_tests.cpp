@@ -1,11 +1,19 @@
-#include <boost/test/unit_test.hpp>
-#include <vector>
+// Copyright (c) 2012-2013 The Bitcoin Core developers
+// Distributed under the MIT/X11 software license, see the accompanying
+// file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #include "bloom.h"
-#include "util.h"
-#include "key.h"
+
 #include "base58.h"
+#include "key.h"
 #include "main.h"
+#include "serialize.h"
+#include "uint256.h"
+#include "util.h"
+
+#include <vector>
+
+#include <boost/test/unit_test.hpp>
 
 using namespace std;
 using namespace boost::tuples;
@@ -69,8 +77,8 @@ BOOST_AUTO_TEST_CASE(bloom_create_insert_serialize_with_tweak)
 
 BOOST_AUTO_TEST_CASE(bloom_create_insert_key)
 {
-    string strSecret = string("6v7hgtX6r7frdh7XDRJ3L4JRLMAn9chCgNgSccwqWdp69XfPdX6");
-    CMarscoinSecret vchSecret;
+    string strSecret = string("5Kg1gnAjaLfKiwhhPpGS3QfRg2m6awQvaj98JCZBZQ5SuS2F15C");
+    CBitcoinSecret vchSecret;
     BOOST_CHECK(vchSecret.SetString(strSecret));
 
     CKey key = vchSecret.GetKey();
@@ -85,7 +93,7 @@ BOOST_AUTO_TEST_CASE(bloom_create_insert_key)
     CDataStream stream(SER_NETWORK, PROTOCOL_VERSION);
     filter.Serialize(stream, SER_NETWORK, PROTOCOL_VERSION);
 
-    vector<unsigned char> vch = ParseHex("0322ed23080000000000000001");
+    vector<unsigned char> vch = ParseHex("038fc16b080000000000000001");
     vector<char> expected(vch.size());
 
     for (unsigned int i = 0; i < vch.size(); i++)
