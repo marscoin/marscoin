@@ -11,20 +11,6 @@ UNIX BUILD NOTES
 To Build
 ---------------------
 
-Install dependencies...
-
-sudo apt-get install build-essential libtool autotools-dev automake pkg-config libssl-dev libevent-dev bsdmainutils python3
-
-sudo apt-get install libboost-all-dev
-
-sudo apt-get install software-properties-common
-sudo add-apt-repository ppa:bitcoin/bitcoin
-sudo apt-get update
-sudo apt-get install libdb4.8-dev libdb4.8++-dev
-
-sudo apt-get install libqt4-dev libminiupnpc-dev
-
-
 	cd src/
 	make -f makefile.unix		# Headless marscoin
 

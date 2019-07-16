@@ -1,33 +1,36 @@
-Name Marscoin
+Name "Marscoin (-bit)"
 
 RequestExecutionLevel highest
 SetCompressor /SOLID lzma
 
 # General Symbol Definitions
 !define REGKEY "SOFTWARE\$(^Name)"
-!define VERSION 1.3
+!define VERSION 1.5.3.0
 !define COMPANY "Marscoin project"
 !define URL http://www.marscoin.org/
 
 # MUI Symbol Definitions
-!define MUI_ICON "../share/pixmaps/marscoin.ico"
-!define MUI_WELCOMEFINISHPAGE_BITMAP "../share/pixmaps/nsis-wizard.bmp"
+!define MUI_ICON "@abs_top_srcdir@/share/pixmaps/bitcoin.ico"
+!define MUI_WELCOMEFINISHPAGE_BITMAP "@abs_top_srcdir@/share/pixmaps/nsis-wizard.bmp"
 !define MUI_HEADERIMAGE
 !define MUI_HEADERIMAGE_RIGHT
-!define MUI_HEADERIMAGE_BITMAP "../share/pixmaps/nsis-header.bmp"
+!define MUI_HEADERIMAGE_BITMAP "@abs_top_srcdir@/share/pixmaps/nsis-header.bmp"
 !define MUI_FINISHPAGE_NOAUTOCLOSE
 !define MUI_STARTMENUPAGE_REGISTRY_ROOT HKLM
 !define MUI_STARTMENUPAGE_REGISTRY_KEY ${REGKEY}
 !define MUI_STARTMENUPAGE_REGISTRY_VALUENAME StartMenuGroup
-!define MUI_STARTMENUPAGE_DEFAULTFOLDER Marscoin
+!define MUI_STARTMENUPAGE_DEFAULTFOLDER "Marscoin"
 !define MUI_FINISHPAGE_RUN $INSTDIR\marscoin-qt.exe
 !define MUI_UNICON "${NSISDIR}\Contrib\Graphics\Icons\modern-uninstall.ico"
-!define MUI_UNWELCOMEFINISHPAGE_BITMAP "../share/pixmaps/nsis-wizard.bmp"
+!define MUI_UNWELCOMEFINISHPAGE_BITMAP "@abs_top_srcdir@/share/pixmaps//nsis-wizard.bmp"
 !define MUI_UNFINISHPAGE_NOAUTOCLOSE
 
 # Included files
 !include Sections.nsh
 !include MUI2.nsh
+!if "" == "64"
+!include x64.nsh
+!endif
 
 # Variables
 Var StartMenuGroup
@@ -45,14 +48,18 @@ Var StartMenuGroup
 !insertmacro MUI_LANGUAGE English
 
 # Installer attributes
-OutFile marscoin-1.3-win32-setup.exe
-InstallDir $PROGRAMFILES\Marscoin
+OutFile /home/novalis78/Archive/marscoin/marscoin-${VERSION}-win-setup.exe
+!if "" == "64"
+InstallDir $PROGRAMFILES64\Litecoin
+!else
+InstallDir $PROGRAMFILES\Litecoin
+!endif
 CRCCheck on
 XPStyle on
 BrandingText " "
 ShowInstDetails show
-VIProductVersion 1.3.0.0
-VIAddVersionKey ProductName Marscoin
+VIProductVersion ${VERSION}.0
+VIAddVersionKey ProductName "Marscoin"
 VIAddVersionKey ProductVersion "${VERSION}"
 VIAddVersionKey CompanyName "${COMPANY}"
 VIAddVersionKey CompanyWebsite "${URL}"
@@ -66,13 +73,14 @@ ShowUninstDetails show
 Section -Main SEC0000
     SetOutPath $INSTDIR
     SetOverwrite on
-    File ../release/marscoin-qt.exe
-    File /oname=COPYING.txt ../COPYING
-    File /oname=readme.txt ../doc/README_windows.txt
+    File @abs_top_srcdir@/release/marscoin-qt.exe
+    File /oname=COPYING.txt @abs_top_srcdir@/COPYING
+    File /oname=readme.txt @abs_top_srcdir@/doc/README_windows.txt
     SetOutPath $INSTDIR\daemon
-    File ../src/marscoind.exe
-    SetOutPath $INSTDIR\src
-    File /r /x *.exe /x *.o ../src\*.*
+    File @abs_top_srcdir@/release/marscoind.exe
+    File @abs_top_srcdir@/release/marscoin-cli.exe
+    SetOutPath $INSTDIR\doc
+    File /r @abs_top_srcdir@/doc\*.*
     SetOutPath $INSTDIR
     WriteRegStr HKCU "${REGKEY}\Components" Main 1
 
@@ -87,8 +95,8 @@ Section -post SEC0001
     WriteUninstaller $INSTDIR\uninstall.exe
     !insertmacro MUI_STARTMENU_WRITE_BEGIN Application
     CreateDirectory $SMPROGRAMS\$StartMenuGroup
-    CreateShortcut "$SMPROGRAMS\$StartMenuGroup\Marscoin.lnk" $INSTDIR\marscoin-qt.exe
-    CreateShortcut "$SMPROGRAMS\$StartMenuGroup\Uninstall Marscoin.lnk" $INSTDIR\uninstall.exe
+    CreateShortcut "$SMPROGRAMS\$StartMenuGroup\$(^Name).lnk" $INSTDIR\marscoin-qt.exe
+    CreateShortcut "$SMPROGRAMS\$StartMenuGroup\Uninstall $(^Name).lnk" $INSTDIR\uninstall.exe
     !insertmacro MUI_STARTMENU_WRITE_END
     WriteRegStr HKCU "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\$(^Name)" DisplayName "$(^Name)"
     WriteRegStr HKCU "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\$(^Name)" DisplayVersion "${VERSION}"
@@ -99,7 +107,7 @@ Section -post SEC0001
     WriteRegDWORD HKCU "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\$(^Name)" NoModify 1
     WriteRegDWORD HKCU "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\$(^Name)" NoRepair 1
     WriteRegStr HKCR "marscoin" "URL Protocol" ""
-    WriteRegStr HKCR "marscoin" "" "URL:Marscoin"
+    WriteRegStr HKCR "marscoin" "" "URL:Litecoin"
     WriteRegStr HKCR "marscoin\DefaultIcon" "" $INSTDIR\marscoin-qt.exe
     WriteRegStr HKCR "marscoin\shell\open\command" "" '"$INSTDIR\marscoin-qt.exe" "%1"'
 SectionEnd
@@ -119,19 +127,19 @@ done${UNSECTION_ID}:
 
 # Uninstaller sections
 Section /o -un.Main UNSEC0000
-    Delete /REBOOTOK $INSTDIR\marscoin-qt.exe
+    Delete /REBOOTOK $INSTDIR\litecoin-qt.exe
     Delete /REBOOTOK $INSTDIR\COPYING.txt
     Delete /REBOOTOK $INSTDIR\readme.txt
     RMDir /r /REBOOTOK $INSTDIR\daemon
-    RMDir /r /REBOOTOK $INSTDIR\src
+    RMDir /r /REBOOTOK $INSTDIR\doc
     DeleteRegValue HKCU "${REGKEY}\Components" Main
 SectionEnd
 
 Section -un.post UNSEC0001
     DeleteRegKey HKCU "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\$(^Name)"
-    Delete /REBOOTOK "$SMPROGRAMS\$StartMenuGroup\Uninstall Marscoin.lnk"
-    Delete /REBOOTOK "$SMPROGRAMS\$StartMenuGroup\Marscoin.lnk"
-    Delete /REBOOTOK "$SMSTARTUP\Marscoin.lnk"
+    Delete /REBOOTOK "$SMPROGRAMS\$StartMenuGroup\Uninstall $(^Name).lnk"
+    Delete /REBOOTOK "$SMPROGRAMS\$StartMenuGroup\$(^Name).lnk"
+    Delete /REBOOTOK "$SMSTARTUP\Litecoin.lnk"
     Delete /REBOOTOK $INSTDIR\uninstall.exe
     Delete /REBOOTOK $INSTDIR\debug.log
     Delete /REBOOTOK $INSTDIR\db.log
@@ -139,7 +147,7 @@ Section -un.post UNSEC0001
     DeleteRegValue HKCU "${REGKEY}" Path
     DeleteRegKey /IfEmpty HKCU "${REGKEY}\Components"
     DeleteRegKey /IfEmpty HKCU "${REGKEY}"
-    DeleteRegKey HKCR "marscoin"
+    DeleteRegKey HKCR "litecoin"
     RmDir /REBOOTOK $SMPROGRAMS\$StartMenuGroup
     RmDir /REBOOTOK $INSTDIR
     Push $R0
@@ -152,6 +160,15 @@ SectionEnd
 # Installer functions
 Function .onInit
     InitPluginsDir
+!if "" == "64"
+    ${If} ${RunningX64}
+      ; disable registry redirection (enable access to 64-bit portion of registry)
+      SetRegView 64
+    ${Else}
+      MessageBox MB_OK|MB_ICONSTOP "Cannot install 64-bit version on a 32-bit system."
+      Abort
+    ${EndIf}
+!endif
 FunctionEnd
 
 # Uninstaller functions

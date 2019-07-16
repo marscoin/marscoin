@@ -6,6 +6,7 @@
 #include "rpcclient.h"
 
 #include "base58.h"
+#include "netbase.h"
 
 #include <boost/algorithm/string.hpp>
 #include <boost/test/unit_test.hpp>
@@ -99,8 +100,8 @@ BOOST_AUTO_TEST_CASE(rpc_rawsign)
     r = CallRPC(string("createrawtransaction ")+prevout+" "+
       "{\"3HqAe9LtNBjnsfM4CyYaWTnvCaUYT7v4oZ\":11}");
     string notsigned = r.get_str();
-    string privkey1 = "\"KzsXybp9jX64P5ekX1KUxRQ79Jht9uzW7LorgwE65i5rWACL6LQe\"";
-    string privkey2 = "\"Kyhdf5LuKTRx4ge69ybABsiUAWjVRK4XGxAKk2FQLp2HjGMy87Z4\"";
+    string privkey1 = "\"T6hoRM7L8u4f9vHd4eGMAmwV6AMCE11PvYi7YjrdegG223kw64r1\"";
+    string privkey2 = "\"T5Xu6pe5iqQYqXGxhcY2QEFr7NNoVQ5R6A4abpswunCTF9w85g8V\"";
     r = CallRPC(string("signrawtransaction ")+notsigned+" "+prevout+" "+"[]");
     BOOST_CHECK(find_value(r.get_obj(), "complete").get_bool() == false);
     r = CallRPC(string("signrawtransaction ")+notsigned+" "+prevout+" "+"["+privkey1+","+privkey2+"]");
@@ -109,14 +110,14 @@ BOOST_AUTO_TEST_CASE(rpc_rawsign)
 
 BOOST_AUTO_TEST_CASE(rpc_format_monetary_values)
 {
-    BOOST_CHECK(write_string(ValueFromAmount(0LL), false) == "0.00000000");
-    BOOST_CHECK(write_string(ValueFromAmount(1LL), false) == "0.00000001");
-    BOOST_CHECK(write_string(ValueFromAmount(17622195LL), false) == "0.17622195");
-    BOOST_CHECK(write_string(ValueFromAmount(50000000LL), false) == "0.50000000");
-    BOOST_CHECK(write_string(ValueFromAmount(89898989LL), false) == "0.89898989");
-    BOOST_CHECK(write_string(ValueFromAmount(100000000LL), false) == "1.00000000");
-    BOOST_CHECK(write_string(ValueFromAmount(2099999999999990LL), false) == "20999999.99999990");
-    BOOST_CHECK(write_string(ValueFromAmount(2099999999999999LL), false) == "20999999.99999999");
+    BOOST_CHECK_EQUAL(write_string(ValueFromAmount(0LL), false), "0.00000000");
+    BOOST_CHECK_EQUAL(write_string(ValueFromAmount(1LL), false), "0.00000001");
+    BOOST_CHECK_EQUAL(write_string(ValueFromAmount(17622195LL), false), "0.17622195");
+    BOOST_CHECK_EQUAL(write_string(ValueFromAmount(50000000LL), false), "0.50000000");
+    BOOST_CHECK_EQUAL(write_string(ValueFromAmount(89898989LL), false), "0.89898989");
+    BOOST_CHECK_EQUAL(write_string(ValueFromAmount(100000000LL), false), "1.00000000");
+    BOOST_CHECK_EQUAL(write_string(ValueFromAmount(2099999999999990LL), false), "20999999.99999990");
+    BOOST_CHECK_EQUAL(write_string(ValueFromAmount(2099999999999999LL), false), "20999999.99999999");
 }
 
 static Value ValueFromString(const std::string &str)
@@ -128,14 +129,47 @@ static Value ValueFromString(const std::string &str)
 
 BOOST_AUTO_TEST_CASE(rpc_parse_monetary_values)
 {
-    BOOST_CHECK(AmountFromValue(ValueFromString("0.00000001")) == 1LL);
-    BOOST_CHECK(AmountFromValue(ValueFromString("0.17622195")) == 17622195LL);
-    BOOST_CHECK(AmountFromValue(ValueFromString("0.5")) == 50000000LL);
-    BOOST_CHECK(AmountFromValue(ValueFromString("0.50000000")) == 50000000LL);
-    BOOST_CHECK(AmountFromValue(ValueFromString("0.89898989")) == 89898989LL);
-    BOOST_CHECK(AmountFromValue(ValueFromString("1.00000000")) == 100000000LL);
-    BOOST_CHECK(AmountFromValue(ValueFromString("20999999.9999999")) == 2099999999999990LL);
-    BOOST_CHECK(AmountFromValue(ValueFromString("20999999.99999999")) == 2099999999999999LL);
+    BOOST_CHECK_EQUAL(AmountFromValue(ValueFromString("0.00000001")), 1LL);
+    BOOST_CHECK_EQUAL(AmountFromValue(ValueFromString("0.17622195")), 17622195LL);
+    BOOST_CHECK_EQUAL(AmountFromValue(ValueFromString("0.5")), 50000000LL);
+    BOOST_CHECK_EQUAL(AmountFromValue(ValueFromString("0.50000000")), 50000000LL);
+    BOOST_CHECK_EQUAL(AmountFromValue(ValueFromString("0.89898989")), 89898989LL);
+    BOOST_CHECK_EQUAL(AmountFromValue(ValueFromString("1.00000000")), 100000000LL);
+    BOOST_CHECK_EQUAL(AmountFromValue(ValueFromString("20999999.9999999")), 2099999999999990LL);
+    BOOST_CHECK_EQUAL(AmountFromValue(ValueFromString("20999999.99999999")), 2099999999999999LL);
+}
+
+BOOST_AUTO_TEST_CASE(json_parse_errors)
+{
+    Value value;
+    // Valid
+    BOOST_CHECK_EQUAL(read_string(std::string("1.0"), value), true);
+    // Valid, with trailing whitespace
+    BOOST_CHECK_EQUAL(read_string(std::string("1.0 "), value), true);
+    // Invalid, initial garbage
+    BOOST_CHECK_EQUAL(read_string(std::string("[1.0"), value), false);
+    BOOST_CHECK_EQUAL(read_string(std::string("a1.0"), value), false);
+    // Invalid, trailing garbage
+    BOOST_CHECK_EQUAL(read_string(std::string("1.0sds"), value), false);
+    BOOST_CHECK_EQUAL(read_string(std::string("1.0]"), value), false);
+    // BTC addresses should fail parsing
+    BOOST_CHECK_EQUAL(read_string(std::string("175tWpb8K1S7NmH4Zx6rewF9WQrcZv245W"), value), false);
+    BOOST_CHECK_EQUAL(read_string(std::string("3J98t1WpEZ73CNmQviecrnyiWrnqRhWNL"), value), false);
+}
+
+BOOST_AUTO_TEST_CASE(rpc_boostasiotocnetaddr)
+{
+    // Check IPv4 addresses
+    BOOST_CHECK_EQUAL(BoostAsioToCNetAddr(boost::asio::ip::address::from_string("1.2.3.4")).ToString(), "1.2.3.4");
+    BOOST_CHECK_EQUAL(BoostAsioToCNetAddr(boost::asio::ip::address::from_string("127.0.0.1")).ToString(), "127.0.0.1");
+    // Check IPv6 addresses
+    BOOST_CHECK_EQUAL(BoostAsioToCNetAddr(boost::asio::ip::address::from_string("::1")).ToString(), "::1");
+    BOOST_CHECK_EQUAL(BoostAsioToCNetAddr(boost::asio::ip::address::from_string("123:4567:89ab:cdef:123:4567:89ab:cdef")).ToString(),
+                                         "123:4567:89ab:cdef:123:4567:89ab:cdef");
+    // v4 compatible must be interpreted as IPv4
+    BOOST_CHECK_EQUAL(BoostAsioToCNetAddr(boost::asio::ip::address::from_string("::0:127.0.0.1")).ToString(), "127.0.0.1");
+    // v4 mapped must be interpreted as IPv4
+    BOOST_CHECK_EQUAL(BoostAsioToCNetAddr(boost::asio::ip::address::from_string("::ffff:127.0.0.1")).ToString(), "127.0.0.1");
 }
 
 BOOST_AUTO_TEST_SUITE_END()
