@@ -152,7 +152,7 @@ Value getrawtransaction(const Array& params, bool fHelp)
             "         \"reqSigs\" : n,            (numeric) The required sigs\n"
             "         \"type\" : \"pubkeyhash\",  (string) The type, eg 'pubkeyhash'\n"
             "         \"addresses\" : [           (json array of string)\n"
-            "           \"litecoinaddress\"        (string) litecoin address\n"
+            "           \"marscoinaddress\"        (string) litecoin address\n"
             "           ,...\n"
             "         ]\n"
             "       }\n"
