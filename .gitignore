@@ -121,4 +121,3 @@ qa/pull-tester/test.*/*
 /doc/doxygen/
 
 /nbproject/
-/src/qt/locale
