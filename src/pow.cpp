@@ -187,12 +187,8 @@ unsigned int DarkGravityWave2(const CBlockIndex* pindexLast, const CBlockHeader 
     CBigNum PastDifficultyAverage;
     CBigNum PastDifficultyAveragePrev;
     LogPrintf("GravityWave2===================================\n");
-    int64_t nTargetTimespan = 88775; //Marscoin: 1 Mars-day has 88775 seconds
     int64_t nTargetSpacing = 123; //Marscoin: 2 Mars-minutes. 1 Mars-second is 61.649486615 seconds
 
-    if(BlockReading->nHeight == 120009){
-        printf("Stop and Look\n");
-    }
     if (BlockLastSolved == NULL || BlockLastSolved->nHeight == 0 || BlockLastSolved->nHeight < PastBlocksMin) { return Params().ProofOfWorkLimit().GetCompact(); }
 
     for (unsigned int i = 1; BlockReading && BlockReading->nHeight > 0; i++) {
@@ -210,7 +206,6 @@ unsigned int DarkGravityWave2(const CBlockIndex* pindexLast, const CBlockHeader 
                 PastDifficultyAverage = ( ( CBigNum().SetCompact(BlockReading->nBits) - PastDifficultyAveragePrev) / CountBlocks) + PastDifficultyAveragePrev; 
             }
             PastDifficultyAveragePrev = PastDifficultyAverage;
-            printf("PastDiffAvgPrev: %d \n", PastDifficultyAveragePrev.GetCompact());
         }
 
         if(LastBlockTime > 0){
@@ -221,7 +216,6 @@ unsigned int DarkGravityWave2(const CBlockIndex* pindexLast, const CBlockHeader 
                 if (nBlockTimeCount == 1) { nBlockTimeAverage = Diff; }
                 else { nBlockTimeAverage = ((Diff - nBlockTimeAveragePrev) / nBlockTimeCount) + nBlockTimeAveragePrev; }
                 nBlockTimeAveragePrev = nBlockTimeAverage;
-                printf("BlockTimeAvgPrev: %d \n", nBlockTimeAveragePrev);
             }
             nBlockTimeCount2++;
             nBlockTimeSum2 += Diff;
@@ -236,15 +230,11 @@ unsigned int DarkGravityWave2(const CBlockIndex* pindexLast, const CBlockHeader 
     if (nBlockTimeCount != 0 && nBlockTimeCount2 != 0) {
             double SmartAverage = ((((long double)nBlockTimeAverage)*0.7)+(((long double)nBlockTimeSum2 / (long double)nBlockTimeCount2)*0.3));
             if(SmartAverage < 1) SmartAverage = 1;
-            LogPrintf("SmartAverage: %d \n", SmartAverage);
             
             double Shift = nTargetSpacing/SmartAverage;
-            LogPrintf("Shift: %d \n", Shift);
             
             double fActualTimespan = ((long double)CountBlocks*(double)nTargetSpacing)/Shift;
             double fTargetTimespan = ((long double)CountBlocks*(double)nTargetSpacing);
-            LogPrintf("fActualTimespan: %d \n", fActualTimespan);
-            LogPrintf("fTargetTimespan: %d \n", fTargetTimespan);
             
             if (fActualTimespan < fTargetTimespan/3)
                 fActualTimespan = fTargetTimespan/3;
@@ -256,16 +246,13 @@ unsigned int DarkGravityWave2(const CBlockIndex* pindexLast, const CBlockHeader 
 
             // Retarget
             bnNew *= nActualTimespan;
-            LogPrintf("bnNew a: %d \n", bnNew.GetCompact());
             bnNew /= nTargetTimespan;
-            LogPrintf("bnNew t: %d \n", bnNew.GetCompact());
     }
 
     if (bnNew.GetCompact() > Params().ProofOfWorkLimit().GetCompact()){
         bnNew.SetCompact(Params().ProofOfWorkLimit().GetCompact());
     }
 
-    LogPrintf("Bit: %d \n", bnNew.GetCompact());
     return bnNew.GetCompact();
 }
 
