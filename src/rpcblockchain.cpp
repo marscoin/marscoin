@@ -363,7 +363,7 @@ Value gettxout(const Array& params, bool fHelp)
             "     \"reqSigs\" : n,          (numeric) Number of required signatures\n"
             "     \"type\" : \"pubkeyhash\", (string) The type, eg pubkeyhash\n"
             "     \"addresses\" : [          (array of string) array of litecoin addresses\n"
-            "        \"litecoinaddress\"     (string) litecoin address\n"
+            "        \"marscoinaddress\"     (string) litecoin address\n"
             "        ,...\n"
             "     ]\n"
             "  },\n"

@@ -52,7 +52,7 @@ Value getinfo(const Array& params, bool fHelp)
             "  \"version\": xxxxx,           (numeric) the server version\n"
             "  \"protocolversion\": xxxxx,   (numeric) the protocol version\n"
             "  \"walletversion\": xxxxx,     (numeric) the wallet version\n"
-            "  \"balance\": xxxxxxx,         (numeric) the total litecoin balance of the wallet\n"
+            "  \"balance\": xxxxxxx,         (numeric) the total marscoin balance of the wallet\n"
             "  \"blocks\": xxxxxx,           (numeric) the current number of blocks processed in the server\n"
             "  \"timeoffset\": xxxxx,        (numeric) the time offset\n"
             "  \"connections\": xxxxx,       (numeric) the number of connections\n"
@@ -154,14 +154,14 @@ Value validateaddress(const Array& params, bool fHelp)
 {
     if (fHelp || params.size() != 1)
         throw runtime_error(
-            "validateaddress \"litecoinaddress\"\n"
-            "\nReturn information about the given litecoin address.\n"
+            "validateaddress \"marscoinaddress\"\n"
+            "\nReturn information about the given marscoin address.\n"
             "\nArguments:\n"
-            "1. \"litecoinaddress\"     (string, required) The litecoin address to validate\n"
+            "1. \"marscoinaddress\"     (string, required) The marscoin address to validate\n"
             "\nResult:\n"
             "{\n"
             "  \"isvalid\" : true|false,         (boolean) If the address is valid or not. If not, this is the only property returned.\n"
-            "  \"address\" : \"litecoinaddress\", (string) The litecoin address validated\n"
+            "  \"address\" : \"marscoinaddress\", (string) The marscoin address validated\n"
             "  \"ismine\" : true|false,          (boolean) If the address is yours or not\n"
             "  \"isscript\" : true|false,        (boolean) If the key is a script\n"
             "  \"pubkey\" : \"publickeyhex\",    (string) The hex value of the raw public key\n"
@@ -169,8 +169,8 @@ Value validateaddress(const Array& params, bool fHelp)
             "  \"account\" : \"account\"         (string) The account associated with the address, \"\" is the default account\n"
             "}\n"
             "\nExamples:\n"
-            + HelpExampleCli("validateaddress", "\"Ler4HNAEfwYhBmGXcFP2Po1NpRUEiK8km2\"")
-            + HelpExampleRpc("validateaddress", "\"Ler4HNAEfwYhBmGXcFP2Po1NpRUEiK8km2\"")
+            + HelpExampleCli("validateaddress", "\"MARSocNh46xszubKP94ikV3awGLxQfiscx\"")
+            + HelpExampleRpc("validateaddress", "\"MARSocNh46xszubKP94ikV3awGLxQfiscx\"")
         );
 
     CBitcoinAddress address(params[0].get_str());
@@ -272,9 +272,9 @@ Value createmultisig(const Array& params, bool fHelp)
 
             "\nArguments:\n"
             "1. nrequired      (numeric, required) The number of required signatures out of the n keys or addresses.\n"
-            "2. \"keys\"       (string, required) A json array of keys which are litecoin addresses or hex-encoded public keys\n"
+            "2. \"keys\"       (string, required) A json array of keys which are marscoin addresses or hex-encoded public keys\n"
             "     [\n"
-            "       \"key\"    (string) litecoin address or hex-encoded public key\n"
+            "       \"key\"    (string) marscoin address or hex-encoded public key\n"
             "       ,...\n"
             "     ]\n"
 
@@ -309,10 +309,10 @@ Value verifymessage(const Array& params, bool fHelp)
 {
     if (fHelp || params.size() != 3)
         throw runtime_error(
-            "verifymessage \"litecoinaddress\" \"signature\" \"message\"\n"
+            "verifymessage \"marscoinaddress\" \"signature\" \"message\"\n"
             "\nVerify a signed message\n"
             "\nArguments:\n"
-            "1. \"litecoinaddress\"  (string, required) The litecoin address to use for the signature.\n"
+            "1. \"marscoinaddress\"  (string, required) The marscoin address to use for the signature.\n"
             "2. \"signature\"       (string, required) The signature provided by the signer in base 64 encoding (see signmessage).\n"
             "3. \"message\"         (string, required) The message that was signed.\n"
             "\nResult:\n"

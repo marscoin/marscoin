@@ -86,7 +86,7 @@ Value getnewaddress(const Array& params, bool fHelp)
             "\nArguments:\n"
             "1. \"account\"        (string, optional) The account name for the address to be linked to. if not provided, the default account \"\" is used. It can also be set to the empty string \"\" to represent the default account. The account does not need to exist, it will be created if there is no account by the given name.\n"
             "\nResult:\n"
-            "\"litecoinaddress\"    (string) The new litecoin address\n"
+            "\"marscoinaddress\"    (string) The new litecoin address\n"
             "\nExamples:\n"
             + HelpExampleCli("getnewaddress", "")
             + HelpExampleCli("getnewaddress", "\"\"")
@@ -160,7 +160,7 @@ Value getaccountaddress(const Array& params, bool fHelp)
             "\nArguments:\n"
             "1. \"account\"       (string, required) The account name for the address. It can also be set to the empty string \"\" to represent the default account. The account does not need to exist, it will be created and a new address created  if there is no account by the given name.\n"
             "\nResult:\n"
-            "\"litecoinaddress\"   (string) The Marscoin account address\n"
+            "\"marscoinaddress\"   (string) The Marscoin account address\n"
             "\nExamples:\n"
             + HelpExampleCli("getaccountaddress", "")
             + HelpExampleCli("getaccountaddress", "\"\"")
@@ -213,10 +213,10 @@ Value setaccount(const Array& params, bool fHelp)
 {
     if (fHelp || params.size() < 1 || params.size() > 2)
         throw runtime_error(
-            "setaccount \"litecoinaddress\" \"account\"\n"
+            "setaccount \"marscoinaddress\" \"account\"\n"
             "\nSets the account associated with the given address.\n"
             "\nArguments:\n"
-            "1. \"litecoinaddress\"  (string, required) The litecoin address to be associated with an account.\n"
+            "1. \"marscoinaddress\"  (string, required) The litecoin address to be associated with an account.\n"
             "2. \"account\"         (string, required) The account to assign the address to.\n"
             "\nExamples:\n"
             + HelpExampleCli("setaccount", "\"Ler4HNAEfwYhBmGXcFP2Po1NpRUEiK8km2\" \"tabby\"")
@@ -255,10 +255,10 @@ Value getaccount(const Array& params, bool fHelp)
 {
     if (fHelp || params.size() != 1)
         throw runtime_error(
-            "getaccount \"litecoinaddress\"\n"
+            "getaccount \"marscoinaddress\"\n"
             "\nReturns the account associated with the given address.\n"
             "\nArguments:\n"
-            "1. \"litecoinaddress\"  (string, required) The litecoin address for account lookup.\n"
+            "1. \"marscoinaddress\"  (string, required) The litecoin address for account lookup.\n"
             "\nResult:\n"
             "\"accountname\"        (string) the account address\n"
             "\nExamples:\n"
@@ -288,7 +288,7 @@ Value getaddressesbyaccount(const Array& params, bool fHelp)
             "1. \"account\"  (string, required) The account name.\n"
             "\nResult:\n"
             "[                     (json array of string)\n"
-            "  \"litecoinaddress\"  (string) a litecoin address associated with the given account\n"
+            "  \"marscoinaddress\"  (string) a litecoin address associated with the given account\n"
             "  ,...\n"
             "]\n"
             "\nExamples:\n"
@@ -348,11 +348,11 @@ Value sendtoaddress(const Array& params, bool fHelp)
 {
     if (fHelp || params.size() < 2 || params.size() > 4)
         throw runtime_error(
-            "sendtoaddress \"litecoinaddress\" amount ( \"comment\" \"comment-to\" )\n"
+            "sendtoaddress \"marscoinaddress\" amount ( \"comment\" \"comment-to\" )\n"
             "\nSend an amount to a given address. The amount is a real and is rounded to the nearest 0.00000001\n"
             + HelpRequiringPassphrase() +
             "\nArguments:\n"
-            "1. \"litecoinaddress\"  (string, required) The litecoin address to send to.\n"
+            "1. \"marscoinaddress\"  (string, required) The litecoin address to send to.\n"
             "2. \"amount\"      (numeric, required) The amount in ltc to send. eg 0.1\n"
             "3. \"comment\"     (string, optional) A comment used to store what the transaction is for. \n"
             "                             This is not part of the transaction, just kept in your wallet.\n"
@@ -400,7 +400,7 @@ Value listaddressgroupings(const Array& params, bool fHelp)
             "[\n"
             "  [\n"
             "    [\n"
-            "      \"litecoinaddress\",     (string) The litecoin address\n"
+            "      \"marscoinaddress\",     (string) The litecoin address\n"
             "      amount,                 (numeric) The amount in ltc\n"
             "      \"account\"             (string, optional) The account\n"
             "    ]\n"
@@ -439,11 +439,11 @@ Value signmessage(const Array& params, bool fHelp)
 {
     if (fHelp || params.size() != 2)
         throw runtime_error(
-            "signmessage \"litecoinaddress\" \"message\"\n"
+            "signmessage \"marscoinaddress\" \"message\"\n"
             "\nSign a message with the private key of an address"
             + HelpRequiringPassphrase() + "\n"
             "\nArguments:\n"
-            "1. \"litecoinaddress\"  (string, required) The litecoin address to use for the private key.\n"
+            "1. \"marscoinaddress\"  (string, required) The litecoin address to use for the private key.\n"
             "2. \"message\"         (string, required) The message to create a signature of.\n"
             "\nResult:\n"
             "\"signature\"          (string) The signature of the message encoded in base 64\n"
@@ -490,10 +490,10 @@ Value getreceivedbyaddress(const Array& params, bool fHelp)
 {
     if (fHelp || params.size() < 1 || params.size() > 2)
         throw runtime_error(
-            "getreceivedbyaddress \"litecoinaddress\" ( minconf )\n"
-            "\nReturns the total amount received by the given litecoinaddress in transactions with at least minconf confirmations.\n"
+            "getreceivedbyaddress \"marscoinaddress\" ( minconf )\n"
+            "\nReturns the total amount received by the given marscoinaddress in transactions with at least minconf confirmations.\n"
             "\nArguments:\n"
-            "1. \"litecoinaddress\"  (string, required) The litecoin address for transactions.\n"
+            "1. \"marscoinaddress\"  (string, required) The litecoin address for transactions.\n"
             "2. minconf             (numeric, optional, default=1) Only include transactions confirmed at least this many times.\n"
             "\nResult:\n"
             "amount   (numeric) The total amount in ltc received at this address.\n"
@@ -776,13 +776,13 @@ Value sendfrom(const Array& params, bool fHelp)
 {
     if (fHelp || params.size() < 3 || params.size() > 6)
         throw runtime_error(
-            "sendfrom \"fromaccount\" \"tolitecoinaddress\" amount ( minconf \"comment\" \"comment-to\" )\n"
+            "sendfrom \"fromaccount\" \"tomarscoinaddress\" amount ( minconf \"comment\" \"comment-to\" )\n"
             "\nSent an amount from an account to a litecoin address.\n"
             "The amount is a real and is rounded to the nearest 0.00000001."
             + HelpRequiringPassphrase() + "\n"
             "\nArguments:\n"
             "1. \"fromaccount\"       (string, required) The name of the account to send funds from. May be the default account using \"\".\n"
-            "2. \"tolitecoinaddress\"  (string, required) The litecoin address to send funds to.\n"
+            "2. \"tomarscoinaddress\"  (string, required) The litecoin address to send funds to.\n"
             "3. amount                (numeric, required) The amount in ltc. (transaction fee is added on top).\n"
             "4. minconf               (numeric, optional, default=1) Only use funds with at least this many confirmations.\n"
             "5. \"comment\"           (string, optional) A comment used to store what the transaction is for. \n"
@@ -932,7 +932,7 @@ Value addmultisigaddress(const Array& params, bool fHelp)
             "3. \"account\"      (string, optional) An account to assign the addresses to.\n"
 
             "\nResult:\n"
-            "\"litecoinaddress\"  (string) A litecoin address associated with the keys.\n"
+            "\"marscoinaddress\"  (string) A litecoin address associated with the keys.\n"
 
             "\nExamples:\n"
             "\nAdd a multisig address from 2 addresses\n"
@@ -1263,7 +1263,7 @@ Value listtransactions(const Array& params, bool fHelp)
             "  {\n"
             "    \"account\":\"accountname\",       (string) The account name associated with the transaction. \n"
             "                                                It will be \"\" for the default account.\n"
-            "    \"address\":\"litecoinaddress\",    (string) The litecoin address of the transaction. Not present for \n"
+            "    \"address\":\"marscoinaddress\",    (string) The litecoin address of the transaction. Not present for \n"
             "                                                move transactions (category = move).\n"
             "    \"category\":\"send|receive|move\", (string) The transaction category. 'move' is a local (off blockchain)\n"
             "                                                transaction between accounts, and not associated with an address,\n"
@@ -1447,7 +1447,7 @@ Value listsinceblock(const Array& params, bool fHelp)
             "{\n"
             "  \"transactions\": [\n"
             "    \"account\":\"accountname\",       (string) The account name associated with the transaction. Will be \"\" for the default account.\n"
-            "    \"address\":\"litecoinaddress\",    (string) The litecoin address of the transaction. Not present for move transactions (category = move).\n"
+            "    \"address\":\"marscoinaddress\",    (string) The litecoin address of the transaction. Not present for move transactions (category = move).\n"
             "    \"category\":\"send|receive\",     (string) The transaction category. 'send' has negative amounts, 'receive' has positive amounts.\n"
             "    \"amount\": x.xxx,          (numeric) The amount in ltc. This is negative for the 'send' category, and for the 'move' category for moves \n"
             "                                          outbound. It is positive for the 'receive' category, and for the 'move' category for inbound funds.\n"
@@ -1541,7 +1541,7 @@ Value gettransaction(const Array& params, bool fHelp)
             "  \"details\" : [\n"
             "    {\n"
             "      \"account\" : \"accountname\",  (string) The account name involved in the transaction, can be \"\" for the default account.\n"
-            "      \"address\" : \"litecoinaddress\",   (string) The litecoin address involved in the transaction\n"
+            "      \"address\" : \"marscoinaddress\",   (string) The litecoin address involved in the transaction\n"
             "      \"category\" : \"send|receive\",    (string) The category, either 'send' or 'receive'\n"
             "      \"amount\" : x.xxx                  (numeric) The amount in ltc\n"
             "      \"vout\" : n,                       (numeric) the vout value\n"
@@ -1801,7 +1801,7 @@ Value encryptwallet(const Array& params, bool fHelp)
             "\nNow set the passphrase to use the wallet, such as for signing or sending litecoin\n"
             + HelpExampleCli("walletpassphrase", "\"my pass phrase\"") +
             "\nNow we can so something like sign\n"
-            + HelpExampleCli("signmessage", "\"litecoinaddress\" \"test message\"") +
+            + HelpExampleCli("signmessage", "\"marscoinaddress\" \"test message\"") +
             "\nNow lock the wallet again by removing the passphrase\n"
             + HelpExampleCli("walletlock", "") +
             "\nAs a json rpc call\n"
