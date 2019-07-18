@@ -29,7 +29,7 @@
   <string>????</string>
 
   <key>CFBundleExecutable</key>
-  <string>Litecoin-Qt</string>
+  <string>Marscoin-Qt</string>
 
   <key>CFBundleIdentifier</key>
   <string>org.marscoin.Marscoin-Qt</string>
@@ -40,7 +40,7 @@
       <key>CFBundleTypeRole</key>
       <string>Editor</string>
       <key>CFBundleURLName</key>
-      <string>org.marscoin.LitecoinPayment</string>
+      <string>org.marscoin.MarscoinPayment</string>
       <key>CFBundleURLSchemes</key>
       <array>
         <string>marscoin</string>
@@ -54,7 +54,7 @@
       <key>UTTypeIdentifier</key>
       <string>org.marscoin.paymentrequest</string>
       <key>UTTypeDescription</key>
-      <string>Litecoin payment request</string>
+      <string>Marscoin payment request</string>
       <key>UTTypeConformsTo</key>
       <array>
         <string>public.data</string>

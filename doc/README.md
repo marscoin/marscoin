@@ -11,7 +11,7 @@ The following are some helpful notes on how to run Marscoin on your native platf
 
 ### Unix
 
-You need the Qt4 run-time libraries to run Bitcoin-Qt. On Debian or Ubuntu:
+You need the Qt4 run-time libraries to run Marscoin-Qt. On Debian or Ubuntu:
 
 	sudo apt-get install libqtgui4
 
@@ -28,7 +28,7 @@ Unpack the files into a directory, and then run marscoin-qt.exe.
 
 ### OS X
 
-Drag Bitcoin-Qt to your applications folder, and then run Bitcoin-Qt.
+Drag Marscoin-Qt to your applications folder, and then run Marscoin-Qt.
 
 ### Need Help?
 
