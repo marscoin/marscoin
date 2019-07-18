@@ -35,19 +35,19 @@ Description: peer-to-peer network based digital currency - daemon
  near-zero cost payments to anyone in the world. Litecoin is an open 
  source, global payment network that is fully decentralized without 
  any central authorities. Mathematics secures the network and empowers
- individuals to control their own finances. Litecoin features faster 
+ individuals to control their own finances. Marscoin features faster 
  transaction confirmation times and improved storage efficiency than 
  the leading math-based currency. With substantial industry support, 
- trade volume and liquidity, Litecoin is a proven medium of commerce 
- complementary to Bitcoin.
+ trade volume and liquidity, Marscoin is a proven medium of commerce 
+ complementary to Bitcoin and Litecoin.
  .
  Full transaction history is stored locally at each client.  This
  requires 5+ GB of space, slowly growing.
  .
- This package provides the daemon, litecoind, and the CLI tool
- litecoin-cli to interact with the daemon.
+ This package provides the daemon, marscoind, and the CLI tool
+ marscoin-cli to interact with the daemon.
 
-Package: litecoin-qt
+Package: marscoin-qt
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
 Description: peer-to-peer network based digital currency - Qt GUI

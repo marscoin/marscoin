@@ -295,7 +295,7 @@
         <translation>開啓 URI...</translation>
     </message>
     <message>
-        <source>Litecoin Core client</source>
+        <source>Marscoin Client client</source>
         <translation>莱特幣核心客戶端軟體</translation>
     </message>
     <message>
@@ -351,7 +351,7 @@
         <translation>已接收</translation>
     </message>
     <message>
-        <source>Show information about Litecoin Core</source>
+        <source>Show information about Marscoin Client</source>
         <translation>顯示莱特幣核心的相關資訊</translation>
     </message>
     <message>
@@ -391,7 +391,7 @@
         <translation>分頁工具列</translation>
     </message>
     <message>
-        <source>Litecoin Core</source>
+        <source>Marscoin Client</source>
         <translation>莱特幣核心</translation>
     </message>
     <message>
@@ -399,7 +399,7 @@
         <translation>要求付款(產生 QR Code 和莱特幣付款協議的 URI)</translation>
     </message>
     <message>
-        <source>&amp;About Litecoin Core</source>
+        <source>&amp;About Marscoin Client</source>
         <translation>關於莱特幣核心</translation>
     </message>
     <message>
@@ -419,7 +419,7 @@
         <translation>命令列選項</translation>
     </message>
     <message>
-        <source>Show the Litecoin Core help message to get a list with possible Litecoin command-line options</source>
+        <source>Show the Marscoin Client help message to get a list with possible Litecoin command-line options</source>
         <translation>顯示莱特幣核心的說明訊息，來取得可用命令列選項的列表</translation>
     </message>
     <message numerus="yes">
@@ -826,7 +826,7 @@ Address: %4
 <context>
     <name>HelpMessageDialog</name>
     <message>
-        <source>Litecoin Core</source>
+        <source>Marscoin Client</source>
         <translation>莱特幣核心</translation>
     </message>
     <message>
@@ -838,7 +838,7 @@ Address: %4
         <translation>(%1 位元)</translation>
     </message>
     <message>
-        <source>About Litecoin Core</source>
+        <source>About Marscoin Client</source>
         <translation>關於莱特幣核心</translation>
     </message>
     <message>
@@ -885,15 +885,15 @@ Address: %4
         <translation>歡迎</translation>
     </message>
     <message>
-        <source>Welcome to Litecoin Core.</source>
+        <source>Welcome to Marscoin Client.</source>
         <translation>歡迎使用莱特幣核心</translation>
     </message>
     <message>
-        <source>As this is the first time the program is launched, you can choose where Litecoin Core will store its data.</source>
+        <source>As this is the first time the program is launched, you can choose where Marscoin Client will store its data.</source>
         <translation>因為這是程式第一次啓動，你可以選擇莱特幣核心儲存資料的地方。</translation>
     </message>
     <message>
-        <source>Litecoin Core will download and store a copy of the Litecoin block chain. At least %1GB of data will be stored in this directory, and it will grow over time. The wallet will also be stored in this directory.</source>
+        <source>Marscoin Client will download and store a copy of the Litecoin block chain. At least %1GB of data will be stored in this directory, and it will grow over time. The wallet will also be stored in this directory.</source>
         <translation>莱特幣核心會下載並儲存一份莱特幣區塊鏈的拷貝。至少有 %1GB 的資料會儲存到這個目錄中，並且還會持續增長。另外錢包資料也會儲存在這個目錄。</translation>
     </message>
     <message>
@@ -905,7 +905,7 @@ Address: %4
         <translation>使用自定的資料目錄:</translation>
     </message>
     <message>
-        <source>Litecoin Core</source>
+        <source>Marscoin Client</source>
         <translation>莱特幣核心</translation>
     </message>
     <message>
@@ -2143,7 +2143,7 @@ Address: %4
 <context>
     <name>ShutdownWindow</name>
     <message>
-        <source>Litecoin Core is shutting down...</source>
+        <source>Marscoin Client is shutting down...</source>
         <translation>莱特幣核心正在關閉中...</translation>
     </message>
     <message>
@@ -2293,7 +2293,7 @@ Address: %4
 <context>
     <name>SplashScreen</name>
     <message>
-        <source>Litecoin Core</source>
+        <source>Marscoin Client</source>
         <translation>莱特幣核心</translation>
     </message>
     <message>
@@ -2848,7 +2848,7 @@ Address: %4
         <translation>這是個還沒發表的測試版本 - 使用請自負風險 - 請不要用來開採或商業應用</translation>
     </message>
     <message>
-        <source>Unable to bind to %s on this computer. Litecoin Core is probably already running.</source>
+        <source>Unable to bind to %s on this computer. Marscoin Client is probably already running.</source>
         <translation>沒辦法繫結在這台電腦上的 %s 。莱特幣核心可能已經在執行了。</translation>
     </message>
     <message>
@@ -3028,7 +3028,7 @@ Address: %4
         <translation>和指定的位址繫結以聽候 JSON-RPC 連線。IPv6 請用 [主機]:通訊埠 這種格式。這個選項可以設定多次。(預設值: 跟所有網路界面上的位址繫結)</translation>
     </message>
     <message>
-        <source>Cannot obtain a lock on data directory %s. Litecoin Core is probably already running.</source>
+        <source>Cannot obtain a lock on data directory %s. Marscoin Client is probably already running.</source>
         <translation>沒辦法鎖定資料目錄 %s。莱特幣核心可能已經在執行了。</translation>
     </message>
     <message>
@@ -3124,7 +3124,7 @@ rpcpassword=%s
         <translation>警告: -maxtxfee 設定了很高的金額！這可是一次交易就有可能付出的最高手續費。</translation>
     </message>
     <message>
-        <source>Warning: Please check that your computer's date and time are correct! If your clock is wrong Litecoin Core will not work properly.</source>
+        <source>Warning: Please check that your computer's date and time are correct! If your clock is wrong Marscoin Client will not work properly.</source>
         <translation>警告: 請檢查電腦日期和時間是否正確！莱特幣核心沒辦法在時鐘不準的情況下正常運作。</translation>
     </message>
     <message>
@@ -3152,7 +3152,7 @@ rpcpassword=%s
         <translation>沒辦法解析 -rpcbind 參數值 %s 為網路位址</translation>
     </message>
     <message>
-        <source>Error loading wallet.dat: Wallet requires newer version of Litecoin Core</source>
+        <source>Error loading wallet.dat: Wallet requires newer version of Marscoin Client</source>
         <translation>載入 wallet.dat 檔案時發生錯誤: 這個錢包需要新版的莱特幣核心</translation>
     </message>
     <message>
@@ -3176,7 +3176,7 @@ rpcpassword=%s
         <translation>資訊</translation>
     </message>
     <message>
-        <source>Initialization sanity check failed. Litecoin Core is shutting down.</source>
+        <source>Initialization sanity check failed. Marscoin Client is shutting down.</source>
         <translation>初始化時的基本檢查失敗了。莱特幣核心就要關閉了。</translation>
     </message>
     <message>
@@ -3288,7 +3288,7 @@ rpcpassword=%s
         <translation>JSON-RPC 連線使用者名稱</translation>
     </message>
     <message>
-        <source>Wallet needed to be rewritten: restart Litecoin Core to complete</source>
+        <source>Wallet needed to be rewritten: restart Marscoin Client to complete</source>
         <translation>錢包需要重寫: 請重新啓動莱特幣核心來完成</translation>
     </message>
     <message>

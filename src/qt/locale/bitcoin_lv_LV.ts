@@ -287,8 +287,8 @@
         <translation>Atvērt &amp;URI...</translation>
     </message>
     <message>
-        <source>Litecoin Core client</source>
-        <translation>Litecoin Core klients</translation>
+        <source>Marscoin Client client</source>
+        <translation>Marscoin Client klients</translation>
     </message>
     <message>
         <source>Importing blocks from disk...</source>
@@ -343,8 +343,8 @@
         <translation>&amp;Saņemt</translation>
     </message>
     <message>
-        <source>Show information about Litecoin Core</source>
-        <translation>Parādīt informāciju par Litecoin Core</translation>
+        <source>Show information about Marscoin Client</source>
+        <translation>Parādīt informāciju par Marscoin Client</translation>
     </message>
     <message>
         <source>&amp;Show / Hide</source>
@@ -383,16 +383,16 @@
         <translation>Ciļņu rīkjosla</translation>
     </message>
     <message>
-        <source>Litecoin Core</source>
-        <translation>Litecoin Core</translation>
+        <source>Marscoin Client</source>
+        <translation>Marscoin Client</translation>
     </message>
     <message>
         <source>Request payments (generates QR codes and marscoin: URIs)</source>
         <translation>Pieprasīt maksājumus (izveido QR kodu un marscoin: URIs)</translation>
     </message>
     <message>
-        <source>&amp;About Litecoin Core</source>
-        <translation>Par &amp;Litecoin Core</translation>
+        <source>&amp;About Marscoin Client</source>
+        <translation>Par &amp;Marscoin Client</translation>
     </message>
     <message>
         <source>Open a marscoin: URI or payment request</source>
@@ -738,8 +738,8 @@ Adrese: %4
 <context>
     <name>HelpMessageDialog</name>
     <message>
-        <source>Litecoin Core</source>
-        <translation>Litecoin Core</translation>
+        <source>Marscoin Client</source>
+        <translation>Marscoin Client</translation>
     </message>
     <message>
         <source>version</source>
@@ -750,8 +750,8 @@ Adrese: %4
         <translation>(%1-biti)</translation>
     </message>
     <message>
-        <source>About Litecoin Core</source>
-        <translation>Par Litecoin Core</translation>
+        <source>About Marscoin Client</source>
+        <translation>Par Marscoin Client</translation>
     </message>
     <message>
         <source>Usage:</source>
@@ -785,8 +785,8 @@ Adrese: %4
         <translation>Sveiciens</translation>
     </message>
     <message>
-        <source>Welcome to Litecoin Core.</source>
-        <translation>Sveicināts Litecoin Core</translation>
+        <source>Welcome to Marscoin Client.</source>
+        <translation>Sveicināts Marscoin Client</translation>
     </message>
     <message>
         <source>Use the default data directory</source>
@@ -797,8 +797,8 @@ Adrese: %4
         <translation>Izmantot pielāgotu datu mapi:</translation>
     </message>
     <message>
-        <source>Litecoin Core</source>
-        <translation>Litecoin Core</translation>
+        <source>Marscoin Client</source>
+        <translation>Marscoin Client</translation>
     </message>
     <message>
         <source>Error</source>
@@ -1611,8 +1611,8 @@ Adrese: %4
 <context>
     <name>ShutdownWindow</name>
     <message>
-        <source>Litecoin Core is shutting down...</source>
-        <translation>Litecoin Core tiek izslēgta...</translation>
+        <source>Marscoin Client is shutting down...</source>
+        <translation>Marscoin Client tiek izslēgta...</translation>
     </message>
     <message>
         <source>Do not shut down the computer until this window disappears.</source>
@@ -1741,8 +1741,8 @@ Adrese: %4
 <context>
     <name>SplashScreen</name>
     <message>
-        <source>Litecoin Core</source>
-        <translation>Litecoin Core</translation>
+        <source>Marscoin Client</source>
+        <translation>Marscoin Client</translation>
     </message>
     <message>
         <source>The Bitcoin Core developers</source>

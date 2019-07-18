@@ -371,7 +371,7 @@
         <translation>Barra de pestañas</translation>
     </message>
     <message>
-        <source>Litecoin Core</source>
+        <source>Marscoin Client</source>
         <translation>Núcleo de Litecoin</translation>
     </message>
     <message>
@@ -379,7 +379,7 @@
         <translation>Solicitar pagos (genera codigo QR y URL's de Litecoin)</translation>
     </message>
     <message>
-        <source>&amp;About Litecoin Core</source>
+        <source>&amp;About Marscoin Client</source>
         <translation>&amp;Acerca del Núcleo de Litecoin</translation>
     </message>
     <message>
@@ -750,7 +750,7 @@ Dirección: %4
 <context>
     <name>HelpMessageDialog</name>
     <message>
-        <source>Litecoin Core</source>
+        <source>Marscoin Client</source>
         <translation>Núcleo de Litecoin</translation>
     </message>
     <message>
@@ -758,7 +758,7 @@ Dirección: %4
         <translation>versión</translation>
     </message>
     <message>
-        <source>About Litecoin Core</source>
+        <source>About Marscoin Client</source>
         <translation>Acerca del Núcleo de Litecoin</translation>
     </message>
     <message>
@@ -801,15 +801,15 @@ Dirección: %4
         <translation>Bienvenido</translation>
     </message>
     <message>
-        <source>Welcome to Litecoin Core.</source>
+        <source>Welcome to Marscoin Client.</source>
         <translation>Bienvenido al Núcleo de Litecoin</translation>
     </message>
     <message>
-        <source>As this is the first time the program is launched, you can choose where Litecoin Core will store its data.</source>
+        <source>As this is the first time the program is launched, you can choose where Marscoin Client will store its data.</source>
         <translation>Al ser la primera vez que se ejecuta el programa, puede elegir dónde almacenará sus datos Litecoin-Qt.</translation>
     </message>
     <message>
-        <source>Litecoin Core will download and store a copy of the Litecoin block chain. At least %1GB of data will be stored in this directory, and it will grow over time. The wallet will also be stored in this directory.</source>
+        <source>Marscoin Client will download and store a copy of the Litecoin block chain. At least %1GB of data will be stored in this directory, and it will grow over time. The wallet will also be stored in this directory.</source>
         <translation>Litecoin-Qt va a descargar y guardar una copia de la cadena de bloques de Litecoin. Se almacenará al menos %1GB de datos en este directorio, que irá creciendo con el tiempo. El monedero se guardará también en este directorio.</translation>
     </message>
     <message>
@@ -821,7 +821,7 @@ Dirección: %4
         <translation>Utilice un directorio de datos personalizado:</translation>
     </message>
     <message>
-        <source>Litecoin Core</source>
+        <source>Marscoin Client</source>
         <translation>Núcleo de Litecoin</translation>
     </message>
     <message>
@@ -1765,7 +1765,7 @@ Dirección: %4
 <context>
     <name>SplashScreen</name>
     <message>
-        <source>Litecoin Core</source>
+        <source>Marscoin Client</source>
         <translation>Núcleo de Litecoin</translation>
     </message>
     <message>

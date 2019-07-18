@@ -334,7 +334,7 @@ Address: %4
         <translation>верзија</translation>
     </message>
     <message>
-        <source>About Litecoin Core</source>
+        <source>About Marscoin Client</source>
         <translation>O Litecoin Coru</translation>
     </message>
     <message>

@@ -355,7 +355,7 @@
         <translation>Barra de ferramentas</translation>
     </message>
     <message>
-        <source>Litecoin Core</source>
+        <source>Marscoin Client</source>
         <translation>Core de Litecoin</translation>
     </message>
     <message>
@@ -363,8 +363,8 @@
         <translation>Solicitar pagos (xenera códigos QR e marscoin: URIs)</translation>
     </message>
     <message>
-        <source>&amp;About Litecoin Core</source>
-        <translation>&amp;Sobre Litecoin Core</translation>
+        <source>&amp;About Marscoin Client</source>
+        <translation>&amp;Sobre Marscoin Client</translation>
     </message>
     <message>
         <source>Show the list of used sending addresses and labels</source>
@@ -710,7 +710,7 @@ Dirección: %4
 <context>
     <name>HelpMessageDialog</name>
     <message>
-        <source>Litecoin Core</source>
+        <source>Marscoin Client</source>
         <translation>Core de Litecoin</translation>
     </message>
     <message>
@@ -718,7 +718,7 @@ Dirección: %4
         <translation>versión</translation>
     </message>
     <message>
-        <source>About Litecoin Core</source>
+        <source>About Marscoin Client</source>
         <translation>Sobre Litecoin core</translation>
     </message>
     <message>
@@ -769,7 +769,7 @@ Dirección: %4
         <translation>Empregar un directorio de datos personalizado</translation>
     </message>
     <message>
-        <source>Litecoin Core</source>
+        <source>Marscoin Client</source>
         <translation>Core de Litecoin</translation>
     </message>
     <message>
@@ -1601,7 +1601,7 @@ Dirección: %4
 <context>
     <name>SplashScreen</name>
     <message>
-        <source>Litecoin Core</source>
+        <source>Marscoin Client</source>
         <translation>Core de Litecoin</translation>
     </message>
     <message>

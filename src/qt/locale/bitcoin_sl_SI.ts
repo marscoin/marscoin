@@ -291,8 +291,8 @@
         <translation>Odpri &amp;URI ...</translation>
     </message>
     <message>
-        <source>Litecoin Core client</source>
-        <translation>Odjemalec Litecoin Core</translation>
+        <source>Marscoin Client client</source>
+        <translation>Odjemalec Marscoin Client</translation>
     </message>
     <message>
         <source>Importing blocks from disk...</source>
@@ -343,7 +343,7 @@
         <translation>&amp;Sprejmi</translation>
     </message>
     <message>
-        <source>Show information about Litecoin Core</source>
+        <source>Show information about Marscoin Client</source>
         <translation>Pokaži informacije o programu</translation>
     </message>
     <message>
@@ -383,15 +383,15 @@
         <translation>Orodna vrstica zavihkov</translation>
     </message>
     <message>
-        <source>Litecoin Core</source>
-        <translation>Litecoin Core</translation>
+        <source>Marscoin Client</source>
+        <translation>Marscoin Client</translation>
     </message>
     <message>
         <source>Request payments (generates QR codes and marscoin: URIs)</source>
         <translation>Ustvarjanje zahtevka za plačilo (izdelava QR kode in marscoin: URI naslova)</translation>
     </message>
     <message>
-        <source>&amp;About Litecoin Core</source>
+        <source>&amp;About Marscoin Client</source>
         <translation>&amp;O programu</translation>
     </message>
     <message>
@@ -411,7 +411,7 @@
         <translation>Opcije &amp;ukazne vrstice</translation>
     </message>
     <message>
-        <source>Show the Litecoin Core help message to get a list with possible Litecoin command-line options</source>
+        <source>Show the Marscoin Client help message to get a list with possible Litecoin command-line options</source>
         <translation>Prikaže seznam vseh opcij pri zagonu programa in kratek opis</translation>
     </message>
     <message numerus="yes">
@@ -806,8 +806,8 @@ Naslov: %4
 <context>
     <name>HelpMessageDialog</name>
     <message>
-        <source>Litecoin Core</source>
-        <translation>Litecoin Core</translation>
+        <source>Marscoin Client</source>
+        <translation>Marscoin Client</translation>
     </message>
     <message>
         <source>version</source>
@@ -818,8 +818,8 @@ Naslov: %4
         <translation>(%1-bit)</translation>
     </message>
     <message>
-        <source>About Litecoin Core</source>
-        <translation>O programu Litecoin Core</translation>
+        <source>About Marscoin Client</source>
+        <translation>O programu Marscoin Client</translation>
     </message>
     <message>
         <source>Command-line options</source>
@@ -865,15 +865,15 @@ Naslov: %4
         <translation>Dobrodošli</translation>
     </message>
     <message>
-        <source>Welcome to Litecoin Core.</source>
-        <translation>Dobrodošli v Litecoin Core.</translation>
+        <source>Welcome to Marscoin Client.</source>
+        <translation>Dobrodošli v Marscoin Client.</translation>
     </message>
     <message>
-        <source>As this is the first time the program is launched, you can choose where Litecoin Core will store its data.</source>
-        <translation>To je prvi zagonom programa, zato izberite kje bo program Litecoin Core shranjeval podatke.</translation>
+        <source>As this is the first time the program is launched, you can choose where Marscoin Client will store its data.</source>
+        <translation>To je prvi zagonom programa, zato izberite kje bo program Marscoin Client shranjeval podatke.</translation>
     </message>
     <message>
-        <source>Litecoin Core will download and store a copy of the Litecoin block chain. At least %1GB of data will be stored in this directory, and it will grow over time. The wallet will also be stored in this directory.</source>
+        <source>Marscoin Client will download and store a copy of the Litecoin block chain. At least %1GB of data will be stored in this directory, and it will grow over time. The wallet will also be stored in this directory.</source>
         <translation>Program bo prenesel in shranil kopijo marscoin verige blokov. V izbrano mapo bo shranjenih vsaj %1 GB podatkov, ta količina bo sčasoma še naraščala. Denarnica bo prav tako shranjena v to mapo.</translation>
     </message>
     <message>
@@ -885,8 +885,8 @@ Naslov: %4
         <translation>Uporabi to mapo za shranjevanje podatkov:</translation>
     </message>
     <message>
-        <source>Litecoin Core</source>
-        <translation>Litecoin Core</translation>
+        <source>Marscoin Client</source>
+        <translation>Marscoin Client</translation>
     </message>
     <message>
         <source>Error: Specified data directory "%1" cannot be created.</source>
@@ -2055,8 +2055,8 @@ Naslov: %4
 <context>
     <name>ShutdownWindow</name>
     <message>
-        <source>Litecoin Core is shutting down...</source>
-        <translation>Litecoin Core se ustavlja...</translation>
+        <source>Marscoin Client is shutting down...</source>
+        <translation>Marscoin Client se ustavlja...</translation>
     </message>
     <message>
         <source>Do not shut down the computer until this window disappears.</source>
@@ -2197,8 +2197,8 @@ Naslov: %4
 <context>
     <name>SplashScreen</name>
     <message>
-        <source>Litecoin Core</source>
-        <translation>Litecoin Core</translation>
+        <source>Marscoin Client</source>
+        <translation>Marscoin Client</translation>
     </message>
     <message>
         <source>The Bitcoin Core developers</source>
@@ -2723,8 +2723,8 @@ Naslov: %4
         <translation>To je preizkusna verzija - uporaba na lastno odgovornost - ne uporabljajte je za rudarjenje marscoinov ali za trgovske aplikacije</translation>
     </message>
     <message>
-        <source>Unable to bind to %s on this computer. Litecoin Core is probably already running.</source>
-        <translation>Na tem računalniku se ni bilo mogoče povezati na %s. Odjemalec Litecoin Core je verjetno že zagnan.</translation>
+        <source>Unable to bind to %s on this computer. Marscoin Client is probably already running.</source>
+        <translation>Na tem računalniku se ni bilo mogoče povezati na %s. Odjemalec Marscoin Client je verjetno že zagnan.</translation>
     </message>
     <message>
         <source>Warning: -paytxfee is set very high! This is the transaction fee you will pay if you send a transaction.</source>
@@ -2891,8 +2891,8 @@ Naslov: %4
         <translation>Veži dani naslov in sprejemaj povezave na JSON-RPC. Za naslove protokola IPv6 uporabite zapis [gostitelj]:vrata. To opcijo lahko navedete večkrat. (privzeto: veži vse omrežne vmesnike)</translation>
     </message>
     <message>
-        <source>Cannot obtain a lock on data directory %s. Litecoin Core is probably already running.</source>
-        <translation>Ne morem zakleniti podatkovne mape %s. Litecoin Core je verjetno že zagnan.</translation>
+        <source>Cannot obtain a lock on data directory %s. Marscoin Client is probably already running.</source>
+        <translation>Ne morem zakleniti podatkovne mape %s. Marscoin Client je verjetno že zagnan.</translation>
     </message>
     <message>
         <source>Create new files with system default permissions, instead of umask 077 (only effective with disabled wallet functionality)</source>
@@ -2919,8 +2919,8 @@ Naslov: %4
         <translation>Če opcija -paytxfee ni nastavljena, nastavi znesek provizije tako visoko, da bodo transakcije potrjene v povprečno n blokih. (privzeto: %u)</translation>
     </message>
     <message>
-        <source>Warning: Please check that your computer's date and time are correct! If your clock is wrong Litecoin Core will not work properly.</source>
-        <translation>Opozorilo: Preverite, če sta datum in ura na vašem računalniku točna! Litecoin Core ne bo dobro deloval, če je nastavljeni čas nepravilen.</translation>
+        <source>Warning: Please check that your computer's date and time are correct! If your clock is wrong Marscoin Client will not work properly.</source>
+        <translation>Opozorilo: Preverite, če sta datum in ura na vašem računalniku točna! Marscoin Client ne bo dobro deloval, če je nastavljeni čas nepravilen.</translation>
     </message>
     <message>
         <source>Cannot resolve -whitebind address: '%s'</source>

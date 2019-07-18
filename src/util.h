@@ -84,6 +84,7 @@ static inline bool error(const char* format)
     return false;
 }
 
+
 void PrintExceptionContinue(std::exception* pex, const char* pszThread);
 void ParseParameters(int argc, const char*const argv[]);
 void FileCommit(FILE *fileout);

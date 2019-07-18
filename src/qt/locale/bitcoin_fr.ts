@@ -295,8 +295,8 @@
         <translation>Ouvrir un &amp;URI...</translation>
     </message>
     <message>
-        <source>Litecoin Core client</source>
-        <translation>Client Litecoin Core</translation>
+        <source>Marscoin Client client</source>
+        <translation>Client Marscoin Client</translation>
     </message>
     <message>
         <source>Importing blocks from disk...</source>
@@ -351,8 +351,8 @@
         <translation>&amp;Recevoir</translation>
     </message>
     <message>
-        <source>Show information about Litecoin Core</source>
-        <translation>Montrer des informations à propos de Litecoin Core</translation>
+        <source>Show information about Marscoin Client</source>
+        <translation>Montrer des informations à propos de Marscoin Client</translation>
     </message>
     <message>
         <source>&amp;Show / Hide</source>
@@ -391,16 +391,16 @@
         <translation>Barre d'outils des onglets</translation>
     </message>
     <message>
-        <source>Litecoin Core</source>
-        <translation>Litecoin Core</translation>
+        <source>Marscoin Client</source>
+        <translation>Marscoin Client</translation>
     </message>
     <message>
         <source>Request payments (generates QR codes and marscoin: URIs)</source>
         <translation>Demander des paiements (génère des codes QR et des URIs marscoin:)</translation>
     </message>
     <message>
-        <source>&amp;About Litecoin Core</source>
-        <translation>À &amp;propos de Litecoin Core</translation>
+        <source>&amp;About Marscoin Client</source>
+        <translation>À &amp;propos de Marscoin Client</translation>
     </message>
     <message>
         <source>Show the list of used sending addresses and labels</source>
@@ -419,8 +419,8 @@
         <translation>Options de ligne de &amp;commande</translation>
     </message>
     <message>
-        <source>Show the Litecoin Core help message to get a list with possible Litecoin command-line options</source>
-        <translation>Afficher le message d'aide de Litecoin Core pour obtenir une liste des options de ligne de commande Litecoin possibles.</translation>
+        <source>Show the Marscoin Client help message to get a list with possible Litecoin command-line options</source>
+        <translation>Afficher le message d'aide de Marscoin Client pour obtenir une liste des options de ligne de commande Litecoin possibles.</translation>
     </message>
     <message numerus="yes">
         <source>%n active connection(s) to Litecoin network</source>
@@ -826,8 +826,8 @@ Adresse : %4
 <context>
     <name>HelpMessageDialog</name>
     <message>
-        <source>Litecoin Core</source>
-        <translation>Litecoin Core</translation>
+        <source>Marscoin Client</source>
+        <translation>Marscoin Client</translation>
     </message>
     <message>
         <source>version</source>
@@ -838,8 +838,8 @@ Adresse : %4
         <translation>(%1-bit)</translation>
     </message>
     <message>
-        <source>About Litecoin Core</source>
-        <translation>À propos de Litecoin Core</translation>
+        <source>About Marscoin Client</source>
+        <translation>À propos de Marscoin Client</translation>
     </message>
     <message>
         <source>Command-line options</source>
@@ -885,16 +885,16 @@ Adresse : %4
         <translation>Bienvenue</translation>
     </message>
     <message>
-        <source>Welcome to Litecoin Core.</source>
-        <translation>Bienvenue à Litecoin Core.</translation>
+        <source>Welcome to Marscoin Client.</source>
+        <translation>Bienvenue à Marscoin Client.</translation>
     </message>
     <message>
-        <source>As this is the first time the program is launched, you can choose where Litecoin Core will store its data.</source>
-        <translation>Comme c'est la première fois que le logiciel est lancé, vous pouvez choisir où Litecoin Core stockera ses données.</translation>
+        <source>As this is the first time the program is launched, you can choose where Marscoin Client will store its data.</source>
+        <translation>Comme c'est la première fois que le logiciel est lancé, vous pouvez choisir où Marscoin Client stockera ses données.</translation>
     </message>
     <message>
-        <source>Litecoin Core will download and store a copy of the Litecoin block chain. At least %1GB of data will be stored in this directory, and it will grow over time. The wallet will also be stored in this directory.</source>
-        <translation>Litecoin Core va télécharger et stocker une copie de la chaîne de blocs Litecoin. Au moins %1Go de données seront stockées dans ce répertoire et cela augmentera avec le temps. Le portefeuille sera également stocké dans ce répertoire.</translation>
+        <source>Marscoin Client will download and store a copy of the Litecoin block chain. At least %1GB of data will be stored in this directory, and it will grow over time. The wallet will also be stored in this directory.</source>
+        <translation>Marscoin Client va télécharger et stocker une copie de la chaîne de blocs Litecoin. Au moins %1Go de données seront stockées dans ce répertoire et cela augmentera avec le temps. Le portefeuille sera également stocké dans ce répertoire.</translation>
     </message>
     <message>
         <source>Use the default data directory</source>
@@ -905,8 +905,8 @@ Adresse : %4
         <translation>Utiliser un répertoire de données personnalisé :</translation>
     </message>
     <message>
-        <source>Litecoin Core</source>
-        <translation>Litecoin Core</translation>
+        <source>Marscoin Client</source>
+        <translation>Marscoin Client</translation>
     </message>
     <message>
         <source>Error: Specified data directory "%1" cannot be created.</source>
@@ -2139,8 +2139,8 @@ Adresse : %4
 <context>
     <name>ShutdownWindow</name>
     <message>
-        <source>Litecoin Core is shutting down...</source>
-        <translation>Arrêt de Litecoin Core...</translation>
+        <source>Marscoin Client is shutting down...</source>
+        <translation>Arrêt de Marscoin Client...</translation>
     </message>
     <message>
         <source>Do not shut down the computer until this window disappears.</source>
@@ -2289,8 +2289,8 @@ Adresse : %4
 <context>
     <name>SplashScreen</name>
     <message>
-        <source>Litecoin Core</source>
-        <translation>Litecoin Core</translation>
+        <source>Marscoin Client</source>
+        <translation>Marscoin Client</translation>
     </message>
     <message>
         <source>The Bitcoin Core developers</source>
@@ -2843,8 +2843,8 @@ Adresse : %4
         <translation>Ceci est une pré-version de test - l'utiliser à vos risques et périls - ne pas l'utiliser pour miner ou pour des applications marchandes</translation>
     </message>
     <message>
-        <source>Unable to bind to %s on this computer. Litecoin Core is probably already running.</source>
-        <translation>Impossible de se lier à %s sur cet ordinateur. Litecoin Core fonctionne probablement déjà.</translation>
+        <source>Unable to bind to %s on this computer. Marscoin Client is probably already running.</source>
+        <translation>Impossible de se lier à %s sur cet ordinateur. Marscoin Client fonctionne probablement déjà.</translation>
     </message>
     <message>
         <source>Warning: -paytxfee is set very high! This is the transaction fee you will pay if you send a transaction.</source>
@@ -3027,8 +3027,8 @@ Adresse : %4
         <translation>Se lier à l'adresse donnée pour écouter des connexions JSON-RPC. Utiliser la notation [host]:port pour l'IPv6. Cette option peut être spécifiée plusieurs fois (par défaut : se lier à toutes les interfaces)</translation>
     </message>
     <message>
-        <source>Cannot obtain a lock on data directory %s. Litecoin Core is probably already running.</source>
-        <translation>Impossible d’obtenir un verrou sur le répertoire de données %s. Litecoin Core fonctionne probablement déjà.</translation>
+        <source>Cannot obtain a lock on data directory %s. Marscoin Client is probably already running.</source>
+        <translation>Impossible d’obtenir un verrou sur le répertoire de données %s. Marscoin Client fonctionne probablement déjà.</translation>
     </message>
     <message>
         <source>Continuously rate-limit free transactions to &lt;n&gt;*1000 bytes per minute (default:%u)</source>
@@ -3119,8 +3119,8 @@ par exemple : alertnotify=echo %%s | mail -s "Alerte Litecoin" admin@foo.com
         <translation>Avertissement :-maxtxfee est défini très haut ! Des frais aussi élevés pourraient être payés sur une seule transaction.</translation>
     </message>
     <message>
-        <source>Warning: Please check that your computer's date and time are correct! If your clock is wrong Litecoin Core will not work properly.</source>
-        <translation>Avertissement : veuillez vérifier que l'heure et la date de votre ordinateur sont correctes ! Si votre horloge n'est pas à l'heure, Litecoin Core ne fonctionnera pas correctement.</translation>
+        <source>Warning: Please check that your computer's date and time are correct! If your clock is wrong Marscoin Client will not work properly.</source>
+        <translation>Avertissement : veuillez vérifier que l'heure et la date de votre ordinateur sont correctes ! Si votre horloge n'est pas à l'heure, Marscoin Client ne fonctionnera pas correctement.</translation>
     </message>
     <message>
         <source>Whitelisted peers cannot be DoS banned and their transactions are always relayed, even if they are already in the mempool, useful e.g. for a gateway</source>
@@ -3147,8 +3147,8 @@ par exemple : alertnotify=echo %%s | mail -s "Alerte Litecoin" admin@foo.com
         <translation>Impossible d'analyser la valeur -rpcbind %s comme adresse réseau</translation>
     </message>
     <message>
-        <source>Error loading wallet.dat: Wallet requires newer version of Litecoin Core</source>
-        <translation>Erreur lors du chargement de wallet.dat : le portefeuille exige une version plus récente de Litecoin Core</translation>
+        <source>Error loading wallet.dat: Wallet requires newer version of Marscoin Client</source>
+        <translation>Erreur lors du chargement de wallet.dat : le portefeuille exige une version plus récente de Marscoin Client</translation>
     </message>
     <message>
         <source>Error reading from database, shutting down.</source>
@@ -3171,7 +3171,7 @@ par exemple : alertnotify=echo %%s | mail -s "Alerte Litecoin" admin@foo.com
         <translation>Informations</translation>
     </message>
     <message>
-        <source>Initialization sanity check failed. Litecoin Core is shutting down.</source>
+        <source>Initialization sanity check failed. Marscoin Client is shutting down.</source>
         <translation>L'initialisation du test de cohérence a échoué. Litecoin est en cours de fermeture. </translation>
     </message>
     <message>
@@ -3283,8 +3283,8 @@ par exemple : alertnotify=echo %%s | mail -s "Alerte Litecoin" admin@foo.com
         <translation>Nom d'utilisateur pour les connexions JSON-RPC</translation>
     </message>
     <message>
-        <source>Wallet needed to be rewritten: restart Litecoin Core to complete</source>
-        <translation>Le portefeuille avait besoin d'être réécrit : veuillez redémarrer Litecoin Core pour terminer</translation>
+        <source>Wallet needed to be rewritten: restart Marscoin Client to complete</source>
+        <translation>Le portefeuille avait besoin d'être réécrit : veuillez redémarrer Marscoin Client pour terminer</translation>
     </message>
     <message>
         <source>Warning</source>

@@ -189,7 +189,7 @@
     </message>
     <message>
         <source>Litecoin will close now to finish the encryption process. Remember that encrypting your wallet cannot fully protect your marscoins from being stolen by malware infecting your computer.</source>
-        <translation>A Litecoin Core most bezár, hogy befejezze a titkosítást. Ne feledd: a tárca titkosítása nem nyújt teljes védelmet azzal szemben, hogy adathalász programok megfertőzzék a számítógéped és ellopják a marscoinjaid.</translation>
+        <translation>A Marscoin Client most bezár, hogy befejezze a titkosítást. Ne feledd: a tárca titkosítása nem nyújt teljes védelmet azzal szemben, hogy adathalász programok megfertőzzék a számítógéped és ellopják a marscoinjaid.</translation>
     </message>
     <message>
         <source>Wallet encryption failed</source>
@@ -295,8 +295,8 @@
         <translation>&amp;URI azonosító megnyitása...</translation>
     </message>
     <message>
-        <source>Litecoin Core client</source>
-        <translation>Litecoin Core kliens</translation>
+        <source>Marscoin Client client</source>
+        <translation>Marscoin Client kliens</translation>
     </message>
     <message>
         <source>Importing blocks from disk...</source>
@@ -351,8 +351,8 @@
         <translation>&amp;Fogadás</translation>
     </message>
     <message>
-        <source>Show information about Litecoin Core</source>
-        <translation>Litecoin Core információ megjelenítése</translation>
+        <source>Show information about Marscoin Client</source>
+        <translation>Marscoin Client információ megjelenítése</translation>
     </message>
     <message>
         <source>&amp;Show / Hide</source>
@@ -391,16 +391,16 @@
         <translation>Fül eszköztár</translation>
     </message>
     <message>
-        <source>Litecoin Core</source>
-        <translation>Litecoin Core</translation>
+        <source>Marscoin Client</source>
+        <translation>Marscoin Client</translation>
     </message>
     <message>
         <source>Request payments (generates QR codes and marscoin: URIs)</source>
         <translation>Fizetési kérelem (QR-kódot és "marscoin:" URI azonosítót hoz létre)</translation>
     </message>
     <message>
-        <source>&amp;About Litecoin Core</source>
-        <translation>&amp;A Litecoin Core-ról</translation>
+        <source>&amp;About Marscoin Client</source>
+        <translation>&amp;A Marscoin Client-ról</translation>
     </message>
     <message>
         <source>Show the list of used sending addresses and labels</source>
@@ -419,8 +419,8 @@
         <translation>Paran&amp;cssor kapcsolók</translation>
     </message>
     <message>
-        <source>Show the Litecoin Core help message to get a list with possible Litecoin command-line options</source>
-        <translation>A Litecoin Core súgóüzenet megjelenítése a Litecoin lehetséges parancssori kapcsolóival.</translation>
+        <source>Show the Marscoin Client help message to get a list with possible Litecoin command-line options</source>
+        <translation>A Marscoin Client súgóüzenet megjelenítése a Litecoin lehetséges parancssori kapcsolóival.</translation>
     </message>
     <message numerus="yes">
         <source>%n active connection(s) to Litecoin network</source>
@@ -818,8 +818,8 @@ Cím: %4
 <context>
     <name>HelpMessageDialog</name>
     <message>
-        <source>Litecoin Core</source>
-        <translation>Litecoin Core</translation>
+        <source>Marscoin Client</source>
+        <translation>Marscoin Client</translation>
     </message>
     <message>
         <source>version</source>
@@ -830,8 +830,8 @@ Cím: %4
         <translation>(%1-bit)</translation>
     </message>
     <message>
-        <source>About Litecoin Core</source>
-        <translation>A Litecoin Core-ról</translation>
+        <source>About Marscoin Client</source>
+        <translation>A Marscoin Client-ról</translation>
     </message>
     <message>
         <source>Command-line options</source>
@@ -878,12 +878,12 @@ Cím: %4
         <translation>Üdvözlünk</translation>
     </message>
     <message>
-        <source>Welcome to Litecoin Core.</source>
-        <translation>Üdvözlünk a Litecoin Core-ban.</translation>
+        <source>Welcome to Marscoin Client.</source>
+        <translation>Üdvözlünk a Marscoin Client-ban.</translation>
     </message>
     <message>
-        <source>Litecoin Core will download and store a copy of the Litecoin block chain. At least %1GB of data will be stored in this directory, and it will grow over time. The wallet will also be stored in this directory.</source>
-        <translation>A Litecoin Core le fogja tölteni és tárolni fogja a Litecoin blokklánc egy másolatát. Legalább %1GB adat lesz tárolva ebben a mappában, és ez folyamatosan nőni fog. A tárca szintén itt lesz tárolva.</translation>
+        <source>Marscoin Client will download and store a copy of the Litecoin block chain. At least %1GB of data will be stored in this directory, and it will grow over time. The wallet will also be stored in this directory.</source>
+        <translation>A Marscoin Client le fogja tölteni és tárolni fogja a Litecoin blokklánc egy másolatát. Legalább %1GB adat lesz tárolva ebben a mappában, és ez folyamatosan nőni fog. A tárca szintén itt lesz tárolva.</translation>
     </message>
     <message>
         <source>Use the default data directory</source>
@@ -894,8 +894,8 @@ Cím: %4
         <translation>Saját adatkönyvtár használata:</translation>
     </message>
     <message>
-        <source>Litecoin Core</source>
-        <translation>Litecoin Core</translation>
+        <source>Marscoin Client</source>
+        <translation>Marscoin Client</translation>
     </message>
     <message>
         <source>Error: Specified data directory "%1" cannot be created.</source>
@@ -1809,8 +1809,8 @@ Cím: %4
 <context>
     <name>ShutdownWindow</name>
     <message>
-        <source>Litecoin Core is shutting down...</source>
-        <translation>A Litecoin Core leáll...</translation>
+        <source>Marscoin Client is shutting down...</source>
+        <translation>A Marscoin Client leáll...</translation>
     </message>
     <message>
         <source>Do not shut down the computer until this window disappears.</source>
@@ -1919,8 +1919,8 @@ Cím: %4
 <context>
     <name>SplashScreen</name>
     <message>
-        <source>Litecoin Core</source>
-        <translation>Litecoin Core</translation>
+        <source>Marscoin Client</source>
+        <translation>Marscoin Client</translation>
     </message>
     <message>
         <source>The Bitcoin Core developers</source>

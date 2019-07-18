@@ -572,10 +572,10 @@ void StartRPCThreads()
         unsigned char rand_pwd[32];
         GetRandBytes(rand_pwd, 32);
         uiInterface.ThreadSafeMessageBox(strprintf(
-            _("To use litecoind, or the -server option to litecoin-qt, you must set an rpcpassword in the configuration file:\n"
+            _("To use marscoind, or the -server option to marscoin-qt, you must set an rpcpassword in the configuration file:\n"
               "%s\n"
               "It is recommended you use the following random password:\n"
-              "rpcuser=litecoinrpc\n"
+              "rpcuser=marscoinrpc\n"
               "rpcpassword=%s\n"
               "(you do not need to remember this password)\n"
               "The username and password MUST NOT be the same.\n"

@@ -295,7 +295,7 @@
         <translation>&amp;URI aç...</translation>
     </message>
     <message>
-        <source>Litecoin Core client</source>
+        <source>Marscoin Client client</source>
         <translation>Litecoin Çekirdeği istemcisi</translation>
     </message>
     <message>
@@ -351,7 +351,7 @@
         <translation>&amp;Al</translation>
     </message>
     <message>
-        <source>Show information about Litecoin Core</source>
+        <source>Show information about Marscoin Client</source>
         <translation>Litecoin Çekirdeği hakkında bilgi göster</translation>
     </message>
     <message>
@@ -391,7 +391,7 @@
         <translation>Sekme araç çubuğu</translation>
     </message>
     <message>
-        <source>Litecoin Core</source>
+        <source>Marscoin Client</source>
         <translation>Litecoin Çekirdeği</translation>
     </message>
     <message>
@@ -399,7 +399,7 @@
         <translation>Ödeme talep et (QR kodu ve marscoin URI'si oluşturur)</translation>
     </message>
     <message>
-        <source>&amp;About Litecoin Core</source>
+        <source>&amp;About Marscoin Client</source>
         <translation>Litecoin Çekirdeği &amp;hakkında</translation>
     </message>
     <message>
@@ -419,7 +419,7 @@
         <translation>&amp;Komut satırı seçenekleri</translation>
     </message>
     <message>
-        <source>Show the Litecoin Core help message to get a list with possible Litecoin command-line options</source>
+        <source>Show the Marscoin Client help message to get a list with possible Litecoin command-line options</source>
         <translation>Litecoin komut satırı seçeneklerinin listesini elde etmek için Litecoin Çekirdeği yardım mesajını göster</translation>
     </message>
     <message numerus="yes">
@@ -826,7 +826,7 @@ Adres: %4
 <context>
     <name>HelpMessageDialog</name>
     <message>
-        <source>Litecoin Core</source>
+        <source>Marscoin Client</source>
         <translation>Litecoin Çekirdeği</translation>
     </message>
     <message>
@@ -838,7 +838,7 @@ Adres: %4
         <translation>(%1-bit)</translation>
     </message>
     <message>
-        <source>About Litecoin Core</source>
+        <source>About Marscoin Client</source>
         <translation>Litecoin Çekirdeği hakkında</translation>
     </message>
     <message>
@@ -885,15 +885,15 @@ Adres: %4
         <translation>Hoş geldiniz</translation>
     </message>
     <message>
-        <source>Welcome to Litecoin Core.</source>
+        <source>Welcome to Marscoin Client.</source>
         <translation>Litecoin Çekirdeğine hoş geldiniz.</translation>
     </message>
     <message>
-        <source>As this is the first time the program is launched, you can choose where Litecoin Core will store its data.</source>
+        <source>As this is the first time the program is launched, you can choose where Marscoin Client will store its data.</source>
         <translation>Bu programı ilk kez başlattığınızdan dolayı Litecoin Çekirdeğinin verilerini nereye saklayacağını seçebilirsiniz.</translation>
     </message>
     <message>
-        <source>Litecoin Core will download and store a copy of the Litecoin block chain. At least %1GB of data will be stored in this directory, and it will grow over time. The wallet will also be stored in this directory.</source>
+        <source>Marscoin Client will download and store a copy of the Litecoin block chain. At least %1GB of data will be stored in this directory, and it will grow over time. The wallet will also be stored in this directory.</source>
         <translation>Litecoin çekirdeği Litecoin blok zincirinin bir kopyasını indirip saklayacaktır. Asgari %1GB bouyutunda veri bu klasörde saklanacak ve zamanla bu boyut artacaktır. Cüzdan da bu klasörde saklanacaktır. </translation>
     </message>
     <message>
@@ -905,7 +905,7 @@ Adres: %4
         <translation>Özel bir veri klasörü kullan:</translation>
     </message>
     <message>
-        <source>Litecoin Core</source>
+        <source>Marscoin Client</source>
         <translation>Litecoin Çekirdeği</translation>
     </message>
     <message>
@@ -2139,7 +2139,7 @@ Adres: %4
 <context>
     <name>ShutdownWindow</name>
     <message>
-        <source>Litecoin Core is shutting down...</source>
+        <source>Marscoin Client is shutting down...</source>
         <translation>Litecoin Çekirdeği kapanıyor...</translation>
     </message>
     <message>
@@ -2289,7 +2289,7 @@ Adres: %4
 <context>
     <name>SplashScreen</name>
     <message>
-        <source>Litecoin Core</source>
+        <source>Marscoin Client</source>
         <translation>Litecoin Çekirdeği</translation>
     </message>
     <message>
@@ -2843,7 +2843,7 @@ Adres: %4
         <translation>Bu yayın öncesi bir deneme sürümüdür - tüm riski siz üstlenmiş olursunuz - marscoin oluşturmak ya da ticari uygulamalar için kullanmayınız</translation>
     </message>
     <message>
-        <source>Unable to bind to %s on this computer. Litecoin Core is probably already running.</source>
+        <source>Unable to bind to %s on this computer. Marscoin Client is probably already running.</source>
         <translation>Bu bilgisayarda %s unsuruna bağlanılamadı. Litecoin Çekirdeği muhtemelen hâlihazırda çalışmaktadır.</translation>
     </message>
     <message>
@@ -3027,7 +3027,7 @@ Adres: %4
         <translation>Belirtilen adrese bağlan ve JSON RPC bağlantıları için dinlemeye geç. IPv6 için [makine]:port imlasını kullanınız. Bu seçenek birden çok kez belirtilebilir (varsayılan: tüm arayüzlere bağlan)</translation>
     </message>
     <message>
-        <source>Cannot obtain a lock on data directory %s. Litecoin Core is probably already running.</source>
+        <source>Cannot obtain a lock on data directory %s. Marscoin Client is probably already running.</source>
         <translation>%s veri dizininde kilit elde edilemedi. Litecoin Çekirdeği muhtemelen hâlihazırda çalışmaktadır.</translation>
     </message>
     <message>
@@ -3123,7 +3123,7 @@ mesela: alertnotify=echo %%s | mail -s "Litecoin Alert" admin@foo.com
         <translation>İkaz: -maxtxfee çok yüksek bir değere ayarlanmış! Bu denli yüksek ücretler tek bir muamelede ödenebilir.</translation>
     </message>
     <message>
-        <source>Warning: Please check that your computer's date and time are correct! If your clock is wrong Litecoin Core will not work properly.</source>
+        <source>Warning: Please check that your computer's date and time are correct! If your clock is wrong Marscoin Client will not work properly.</source>
         <translation>Uyarı: Lütfen bilgisayarınızın saat ve tarihinin doğru olduğunu kontol ediniz! Saatinizde gecikme varsa Litecoin Çekirdeği doğru şekilde çalışamaz.</translation>
     </message>
     <message>
@@ -3151,7 +3151,7 @@ mesela: alertnotify=echo %%s | mail -s "Litecoin Alert" admin@foo.com
         <translation>-rpcbind değeri %s şebeke adresi olarak ayrıştırılamadı</translation>
     </message>
     <message>
-        <source>Error loading wallet.dat: Wallet requires newer version of Litecoin Core</source>
+        <source>Error loading wallet.dat: Wallet requires newer version of Marscoin Client</source>
         <translation>wallet.dat dosyasının yüklenmesinde hata: Cüzdan Litecoin Çekirdeğinin daha yeni bir sürümünü gerektirmektedir</translation>
     </message>
     <message>
@@ -3171,7 +3171,7 @@ mesela: alertnotify=echo %%s | mail -s "Litecoin Alert" admin@foo.com
         <translation>Bilgi</translation>
     </message>
     <message>
-        <source>Initialization sanity check failed. Litecoin Core is shutting down.</source>
+        <source>Initialization sanity check failed. Marscoin Client is shutting down.</source>
         <translation>Başlatma sınaması başarısız oldu. Litecoin Çekirdeği kapatılıyor.</translation>
     </message>
     <message>
@@ -3279,7 +3279,7 @@ mesela: alertnotify=echo %%s | mail -s "Litecoin Alert" admin@foo.com
         <translation>JSON-RPC bağlantıları için kullanıcı ismi</translation>
     </message>
     <message>
-        <source>Wallet needed to be rewritten: restart Litecoin Core to complete</source>
+        <source>Wallet needed to be rewritten: restart Marscoin Client to complete</source>
         <translation>Cüzdanın tekrar yazılması gerekmektedir: tamamlamak için Litecoin Çekirdeğini yeniden başlatın</translation>
     </message>
     <message>

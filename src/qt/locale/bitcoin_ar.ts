@@ -291,7 +291,7 @@
         <translation>افتح &amp;URI...</translation>
     </message>
     <message>
-        <source>Litecoin Core client</source>
+        <source>Marscoin Client client</source>
         <translation>عميل marscoin core</translation>
     </message>
     <message>
@@ -339,7 +339,7 @@
         <translation>&amp;استقبل</translation>
     </message>
     <message>
-        <source>Show information about Litecoin Core</source>
+        <source>Show information about Marscoin Client</source>
         <translation>  اظهار معلومات حول Litecoin core</translation>
     </message>
     <message>
@@ -371,11 +371,11 @@
         <translation>شريط أدوات علامات التبويب</translation>
     </message>
     <message>
-        <source>Litecoin Core</source>
+        <source>Marscoin Client</source>
         <translation>جوهر البيت كوين</translation>
     </message>
     <message>
-        <source>&amp;About Litecoin Core</source>
+        <source>&amp;About Marscoin Client</source>
         <translation>حول marscoin core</translation>
     </message>
     <message numerus="yes">
@@ -626,7 +626,7 @@
 <context>
     <name>HelpMessageDialog</name>
     <message>
-        <source>Litecoin Core</source>
+        <source>Marscoin Client</source>
         <translation>جوهر البيت كوين</translation>
     </message>
     <message>
@@ -634,7 +634,7 @@
         <translation>النسخة</translation>
     </message>
     <message>
-        <source>About Litecoin Core</source>
+        <source>About Marscoin Client</source>
         <translation>عن جوهر البيت كوين</translation>
     </message>
     <message>
@@ -661,7 +661,7 @@
         <translation>استخدام دليل بيانات مخصص:</translation>
     </message>
     <message>
-        <source>Litecoin Core</source>
+        <source>Marscoin Client</source>
         <translation>جوهر البيت كوين</translation>
     </message>
     <message>
@@ -1301,7 +1301,7 @@
 <context>
     <name>SplashScreen</name>
     <message>
-        <source>Litecoin Core</source>
+        <source>Marscoin Client</source>
         <translation>جوهر البيت كوين</translation>
     </message>
     <message>

@@ -295,8 +295,8 @@
         <translation>Avaa &amp;URI...</translation>
     </message>
     <message>
-        <source>Litecoin Core client</source>
-        <translation>Litecoin Core ohjelma</translation>
+        <source>Marscoin Client client</source>
+        <translation>Marscoin Client ohjelma</translation>
     </message>
     <message>
         <source>Importing blocks from disk...</source>
@@ -351,8 +351,8 @@
         <translation>&amp;Vastaanota</translation>
     </message>
     <message>
-        <source>Show information about Litecoin Core</source>
-        <translation>Näytä tietoja Litecoin Core:sta</translation>
+        <source>Show information about Marscoin Client</source>
+        <translation>Näytä tietoja Marscoin Client:sta</translation>
     </message>
     <message>
         <source>&amp;Show / Hide</source>
@@ -391,7 +391,7 @@
         <translation>Välilehtipalkki</translation>
     </message>
     <message>
-        <source>Litecoin Core</source>
+        <source>Marscoin Client</source>
         <translation>Litecoin-ydin</translation>
     </message>
     <message>
@@ -399,8 +399,8 @@
         <translation>Pyydä maksuja (Luo QR koodit ja marscoin: URIt)</translation>
     </message>
     <message>
-        <source>&amp;About Litecoin Core</source>
-        <translation>&amp;Tietoja Litecoin Core</translation>
+        <source>&amp;About Marscoin Client</source>
+        <translation>&amp;Tietoja Marscoin Client</translation>
     </message>
     <message>
         <source>Show the list of used sending addresses and labels</source>
@@ -419,8 +419,8 @@
         <translation>&amp;Komentorivin valinnat</translation>
     </message>
     <message>
-        <source>Show the Litecoin Core help message to get a list with possible Litecoin command-line options</source>
-        <translation>Näytä Litecoin Core ohjeet saadaksesi listan mahdollisista Litecoinin komentorivivalinnoista</translation>
+        <source>Show the Marscoin Client help message to get a list with possible Litecoin command-line options</source>
+        <translation>Näytä Marscoin Client ohjeet saadaksesi listan mahdollisista Litecoinin komentorivivalinnoista</translation>
     </message>
     <message numerus="yes">
         <source>%n active connection(s) to Litecoin network</source>
@@ -825,7 +825,7 @@ Osoite: %4</translation>
 <context>
     <name>HelpMessageDialog</name>
     <message>
-        <source>Litecoin Core</source>
+        <source>Marscoin Client</source>
         <translation>Litecoin-ydin</translation>
     </message>
     <message>
@@ -837,8 +837,8 @@ Osoite: %4</translation>
         <translation>(%1-bit)</translation>
     </message>
     <message>
-        <source>About Litecoin Core</source>
-        <translation>Tietoja Litecoin Core</translation>
+        <source>About Marscoin Client</source>
+        <translation>Tietoja Marscoin Client</translation>
     </message>
     <message>
         <source>Command-line options</source>
@@ -884,16 +884,16 @@ Osoite: %4</translation>
         <translation>Tervetuloa</translation>
     </message>
     <message>
-        <source>Welcome to Litecoin Core.</source>
-        <translation>Tervetuloa Litecoin Core</translation>
+        <source>Welcome to Marscoin Client.</source>
+        <translation>Tervetuloa Marscoin Client</translation>
     </message>
     <message>
-        <source>As this is the first time the program is launched, you can choose where Litecoin Core will store its data.</source>
-        <translation>Tämän on ensimmäinen kerta kun Litecoin Core on käynnistetty joten voit valita data-hakemiston paikan.</translation>
+        <source>As this is the first time the program is launched, you can choose where Marscoin Client will store its data.</source>
+        <translation>Tämän on ensimmäinen kerta kun Marscoin Client on käynnistetty joten voit valita data-hakemiston paikan.</translation>
     </message>
     <message>
-        <source>Litecoin Core will download and store a copy of the Litecoin block chain. At least %1GB of data will be stored in this directory, and it will grow over time. The wallet will also be stored in this directory.</source>
-        <translation>Litecoin Core lataa ja tallentaa kopion Litecoinin lohkoketjusta. Vähintään %1GB dataa tullaan tallentamaan tähän hakemistoon ja tarve kasvaa ajan myötä. Lomakko tullaan myös tallentamaan tähän hakemistoon.</translation>
+        <source>Marscoin Client will download and store a copy of the Litecoin block chain. At least %1GB of data will be stored in this directory, and it will grow over time. The wallet will also be stored in this directory.</source>
+        <translation>Marscoin Client lataa ja tallentaa kopion Litecoinin lohkoketjusta. Vähintään %1GB dataa tullaan tallentamaan tähän hakemistoon ja tarve kasvaa ajan myötä. Lomakko tullaan myös tallentamaan tähän hakemistoon.</translation>
     </message>
     <message>
         <source>Use the default data directory</source>
@@ -904,7 +904,7 @@ Osoite: %4</translation>
         <translation>Määritä oma kansio:</translation>
     </message>
     <message>
-        <source>Litecoin Core</source>
+        <source>Marscoin Client</source>
         <translation>Litecoin-ydin</translation>
     </message>
     <message>
@@ -2122,7 +2122,7 @@ Osoite: %4</translation>
 <context>
     <name>ShutdownWindow</name>
     <message>
-        <source>Litecoin Core is shutting down...</source>
+        <source>Marscoin Client is shutting down...</source>
         <translation>Litecoin core sulkeutuu...</translation>
     </message>
     <message>
@@ -2272,7 +2272,7 @@ Osoite: %4</translation>
 <context>
     <name>SplashScreen</name>
     <message>
-        <source>Litecoin Core</source>
+        <source>Marscoin Client</source>
         <translation>Litecoin-ydin</translation>
     </message>
     <message>
@@ -2818,8 +2818,8 @@ Osoite: %4</translation>
         <translation>Tämä on esi-julkaistu testiversio - Käytä omalla riskillä - Ei saa käytää louhimiseen tai kauppasovelluksiin.</translation>
     </message>
     <message>
-        <source>Unable to bind to %s on this computer. Litecoin Core is probably already running.</source>
-        <translation>Ei voida yhdistää %s tässä tietokoneessa. Litecoin Core on luultavasti jo käynnissä.</translation>
+        <source>Unable to bind to %s on this computer. Marscoin Client is probably already running.</source>
+        <translation>Ei voida yhdistää %s tässä tietokoneessa. Marscoin Client on luultavasti jo käynnissä.</translation>
     </message>
     <message>
         <source>Warning: -paytxfee is set very high! This is the transaction fee you will pay if you send a transaction.</source>
@@ -2982,8 +2982,8 @@ Osoite: %4</translation>
         <translation>Tuodaan lohkoja ulkoisesta blk000??.dat tiedostosta</translation>
     </message>
     <message>
-        <source>Cannot obtain a lock on data directory %s. Litecoin Core is probably already running.</source>
-        <translation>Ei voida lukita data-hakemistoa %s. Litecoin Core on luultavasti jo käynnissä.</translation>
+        <source>Cannot obtain a lock on data directory %s. Marscoin Client is probably already running.</source>
+        <translation>Ei voida lukita data-hakemistoa %s. Marscoin Client on luultavasti jo käynnissä.</translation>
     </message>
     <message>
         <source>Execute command when a relevant alert is received or we see a really long fork (%s in cmd is replaced by message)</source>
@@ -3014,7 +3014,7 @@ Osoite: %4</translation>
         <translation>Copyright (C) 2009-%i  Bitcoin kehittäjät</translation>
     </message>
     <message>
-        <source>Error loading wallet.dat: Wallet requires newer version of Litecoin Core</source>
+        <source>Error loading wallet.dat: Wallet requires newer version of Marscoin Client</source>
         <translation>Virhe ladattaessa wallet.dat-tiedostoa: Tarvitset uudemman version Litecoinista</translation>
     </message>
     <message>
@@ -3098,7 +3098,7 @@ Osoite: %4</translation>
         <translation>Käyttäjätunnus JSON-RPC-yhteyksille</translation>
     </message>
     <message>
-        <source>Wallet needed to be rewritten: restart Litecoin Core to complete</source>
+        <source>Wallet needed to be rewritten: restart Marscoin Client to complete</source>
         <translation>Lompakko tarvitsee uudelleenkirjoittaa: käynnistä Litecoin uudelleen</translation>
     </message>
     <message>

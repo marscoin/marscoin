@@ -243,11 +243,11 @@
         <translation>Shiriti i mjeteve</translation>
     </message>
     <message>
-        <source>Litecoin Core</source>
+        <source>Marscoin Client</source>
         <translation>Berthama Litecoin</translation>
     </message>
     <message>
-        <source>&amp;About Litecoin Core</source>
+        <source>&amp;About Marscoin Client</source>
         <translation>Rreth Berthames Bitkoin</translation>
     </message>
     <message numerus="yes">
@@ -398,7 +398,7 @@
 <context>
     <name>HelpMessageDialog</name>
     <message>
-        <source>Litecoin Core</source>
+        <source>Marscoin Client</source>
         <translation>Berthama Litecoin</translation>
     </message>
     <message>
@@ -406,7 +406,7 @@
         <translation>versioni</translation>
     </message>
     <message>
-        <source>About Litecoin Core</source>
+        <source>About Marscoin Client</source>
         <translation>Rreth Berthames Bitkoin</translation>
     </message>
     </context>
@@ -417,11 +417,11 @@
         <translation>Miresevini</translation>
     </message>
     <message>
-        <source>Welcome to Litecoin Core.</source>
+        <source>Welcome to Marscoin Client.</source>
         <translation>Miresevini ne Berthamen Litecoin</translation>
     </message>
     <message>
-        <source>Litecoin Core</source>
+        <source>Marscoin Client</source>
         <translation>Berthama Litecoin</translation>
     </message>
     <message>
@@ -609,7 +609,7 @@
 <context>
     <name>SplashScreen</name>
     <message>
-        <source>Litecoin Core</source>
+        <source>Marscoin Client</source>
         <translation>Berthama Litecoin</translation>
     </message>
     <message>

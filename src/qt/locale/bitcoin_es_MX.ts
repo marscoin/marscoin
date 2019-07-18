@@ -327,7 +327,7 @@
         <translation>Pestañas</translation>
     </message>
     <message>
-        <source>Litecoin Core</source>
+        <source>Marscoin Client</source>
         <translation>nucleo Litecoin</translation>
     </message>
     <message>
@@ -335,7 +335,7 @@
         <translation>opciones de la &amp;Linea de comandos</translation>
     </message>
     <message>
-        <source>Show the Litecoin Core help message to get a list with possible Litecoin command-line options</source>
+        <source>Show the Marscoin Client help message to get a list with possible Litecoin command-line options</source>
         <translation>Mostrar mensaje de ayuda del nucleo de Litecoin para optener una lista con los posibles comandos  de Litecoin</translation>
     </message>
     <message numerus="yes">
@@ -490,7 +490,7 @@
 <context>
     <name>HelpMessageDialog</name>
     <message>
-        <source>Litecoin Core</source>
+        <source>Marscoin Client</source>
         <translation>nucleo Litecoin</translation>
     </message>
     <message>
@@ -502,8 +502,8 @@
         <translation>(%1-bit)</translation>
     </message>
     <message>
-        <source>About Litecoin Core</source>
-        <translation>Acerca de Litecoin Core</translation>
+        <source>About Marscoin Client</source>
+        <translation>Acerca de Marscoin Client</translation>
     </message>
     <message>
         <source>Usage:</source>
@@ -537,7 +537,7 @@
 <context>
     <name>Intro</name>
     <message>
-        <source>Litecoin Core</source>
+        <source>Marscoin Client</source>
         <translation>nucleo Litecoin</translation>
     </message>
     </context>
@@ -795,7 +795,7 @@
 <context>
     <name>ShutdownWindow</name>
     <message>
-        <source>Litecoin Core is shutting down...</source>
+        <source>Marscoin Client is shutting down...</source>
         <translation>Apagando el nucleo de Litecoin...</translation>
     </message>
     <message>
@@ -821,7 +821,7 @@
 <context>
     <name>SplashScreen</name>
     <message>
-        <source>Litecoin Core</source>
+        <source>Marscoin Client</source>
         <translation>nucleo Litecoin</translation>
     </message>
     <message>

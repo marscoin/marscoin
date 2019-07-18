@@ -15,7 +15,7 @@
         <translation>Litecoin</translation>
     </message>
     <message>
-        <source>Litecoin Core</source>
+        <source>Marscoin Client</source>
         <translation>Litecoin Jezrga</translation>
     </message>
     </context>
@@ -34,14 +34,14 @@
 <context>
     <name>HelpMessageDialog</name>
     <message>
-        <source>Litecoin Core</source>
+        <source>Marscoin Client</source>
         <translation>Litecoin Jezrga</translation>
     </message>
     </context>
 <context>
     <name>Intro</name>
     <message>
-        <source>Litecoin Core</source>
+        <source>Marscoin Client</source>
         <translation>Litecoin Jezrga</translation>
     </message>
     </context>
@@ -109,7 +109,7 @@
 <context>
     <name>SplashScreen</name>
     <message>
-        <source>Litecoin Core</source>
+        <source>Marscoin Client</source>
         <translation>Litecoin Jezrga</translation>
     </message>
     </context>

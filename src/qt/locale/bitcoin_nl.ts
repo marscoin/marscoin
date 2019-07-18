@@ -295,7 +295,7 @@
         <translation>Open &amp;URI...</translation>
     </message>
     <message>
-        <source>Litecoin Core client</source>
+        <source>Marscoin Client client</source>
         <translation>Litecoin Kern applicatie</translation>
     </message>
     <message>
@@ -351,7 +351,7 @@
         <translation>&amp;Ontvangen</translation>
     </message>
     <message>
-        <source>Show information about Litecoin Core</source>
+        <source>Show information about Marscoin Client</source>
         <translation>Toon informatie over marscoin kern</translation>
     </message>
     <message>
@@ -391,7 +391,7 @@
         <translation>Tab-werkbalk</translation>
     </message>
     <message>
-        <source>Litecoin Core</source>
+        <source>Marscoin Client</source>
         <translation>Litecoin Kern</translation>
     </message>
     <message>
@@ -399,8 +399,8 @@
         <translation>Vraag betaling aan (genereert QR codes en marscoin: URIs)</translation>
     </message>
     <message>
-        <source>&amp;About Litecoin Core</source>
-        <translation>&amp;Over Litecoin Core</translation>
+        <source>&amp;About Marscoin Client</source>
+        <translation>&amp;Over Marscoin Client</translation>
     </message>
     <message>
         <source>Show the list of used sending addresses and labels</source>
@@ -419,8 +419,8 @@
         <translation>&amp;Commandoregel-opties</translation>
     </message>
     <message>
-        <source>Show the Litecoin Core help message to get a list with possible Litecoin command-line options</source>
-        <translation>Toon het Litecoin Core hulpbericht om een lijst te krijgen met mogelijke Litecoin commandoregelopties</translation>
+        <source>Show the Marscoin Client help message to get a list with possible Litecoin command-line options</source>
+        <translation>Toon het Marscoin Client hulpbericht om een lijst te krijgen met mogelijke Litecoin commandoregelopties</translation>
     </message>
     <message numerus="yes">
         <source>%n active connection(s) to Litecoin network</source>
@@ -826,7 +826,7 @@ Adres: %4
 <context>
     <name>HelpMessageDialog</name>
     <message>
-        <source>Litecoin Core</source>
+        <source>Marscoin Client</source>
         <translation>Litecoin Kern</translation>
     </message>
     <message>
@@ -838,8 +838,8 @@ Adres: %4
         <translation>(%1-bit)</translation>
     </message>
     <message>
-        <source>About Litecoin Core</source>
-        <translation>Over Litecoin Core</translation>
+        <source>About Marscoin Client</source>
+        <translation>Over Marscoin Client</translation>
     </message>
     <message>
         <source>Command-line options</source>
@@ -885,16 +885,16 @@ Adres: %4
         <translation>Welkom</translation>
     </message>
     <message>
-        <source>Welcome to Litecoin Core.</source>
-        <translation>Welkom bij Litecoin Core</translation>
+        <source>Welcome to Marscoin Client.</source>
+        <translation>Welkom bij Marscoin Client</translation>
     </message>
     <message>
-        <source>As this is the first time the program is launched, you can choose where Litecoin Core will store its data.</source>
-        <translation>Omdat dit de eerste keer is dat het programma gestart is, kunt u nu kiezen waar Litecoin Core de data moet opslaan.</translation>
+        <source>As this is the first time the program is launched, you can choose where Marscoin Client will store its data.</source>
+        <translation>Omdat dit de eerste keer is dat het programma gestart is, kunt u nu kiezen waar Marscoin Client de data moet opslaan.</translation>
     </message>
     <message>
-        <source>Litecoin Core will download and store a copy of the Litecoin block chain. At least %1GB of data will be stored in this directory, and it will grow over time. The wallet will also be stored in this directory.</source>
-        <translation>Litecoin Core zal een kopie van de Litecoin blokketen downloaden en opslaan. Tenminste %1 GB aan data wordt opgeslagen in deze map en het zal groeien in de tijd. De portemonnee wordt ook in deze map opgeslagen.</translation>
+        <source>Marscoin Client will download and store a copy of the Litecoin block chain. At least %1GB of data will be stored in this directory, and it will grow over time. The wallet will also be stored in this directory.</source>
+        <translation>Marscoin Client zal een kopie van de Litecoin blokketen downloaden en opslaan. Tenminste %1 GB aan data wordt opgeslagen in deze map en het zal groeien in de tijd. De portemonnee wordt ook in deze map opgeslagen.</translation>
     </message>
     <message>
         <source>Use the default data directory</source>
@@ -905,7 +905,7 @@ Adres: %4
         <translation>Gebruik een persoonlijke gegevensmap:</translation>
     </message>
     <message>
-        <source>Litecoin Core</source>
+        <source>Marscoin Client</source>
         <translation>Litecoin Kern</translation>
     </message>
     <message>
@@ -2139,8 +2139,8 @@ Adres: %4
 <context>
     <name>ShutdownWindow</name>
     <message>
-        <source>Litecoin Core is shutting down...</source>
-        <translation>Litecoin Core is aan het afsluiten...</translation>
+        <source>Marscoin Client is shutting down...</source>
+        <translation>Marscoin Client is aan het afsluiten...</translation>
     </message>
     <message>
         <source>Do not shut down the computer until this window disappears.</source>
@@ -2289,7 +2289,7 @@ Adres: %4
 <context>
     <name>SplashScreen</name>
     <message>
-        <source>Litecoin Core</source>
+        <source>Marscoin Client</source>
         <translation>Litecoin Kern</translation>
     </message>
     <message>
@@ -2843,8 +2843,8 @@ Adres: %4
         <translation>Dit is een pre-release testversie - gebruik op eigen risico! Gebruik deze niet voor het delven van munten of handelsdoeleinden</translation>
     </message>
     <message>
-        <source>Unable to bind to %s on this computer. Litecoin Core is probably already running.</source>
-        <translation>Niet in staat om %s te verbinden op deze computer. Litecoin Core draait waarschijnlijk al.</translation>
+        <source>Unable to bind to %s on this computer. Marscoin Client is probably already running.</source>
+        <translation>Niet in staat om %s te verbinden op deze computer. Marscoin Client draait waarschijnlijk al.</translation>
     </message>
     <message>
         <source>Warning: -paytxfee is set very high! This is the transaction fee you will pay if you send a transaction.</source>
@@ -3027,8 +3027,8 @@ Adres: %4
         <translation>Bind aan gegeven adres om te luisteren voor JSON-RPC verbindingen. Gebruik [host]:poort notatie voor IPv6. Deze optie kan meerdere keren gespecificeerd worden (standaard: bind aan alle interfaces.</translation>
     </message>
     <message>
-        <source>Cannot obtain a lock on data directory %s. Litecoin Core is probably already running.</source>
-        <translation>Kan geen lock verkrijgen op gegevensmap %s. Litecoin Core draait waarschijnlijk al.</translation>
+        <source>Cannot obtain a lock on data directory %s. Marscoin Client is probably already running.</source>
+        <translation>Kan geen lock verkrijgen op gegevensmap %s. Marscoin Client draait waarschijnlijk al.</translation>
     </message>
     <message>
         <source>Continuously rate-limit free transactions to &lt;n&gt;*1000 bytes per minute (default:%u)</source>
@@ -3124,8 +3124,8 @@ Voorbeeld: alertnotify=echo %%s | mail -s "Litecoin Alert" admin@foo.com
         <translation>Let op: -maxtxfee is erg hoog ingesteld! Transactiekosten van dergelijke groottes kunnen in een enkele transactie worden betaald.</translation>
     </message>
     <message>
-        <source>Warning: Please check that your computer's date and time are correct! If your clock is wrong Litecoin Core will not work properly.</source>
-        <translation>Waarschuwing: Controleer dat de datum en tijd van uw computer correct zijn ingesteld! Bij een onjuist ingestelde klok zal Litecoin Core niet goed werken.</translation>
+        <source>Warning: Please check that your computer's date and time are correct! If your clock is wrong Marscoin Client will not work properly.</source>
+        <translation>Waarschuwing: Controleer dat de datum en tijd van uw computer correct zijn ingesteld! Bij een onjuist ingestelde klok zal Marscoin Client niet goed werken.</translation>
     </message>
     <message>
         <source>Whitelisted peers cannot be DoS banned and their transactions are always relayed, even if they are already in the mempool, useful e.g. for a gateway</source>
@@ -3152,8 +3152,8 @@ Voorbeeld: alertnotify=echo %%s | mail -s "Litecoin Alert" admin@foo.com
         <translation>Niet mogelijk om -rpcbind waarde %s te verwerken als netwerk adres</translation>
     </message>
     <message>
-        <source>Error loading wallet.dat: Wallet requires newer version of Litecoin Core</source>
-        <translation>Fout bij laden wallet.dat: Portemonnee vereist een nieuwere versie van Litecoin Core</translation>
+        <source>Error loading wallet.dat: Wallet requires newer version of Marscoin Client</source>
+        <translation>Fout bij laden wallet.dat: Portemonnee vereist een nieuwere versie van Marscoin Client</translation>
     </message>
     <message>
         <source>Error reading from database, shutting down.</source>
@@ -3172,8 +3172,8 @@ Voorbeeld: alertnotify=echo %%s | mail -s "Litecoin Alert" admin@foo.com
         <translation>Informatie</translation>
     </message>
     <message>
-        <source>Initialization sanity check failed. Litecoin Core is shutting down.</source>
-        <translation>Initialisatie sanity check mislukt. Litecoin Core is aan het afsluiten.</translation>
+        <source>Initialization sanity check failed. Marscoin Client is shutting down.</source>
+        <translation>Initialisatie sanity check mislukt. Marscoin Client is aan het afsluiten.</translation>
     </message>
     <message>
         <source>Invalid amount for -maxtxfee=&lt;amount&gt;: '%s'</source>
@@ -3280,8 +3280,8 @@ Voorbeeld: alertnotify=echo %%s | mail -s "Litecoin Alert" admin@foo.com
         <translation>Gebruikersnaam voor JSON-RPC-verbindingen</translation>
     </message>
     <message>
-        <source>Wallet needed to be rewritten: restart Litecoin Core to complete</source>
-        <translation>Portemonnee moest herschreven worden: Herstart Litecoin Core om te voltooien</translation>
+        <source>Wallet needed to be rewritten: restart Marscoin Client to complete</source>
+        <translation>Portemonnee moest herschreven worden: Herstart Marscoin Client om te voltooien</translation>
     </message>
     <message>
         <source>Warning</source>

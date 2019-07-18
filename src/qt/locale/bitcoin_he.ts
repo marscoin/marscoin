@@ -291,7 +291,7 @@
         <translation>פתיחת &amp;כתובת משאב…</translation>
     </message>
     <message>
-        <source>Litecoin Core client</source>
+        <source>Marscoin Client client</source>
         <translation>לקוח ליבה של לייטקוין</translation>
     </message>
     <message>
@@ -347,7 +347,7 @@
         <translation>&amp;קבלה</translation>
     </message>
     <message>
-        <source>Show information about Litecoin Core</source>
+        <source>Show information about Marscoin Client</source>
         <translation>הצגת מידע על ליבת לייטקוין</translation>
     </message>
     <message>
@@ -387,7 +387,7 @@
         <translation>סרגל כלים לשוניות</translation>
     </message>
     <message>
-        <source>Litecoin Core</source>
+        <source>Marscoin Client</source>
         <translation>ליבת לייטקוין</translation>
     </message>
     <message>
@@ -395,7 +395,7 @@
         <translation>בקשת תשלומים (יצירה של קודים מסוג QR וסכימות כתובות משאב של :marscoin)</translation>
     </message>
     <message>
-        <source>&amp;About Litecoin Core</source>
+        <source>&amp;About Marscoin Client</source>
         <translation>על &amp;אודות ליבת לייטקוין</translation>
     </message>
     <message>
@@ -415,7 +415,7 @@
         <translation>אפשרויות &amp;שורת הפקודה</translation>
     </message>
     <message>
-        <source>Show the Litecoin Core help message to get a list with possible Litecoin command-line options</source>
+        <source>Show the Marscoin Client help message to get a list with possible Litecoin command-line options</source>
         <translation>הצגת הודעות העזרה של ליבת לייטקוין כדי לקבל רשימה עם אפשרויות שורת הפקודה האפשריות של לייטקוין</translation>
     </message>
     <message>
@@ -785,7 +785,7 @@ Address: %4
 <context>
     <name>HelpMessageDialog</name>
     <message>
-        <source>Litecoin Core</source>
+        <source>Marscoin Client</source>
         <translation>ליבת לייטקוין</translation>
     </message>
     <message>
@@ -797,7 +797,7 @@ Address: %4
         <translation>(%1-סיביות)</translation>
     </message>
     <message>
-        <source>About Litecoin Core</source>
+        <source>About Marscoin Client</source>
         <translation>על אודות ליבת לייטקוין</translation>
     </message>
     <message>
@@ -844,15 +844,15 @@ Address: %4
         <translation>ברוך בואך</translation>
     </message>
     <message>
-        <source>Welcome to Litecoin Core.</source>
+        <source>Welcome to Marscoin Client.</source>
         <translation>ברוך בואך לליבת לייטקוין</translation>
     </message>
     <message>
-        <source>As this is the first time the program is launched, you can choose where Litecoin Core will store its data.</source>
+        <source>As this is the first time the program is launched, you can choose where Marscoin Client will store its data.</source>
         <translation>מכיוון שזאת הפעם הראשונה שהתכנית פועלת ניתן לבחור איפה ליבת לייטקוין תאחסן את הנתונים שלה.</translation>
     </message>
     <message>
-        <source>Litecoin Core will download and store a copy of the Litecoin block chain. At least %1GB of data will be stored in this directory, and it will grow over time. The wallet will also be stored in this directory.</source>
+        <source>Marscoin Client will download and store a copy of the Litecoin block chain. At least %1GB of data will be stored in this directory, and it will grow over time. The wallet will also be stored in this directory.</source>
         <translation>לקוח לייטקוין יוריד וישמור העתק של שרשרת המקטעים של לייטקוין. לפחות %1 ג״ב מהנתונים יאוחסנו בתיקייה זו, והיא תגדל עם הזמן. הארנק גם יאוחסן בתיקייה הזו.</translation>
     </message>
     <message>
@@ -864,7 +864,7 @@ Address: %4
         <translation>שימוש בתיקיית נתונים מותאמת אישית:</translation>
     </message>
     <message>
-        <source>Litecoin Core</source>
+        <source>Marscoin Client</source>
         <translation>ליבת לייטקוין</translation>
     </message>
     <message>
@@ -1986,7 +1986,7 @@ Address: %4
 <context>
     <name>ShutdownWindow</name>
     <message>
-        <source>Litecoin Core is shutting down...</source>
+        <source>Marscoin Client is shutting down...</source>
         <translation>ליבת לייטקוין נסגרת…</translation>
     </message>
     <message>
@@ -2136,7 +2136,7 @@ Address: %4
 <context>
     <name>SplashScreen</name>
     <message>
-        <source>Litecoin Core</source>
+        <source>Marscoin Client</source>
         <translation>ליבת לייטקוין</translation>
     </message>
     <message>
@@ -2670,7 +2670,7 @@ Address: %4
         <translation>זוהי בניית ניסיון טרום-שחרור - השימוש בה על אחריותך - אין להשתמש לצורך כריה או יישומי מסחר</translation>
     </message>
     <message>
-        <source>Unable to bind to %s on this computer. Litecoin Core is probably already running.</source>
+        <source>Unable to bind to %s on this computer. Marscoin Client is probably already running.</source>
         <translation>לא ניתן להתאגד אל %s במחשב זה. כנראה שליבת לייטקוין כבר פועלת.</translation>
     </message>
     <message>
@@ -2838,7 +2838,7 @@ Address: %4
         <translation>העמלות (ב־LTC/ק״ב) הנמוכות מהסכום הזה נחשבות לעמלות אפס ליצירת העברה (בררת מחדל: %s)</translation>
     </message>
     <message>
-        <source>Warning: Please check that your computer's date and time are correct! If your clock is wrong Litecoin Core will not work properly.</source>
+        <source>Warning: Please check that your computer's date and time are correct! If your clock is wrong Marscoin Client will not work properly.</source>
         <translation>אזהרה: נא לבדוק שהתאריך והשעה של המחשב שלך נכונים! אם השעון שלך שגוי ליבת לייטקוין לא תעבוד כראוי.</translation>
     </message>
     <message>
@@ -2858,7 +2858,7 @@ Address: %4
         <translation>לא ניתן לנתח את הערך של ‎-rpcbind שצוין בתור %s ככתובת רשת</translation>
     </message>
     <message>
-        <source>Error loading wallet.dat: Wallet requires newer version of Litecoin Core</source>
+        <source>Error loading wallet.dat: Wallet requires newer version of Marscoin Client</source>
         <translation>אירעה שגיאה בטעינת wallet.dat: הארנק דורש גרסה חדשה יותר של ליבת לייטקוין</translation>
     </message>
     <message>
@@ -2874,7 +2874,7 @@ Address: %4
         <translation>מידע</translation>
     </message>
     <message>
-        <source>Initialization sanity check failed. Litecoin Core is shutting down.</source>
+        <source>Initialization sanity check failed. Marscoin Client is shutting down.</source>
         <translation>בדיקת התקינות ההתחלתית נכשלה. ליבת לייטקוין תיסגר כעת.</translation>
     </message>
     <message>
@@ -2958,7 +2958,7 @@ Address: %4
         <translation>שם משתמש לחיבורי JSON-RPC</translation>
     </message>
     <message>
-        <source>Wallet needed to be rewritten: restart Litecoin Core to complete</source>
+        <source>Wallet needed to be rewritten: restart Marscoin Client to complete</source>
         <translation>יש לכתוב את הארנק מחדש: נא להפעיל את ליבת לייטקוין מחדש כדי להשלים את הפעולה</translation>
     </message>
     <message>

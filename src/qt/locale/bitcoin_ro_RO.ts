@@ -295,8 +295,8 @@
         <translation>Deschide &amp;URI...</translation>
     </message>
     <message>
-        <source>Litecoin Core client</source>
-        <translation>Clientul Litecoin Core</translation>
+        <source>Marscoin Client client</source>
+        <translation>Clientul Marscoin Client</translation>
     </message>
     <message>
         <source>Importing blocks from disk...</source>
@@ -351,8 +351,8 @@
         <translation>P&amp;rimeşte</translation>
     </message>
     <message>
-        <source>Show information about Litecoin Core</source>
-        <translation>Arată informaţii despre Litecoin Core</translation>
+        <source>Show information about Marscoin Client</source>
+        <translation>Arată informaţii despre Marscoin Client</translation>
     </message>
     <message>
         <source>&amp;Show / Hide</source>
@@ -391,7 +391,7 @@
         <translation>Bara de unelte</translation>
     </message>
     <message>
-        <source>Litecoin Core</source>
+        <source>Marscoin Client</source>
         <translation>Nucleul Litecoin</translation>
     </message>
     <message>
@@ -399,7 +399,7 @@
         <translation>Cereţi plăţi (generează coduri QR şi marscoin-uri: URls)</translation>
     </message>
     <message>
-        <source>&amp;About Litecoin Core</source>
+        <source>&amp;About Marscoin Client</source>
         <translation>&amp;Despre Nucleul Litecoin</translation>
     </message>
     <message>
@@ -419,8 +419,8 @@
         <translation>Opţiuni linie de &amp;comandă</translation>
     </message>
     <message>
-        <source>Show the Litecoin Core help message to get a list with possible Litecoin command-line options</source>
-        <translation>Arată mesajul de ajutor Litecoin Core pentru a obţine o listă cu opţiunile posibile de linii de comandă Litecoin</translation>
+        <source>Show the Marscoin Client help message to get a list with possible Litecoin command-line options</source>
+        <translation>Arată mesajul de ajutor Marscoin Client pentru a obţine o listă cu opţiunile posibile de linii de comandă Litecoin</translation>
     </message>
     <message numerus="yes">
         <source>%n active connection(s) to Litecoin network</source>
@@ -814,7 +814,7 @@ Adresa: %4
 <context>
     <name>HelpMessageDialog</name>
     <message>
-        <source>Litecoin Core</source>
+        <source>Marscoin Client</source>
         <translation>Nucleul Litecoin</translation>
     </message>
     <message>
@@ -826,7 +826,7 @@ Adresa: %4
         <translation>(%1-bit)</translation>
     </message>
     <message>
-        <source>About Litecoin Core</source>
+        <source>About Marscoin Client</source>
         <translation>Despre Nucleul Litecoin</translation>
     </message>
     <message>
@@ -873,11 +873,11 @@ Adresa: %4
         <translation>Bun venit</translation>
     </message>
     <message>
-        <source>Welcome to Litecoin Core.</source>
+        <source>Welcome to Marscoin Client.</source>
         <translation>Bine aţi venit la Nucleul Litecoin.</translation>
     </message>
     <message>
-        <source>As this is the first time the program is launched, you can choose where Litecoin Core will store its data.</source>
+        <source>As this is the first time the program is launched, you can choose where Marscoin Client will store its data.</source>
         <translation>Dacă aceasta este prima dată cînd programul este lansat, puteţi alege unde Nucleul Litecoin va stoca datele.</translation>
     </message>
     <message>
@@ -889,7 +889,7 @@ Adresa: %4
         <translation>Foloseşte un dosar de date personalizat:</translation>
     </message>
     <message>
-        <source>Litecoin Core</source>
+        <source>Marscoin Client</source>
         <translation>Nucleul Litecoin</translation>
     </message>
     <message>
@@ -2079,7 +2079,7 @@ Adresa: %4
 <context>
     <name>ShutdownWindow</name>
     <message>
-        <source>Litecoin Core is shutting down...</source>
+        <source>Marscoin Client is shutting down...</source>
         <translation>Nucleul Litecoin se închide...</translation>
     </message>
     <message>
@@ -2229,11 +2229,11 @@ Adresa: %4
 <context>
     <name>SplashScreen</name>
     <message>
-        <source>Litecoin Core</source>
+        <source>Marscoin Client</source>
         <translation>Nucleul Litecoin</translation>
     </message>
     <message>
-        <source>The Litecoin Core developers</source>
+        <source>The Marscoin Client developers</source>
         <translation>Dezvoltatorii Nucleului Litecoin</translation>
     </message>
     <message>
@@ -2771,7 +2771,7 @@ Adresa: %4
         <translation>Aceasta este o versiune de test preliminară - vă asumaţi riscul folosind-o - nu folosiţi pentru minerit sau aplicaţiile comercianţilor</translation>
     </message>
     <message>
-        <source>Unable to bind to %s on this computer. Litecoin Core is probably already running.</source>
+        <source>Unable to bind to %s on this computer. Marscoin Client is probably already running.</source>
         <translation>Nu se poate lega la %s pe acest calculator. Nucleul Litecoin probabil deja rulează.</translation>
     </message>
     <message>
@@ -2943,7 +2943,7 @@ Adresa: %4
         <translation>A apărut o eroare la setarea adresei RPC %s portul %u pentru ascultare: %s</translation>
     </message>
     <message>
-        <source>Cannot obtain a lock on data directory %s. Litecoin Core is probably already running.</source>
+        <source>Cannot obtain a lock on data directory %s. Marscoin Client is probably already running.</source>
         <translation>Nu se poate obţine blocarea folderului cu date %s. Nucleul Litecoin probabil deja rulează.</translation>
     </message>
     <message>
@@ -2967,7 +2967,7 @@ Adresa: %4
         <translation>Conectare prin proxy SOCKS5</translation>
     </message>
     <message>
-        <source>Copyright (C) 2009-%i The Litecoin Core Developers</source>
+        <source>Copyright (C) 2009-%i The Marscoin Client Developers</source>
         <translation>Copyright (C) 2009-%i Dezvoltatorii Litecoin</translation>
     </message>
     <message>
@@ -2987,7 +2987,7 @@ Adresa: %4
         <translation>Informaţie</translation>
     </message>
     <message>
-        <source>Initialization sanity check failed. Litecoin Core is shutting down.</source>
+        <source>Initialization sanity check failed. Marscoin Client is shutting down.</source>
         <translation>Nu s-a reuşit iniţierea verificării sănătăţii. Nucleul Litecoin se opreşte.</translation>
     </message>
     <message>
@@ -3087,7 +3087,7 @@ Adresa: %4
         <translation>Utilizator pentru conexiunile JSON-RPC</translation>
     </message>
     <message>
-        <source>Wallet needed to be rewritten: restart Litecoin Core to complete</source>
+        <source>Wallet needed to be rewritten: restart Marscoin Client to complete</source>
         <translation>Portofelul necesită rescrierea: reporniţi Nucleul Litecoin pentru completare</translation>
     </message>
     <message>

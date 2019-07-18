@@ -291,7 +291,7 @@
         <translation>Malfermi &amp;URI-on...</translation>
     </message>
     <message>
-        <source>Litecoin Core client</source>
+        <source>Marscoin Client client</source>
         <translation>kliento de Litecoin-kerno</translation>
     </message>
     <message>
@@ -347,7 +347,7 @@
         <translation>&amp;Ricevi</translation>
     </message>
     <message>
-        <source>Show information about Litecoin Core</source>
+        <source>Show information about Marscoin Client</source>
         <translation>Vidigi informon pri Litecoin Kerno</translation>
     </message>
     <message>
@@ -387,7 +387,7 @@
         <translation>Langeto-breto</translation>
     </message>
     <message>
-        <source>Litecoin Core</source>
+        <source>Marscoin Client</source>
         <translation>Kerno de Litecoin</translation>
     </message>
     <message>
@@ -395,7 +395,7 @@
         <translation>Peti pagon (kreas QR-kodojn kaj URI-ojn kun prefikso marscoin:)</translation>
     </message>
     <message>
-        <source>&amp;About Litecoin Core</source>
+        <source>&amp;About Marscoin Client</source>
         <translation>&amp;Pri la Litecoin Kerno</translation>
     </message>
     <message>
@@ -802,7 +802,7 @@ Adreso: %4
 <context>
     <name>HelpMessageDialog</name>
     <message>
-        <source>Litecoin Core</source>
+        <source>Marscoin Client</source>
         <translation>Kerno de Litecoin</translation>
     </message>
     <message>
@@ -810,7 +810,7 @@ Adreso: %4
         <translation>versio</translation>
     </message>
     <message>
-        <source>About Litecoin Core</source>
+        <source>About Marscoin Client</source>
         <translation>Pri la Litecoin Kerno</translation>
     </message>
     <message>
@@ -853,16 +853,16 @@ Adreso: %4
         <translation>Bonvenon</translation>
     </message>
     <message>
-        <source>Welcome to Litecoin Core.</source>
-        <translation>Bonvenon al la Litecoin kerno, Litecoin Core.</translation>
+        <source>Welcome to Marscoin Client.</source>
+        <translation>Bonvenon al la Litecoin kerno, Marscoin Client.</translation>
     </message>
     <message>
-        <source>As this is the first time the program is launched, you can choose where Litecoin Core will store its data.</source>
-        <translation>Dum tiu ĉi unua uzo de la programo, vi povas elekti lokon, kie Litecoin Core stokos siajn datumojn.</translation>
+        <source>As this is the first time the program is launched, you can choose where Marscoin Client will store its data.</source>
+        <translation>Dum tiu ĉi unua uzo de la programo, vi povas elekti lokon, kie Marscoin Client stokos siajn datumojn.</translation>
     </message>
     <message>
-        <source>Litecoin Core will download and store a copy of the Litecoin block chain. At least %1GB of data will be stored in this directory, and it will grow over time. The wallet will also be stored in this directory.</source>
-        <translation>Litecoin Core elŝutos kaj konservos kopion de la Litecoin blokĉeno. Almenaŭ %1GB da datumoj konserviĝos en tiu loko, kaj tio poiome kreskos. Ankaŭ via monujo konserviĝos en tiu dosierujo.</translation>
+        <source>Marscoin Client will download and store a copy of the Litecoin block chain. At least %1GB of data will be stored in this directory, and it will grow over time. The wallet will also be stored in this directory.</source>
+        <translation>Marscoin Client elŝutos kaj konservos kopion de la Litecoin blokĉeno. Almenaŭ %1GB da datumoj konserviĝos en tiu loko, kaj tio poiome kreskos. Ankaŭ via monujo konserviĝos en tiu dosierujo.</translation>
     </message>
     <message>
         <source>Use the default data directory</source>
@@ -873,7 +873,7 @@ Adreso: %4
         <translation>Uzi alian dosierujon por datumoj:</translation>
     </message>
     <message>
-        <source>Litecoin Core</source>
+        <source>Marscoin Client</source>
         <translation>Kerno de Litecoin</translation>
     </message>
     <message>
@@ -1793,7 +1793,7 @@ Adreso: %4
 <context>
     <name>SplashScreen</name>
     <message>
-        <source>Litecoin Core</source>
+        <source>Marscoin Client</source>
         <translation>Kerno de Litecoin</translation>
     </message>
     <message>

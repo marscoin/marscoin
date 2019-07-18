@@ -295,8 +295,8 @@
         <translation>Otvoriť &amp;URI...</translation>
     </message>
     <message>
-        <source>Litecoin Core client</source>
-        <translation>Litecoin Core klient</translation>
+        <source>Marscoin Client client</source>
+        <translation>Marscoin Client klient</translation>
     </message>
     <message>
         <source>Importing blocks from disk...</source>
@@ -351,8 +351,8 @@
         <translation>&amp;Prijať</translation>
     </message>
     <message>
-        <source>Show information about Litecoin Core</source>
-        <translation>Zobraziť informácie o Litecoin Core</translation>
+        <source>Show information about Marscoin Client</source>
+        <translation>Zobraziť informácie o Marscoin Client</translation>
     </message>
     <message>
         <source>&amp;Show / Hide</source>
@@ -391,7 +391,7 @@
         <translation>Lišta záložiek</translation>
     </message>
     <message>
-        <source>Litecoin Core</source>
+        <source>Marscoin Client</source>
         <translation>Jadro Litecoin</translation>
     </message>
     <message>
@@ -399,7 +399,7 @@
         <translation>Vyžiadať platbu (vygeneruje QR kód a marscoin: URI)</translation>
     </message>
     <message>
-        <source>&amp;About Litecoin Core</source>
+        <source>&amp;About Marscoin Client</source>
         <translation>O jadre Litecoin</translation>
     </message>
     <message>
@@ -419,7 +419,7 @@
         <translation>Možnosti príkazového riadku</translation>
     </message>
     <message>
-        <source>Show the Litecoin Core help message to get a list with possible Litecoin command-line options</source>
+        <source>Show the Marscoin Client help message to get a list with possible Litecoin command-line options</source>
         <translation>Zobraziť pomocnú správu od Litecoin Jadra pre získanie zoznamu dostupných možností príkazového riadku</translation>
     </message>
     <message numerus="yes">
@@ -825,7 +825,7 @@ Adresa: %4</translation>
 <context>
     <name>HelpMessageDialog</name>
     <message>
-        <source>Litecoin Core</source>
+        <source>Marscoin Client</source>
         <translation>Jadro Litecoin</translation>
     </message>
     <message>
@@ -837,7 +837,7 @@ Adresa: %4</translation>
         <translation>(%1-bit)</translation>
     </message>
     <message>
-        <source>About Litecoin Core</source>
+        <source>About Marscoin Client</source>
         <translation>O jadre Litecoin</translation>
     </message>
     <message>
@@ -884,15 +884,15 @@ Adresa: %4</translation>
         <translation>Vitajte</translation>
     </message>
     <message>
-        <source>Welcome to Litecoin Core.</source>
+        <source>Welcome to Marscoin Client.</source>
         <translation>Vitajte v jadre Litecoin.</translation>
     </message>
     <message>
-        <source>As this is the first time the program is launched, you can choose where Litecoin Core will store its data.</source>
+        <source>As this is the first time the program is launched, you can choose where Marscoin Client will store its data.</source>
         <translation>Keďže spúštate program prvý krát, môžte si vybrať kde bude Litecoin Jadro ukladať svoje dáta.</translation>
     </message>
     <message>
-        <source>Litecoin Core will download and store a copy of the Litecoin block chain. At least %1GB of data will be stored in this directory, and it will grow over time. The wallet will also be stored in this directory.</source>
+        <source>Marscoin Client will download and store a copy of the Litecoin block chain. At least %1GB of data will be stored in this directory, and it will grow over time. The wallet will also be stored in this directory.</source>
         <translation>Jadro Litecoin stiahne zo siete a uloží kópiu Litecoin blockchain. Aspoň %1GB dát bude uložených v tomto priečinku a časom porastie. Peňaženka bude tiež uložená v tomto priečinku.</translation>
     </message>
     <message>
@@ -904,7 +904,7 @@ Adresa: %4</translation>
         <translation>Použiť vlastný dátový adresár:</translation>
     </message>
     <message>
-        <source>Litecoin Core</source>
+        <source>Marscoin Client</source>
         <translation>Jadro Litecoin</translation>
     </message>
     <message>
@@ -2122,7 +2122,7 @@ Adresa: %4</translation>
 <context>
     <name>ShutdownWindow</name>
     <message>
-        <source>Litecoin Core is shutting down...</source>
+        <source>Marscoin Client is shutting down...</source>
         <translation>Jadro Litecoin sa ukončuje...</translation>
     </message>
     <message>
@@ -2268,7 +2268,7 @@ Adresa: %4</translation>
 <context>
     <name>SplashScreen</name>
     <message>
-        <source>Litecoin Core</source>
+        <source>Marscoin Client</source>
         <translation>Jadro Litecoin</translation>
     </message>
     <message>
@@ -2806,7 +2806,7 @@ Adresa: %4</translation>
         <translation>Toto je pred-testovacia verzia - použitie je na vlastné riziko - nepoužívajte na tvorbu marscoin ani obchodovanie.</translation>
     </message>
     <message>
-        <source>Unable to bind to %s on this computer. Litecoin Core is probably already running.</source>
+        <source>Unable to bind to %s on this computer. Marscoin Client is probably already running.</source>
         <translation>Nepodarilo sa pripojiť na %s na tomto počítači. Litecoin Jadro je už pravdepodobne spustené.</translation>
     </message>
     <message>
@@ -2992,7 +2992,7 @@ The network does not appear to fully agree! Some miners appear to be experiencin
         <translation>Spojiť s danou adresou pre počúvanie JSON-RPC spojení. Použite zápis [host]:port pre IPv6. Táto možnosť môže byt zadaná niekoľko krát (predvolené: spojiť so všetkými rozhraniami)</translation>
     </message>
     <message>
-        <source>Cannot obtain a lock on data directory %s. Litecoin Core is probably already running.</source>
+        <source>Cannot obtain a lock on data directory %s. Marscoin Client is probably already running.</source>
         <translation>Neviem uzamknúť data adresár %s. Jadro Litecoin je pravdepodobne už spustené.</translation>
     </message>
     <message>
@@ -3084,7 +3084,7 @@ The network does not appear to fully agree! Some miners appear to be experiencin
         <translation>Nedá sa analyzovať -rpcbind hodnota %s ako sieťová adresa</translation>
     </message>
     <message>
-        <source>Error loading wallet.dat: Wallet requires newer version of Litecoin Core</source>
+        <source>Error loading wallet.dat: Wallet requires newer version of Marscoin Client</source>
         <translation>Chyba pri čítaní wallet.dat: Peňaženka vyžaduje vyššiu verziu Jadra Litecoin</translation>
     </message>
     <message>

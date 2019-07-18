@@ -378,7 +378,7 @@
     </message>
     <message>
         <location line="+173"/>
-        <source>Litecoin Core client</source>
+        <source>Marscoin Client client</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -448,7 +448,7 @@
     </message>
     <message>
         <location line="+32"/>
-        <source>Show information about Litecoin Core</source>
+        <source>Show information about Marscoin Client</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -498,8 +498,8 @@
     </message>
     <message>
         <location line="-298"/>
-        <source>Litecoin Core</source>
-        <translation type="unfinished">Litecoin Core</translation>
+        <source>Marscoin Client</source>
+        <translation type="unfinished">Marscoin Client</translation>
     </message>
     <message>
         <location line="+155"/>
@@ -508,7 +508,7 @@
     </message>
     <message>
         <location line="+30"/>
-        <source>&amp;About Litecoin Core</source>
+        <source>&amp;About Marscoin Client</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -533,7 +533,7 @@
     </message>
     <message>
         <location line="+2"/>
-        <source>Show the Litecoin Core help message to get a list with possible Litecoin command-line options</source>
+        <source>Show the Marscoin Client help message to get a list with possible Litecoin command-line options</source>
         <translation type="unfinished"></translation>
     </message>
     <message numerus="yes">
@@ -1058,8 +1058,8 @@ Address: %4
     <name>HelpMessageDialog</name>
     <message>
         <location filename="../utilitydialog.cpp" line="+31"/>
-        <source>Litecoin Core</source>
-        <translation type="unfinished">Litecoin Core</translation>
+        <source>Marscoin Client</source>
+        <translation type="unfinished">Marscoin Client</translation>
     </message>
     <message>
         <location line="+0"/>
@@ -1074,7 +1074,7 @@ Address: %4
     </message>
     <message>
         <location line="+5"/>
-        <source>About Litecoin Core</source>
+        <source>About Marscoin Client</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1132,17 +1132,17 @@ Address: %4
     </message>
     <message>
         <location line="+9"/>
-        <source>Welcome to Litecoin Core.</source>
+        <source>Welcome to Marscoin Client.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+26"/>
-        <source>As this is the first time the program is launched, you can choose where Litecoin Core will store its data.</source>
+        <source>As this is the first time the program is launched, you can choose where Marscoin Client will store its data.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+10"/>
-        <source>Litecoin Core will download and store a copy of the Litecoin block chain. At least %1GB of data will be stored in this directory, and it will grow over time. The wallet will also be stored in this directory.</source>
+        <source>Marscoin Client will download and store a copy of the Litecoin block chain. At least %1GB of data will be stored in this directory, and it will grow over time. The wallet will also be stored in this directory.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1157,8 +1157,8 @@ Address: %4
     </message>
     <message>
         <location filename="../intro.cpp" line="+82"/>
-        <source>Litecoin Core</source>
-        <translation type="unfinished">Litecoin Core</translation>
+        <source>Marscoin Client</source>
+        <translation type="unfinished">Marscoin Client</translation>
     </message>
     <message>
         <location line="+1"/>
@@ -2753,7 +2753,7 @@ Address: %4
     <name>ShutdownWindow</name>
     <message>
         <location filename="../utilitydialog.cpp" line="+47"/>
-        <source>Litecoin Core is shutting down...</source>
+        <source>Marscoin Client is shutting down...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -2948,8 +2948,8 @@ Address: %4
     <name>SplashScreen</name>
     <message>
         <location filename="../splashscreen.cpp" line="+35"/>
-        <source>Litecoin Core</source>
-        <translation type="unfinished">Litecoin Core</translation>
+        <source>Marscoin Client</source>
+        <translation type="unfinished">Marscoin Client</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -3660,7 +3660,7 @@ Address: %4
     </message>
     <message>
         <location line="+20"/>
-        <source>Unable to bind to %s on this computer. Litecoin Core is probably already running.</source>
+        <source>Unable to bind to %s on this computer. Marscoin Client is probably already running.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -3890,7 +3890,7 @@ Address: %4
     </message>
     <message>
         <location line="+4"/>
-        <source>Cannot obtain a lock on data directory %s. Litecoin Core is probably already running.</source>
+        <source>Cannot obtain a lock on data directory %s. Marscoin Client is probably already running.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -3995,7 +3995,7 @@ for example: alertnotify=echo %%s | mail -s &quot;Litecoin Alert&quot; admin@foo
     </message>
     <message>
         <location line="+6"/>
-        <source>Warning: Please check that your computer&apos;s date and time are correct! If your clock is wrong Litecoin Core will not work properly.</source>
+        <source>Warning: Please check that your computer&apos;s date and time are correct! If your clock is wrong Marscoin Client will not work properly.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -4030,7 +4030,7 @@ for example: alertnotify=echo %%s | mail -s &quot;Litecoin Alert&quot; admin@foo
     </message>
     <message>
         <location line="+12"/>
-        <source>Error loading wallet.dat: Wallet requires newer version of Litecoin Core</source>
+        <source>Error loading wallet.dat: Wallet requires newer version of Marscoin Client</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -4060,7 +4060,7 @@ for example: alertnotify=echo %%s | mail -s &quot;Litecoin Alert&quot; admin@foo
     </message>
     <message>
         <location line="+1"/>
-        <source>Initialization sanity check failed. Litecoin Core is shutting down.</source>
+        <source>Initialization sanity check failed. Marscoin Client is shutting down.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -4200,7 +4200,7 @@ for example: alertnotify=echo %%s | mail -s &quot;Litecoin Alert&quot; admin@foo
     </message>
     <message>
         <location line="+4"/>
-        <source>Wallet needed to be rewritten: restart Litecoin Core to complete</source>
+        <source>Wallet needed to be rewritten: restart Marscoin Client to complete</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

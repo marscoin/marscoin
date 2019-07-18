@@ -754,7 +754,7 @@ Address: %4
 <context>
     <name>ShutdownWindow</name>
     <message>
-        <source>Litecoin Core is shutting down...</source>
+        <source>Marscoin Client is shutting down...</source>
         <translation>Litecoinы цѳм хаагдаж байна...</translation>
     </message>
     <message>
