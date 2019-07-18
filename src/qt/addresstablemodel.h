@@ -1,17 +1,12 @@
-// Copyright (c) 2011-2013 The Bitcoin developers
-// Distributed under the MIT/X11 software license, see the accompanying
-// file COPYING or http://www.opensource.org/licenses/mit-license.php.
-
-#ifndef BITCOIN_QT_ADDRESSTABLEMODEL_H
-#define BITCOIN_QT_ADDRESSTABLEMODEL_H
+#ifndef ADDRESSTABLEMODEL_H
+#define ADDRESSTABLEMODEL_H
 
 #include <QAbstractTableModel>
 #include <QStringList>
 
 class AddressTablePriv;
-class WalletModel;
-
 class CWallet;
+class WalletModel;
 
 /**
    Qt model of the address book in the core. This allows views to access and modify the address book.
@@ -26,7 +21,7 @@ public:
 
     enum ColumnIndex {
         Label = 0,   /**< User specified label */
-        Address = 1  /**< Bitcoin address */
+        Address = 1  /**< Marscoin address */
     };
 
     enum RoleIndex {
@@ -84,12 +79,15 @@ private:
     /** Notify listeners that data changed. */
     void emitDataChanged(int index);
 
+signals:
+    void defaultAddressChanged(const QString &address);
+
 public slots:
     /* Update address list from core.
      */
-    void updateEntry(const QString &address, const QString &label, bool isMine, const QString &purpose, int status);
+    void updateEntry(const QString &address, const QString &label, bool isMine, int status);
 
     friend class AddressTablePriv;
 };
 
-#endif // BITCOIN_QT_ADDRESSTABLEMODEL_H
+#endif // ADDRESSTABLEMODEL_H
