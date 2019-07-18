@@ -291,8 +291,8 @@
         <translation>Открыть URI...</translation>
     </message>
     <message>
-        <source>Litecoin Core client</source>
-        <translation>Litecoin Core клиент</translation>
+        <source>Marscoin Client client</source>
+        <translation>Marscoin Client клиент</translation>
     </message>
     <message>
         <source>Importing blocks from disk...</source>
@@ -347,8 +347,8 @@
         <translation>Получить</translation>
     </message>
     <message>
-        <source>Show information about Litecoin Core</source>
-        <translation>Показать информацию о Litecoin Core</translation>
+        <source>Show information about Marscoin Client</source>
+        <translation>Показать информацию о Marscoin Client</translation>
     </message>
     <message>
         <source>&amp;Show / Hide</source>
@@ -387,16 +387,16 @@
         <translation>Панель вкладок</translation>
     </message>
     <message>
-        <source>Litecoin Core</source>
-        <translation>Litecoin Core</translation>
+        <source>Marscoin Client</source>
+        <translation>Marscoin Client</translation>
     </message>
     <message>
         <source>Request payments (generates QR codes and marscoin: URIs)</source>
         <translation>Запросить платежи (создаёт QR-коды и marscoin: ссылки)</translation>
     </message>
     <message>
-        <source>&amp;About Litecoin Core</source>
-        <translation>&amp;О Litecoin Core</translation>
+        <source>&amp;About Marscoin Client</source>
+        <translation>&amp;О Marscoin Client</translation>
     </message>
     <message>
         <source>Show the list of used sending addresses and labels</source>
@@ -415,8 +415,8 @@
         <translation>&amp;Параметры командной строки</translation>
     </message>
     <message>
-        <source>Show the Litecoin Core help message to get a list with possible Litecoin command-line options</source>
-        <translation>Показать помощь по Litecoin Core и получить список доступных параметров командной строки.</translation>
+        <source>Show the Marscoin Client help message to get a list with possible Litecoin command-line options</source>
+        <translation>Показать помощь по Marscoin Client и получить список доступных параметров командной строки.</translation>
     </message>
     <message>
         <source>No block source available...</source>
@@ -458,15 +458,15 @@
 <context>
     <name>HelpMessageDialog</name>
     <message>
-        <source>Litecoin Core</source>
-        <translation>Litecoin Core</translation>
+        <source>Marscoin Client</source>
+        <translation>Marscoin Client</translation>
     </message>
     </context>
 <context>
     <name>Intro</name>
     <message>
-        <source>Litecoin Core</source>
-        <translation>Litecoin Core</translation>
+        <source>Marscoin Client</source>
+        <translation>Marscoin Client</translation>
     </message>
     </context>
 <context>
@@ -553,8 +553,8 @@
 <context>
     <name>SplashScreen</name>
     <message>
-        <source>Litecoin Core</source>
-        <translation>Litecoin Core</translation>
+        <source>Marscoin Client</source>
+        <translation>Marscoin Client</translation>
     </message>
     </context>
 <context>

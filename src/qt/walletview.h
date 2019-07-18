@@ -1,29 +1,26 @@
-/*
- * Qt4 marscoin GUI.
- *
- * W.J. van der Laan 2011-2012
- * The Marscoin Developers 2011-2013
- */
-#ifndef WALLETVIEW_H
-#define WALLETVIEW_H
+// Copyright (c) 2011-2013 The Bitcoin developers
+// Distributed under the MIT/X11 software license, see the accompanying
+// file COPYING or http://www.opensource.org/licenses/mit-license.php.
+
+#ifndef BITCOIN_QT_WALLETVIEW_H
+#define BITCOIN_QT_WALLETVIEW_H
+
+#include "amount.h"
 
 #include <QStackedWidget>
 
-class MarscoinGUI;
+class BitcoinGUI;
 class ClientModel;
-class WalletModel;
-class TransactionView;
 class OverviewPage;
-class ChatWindow;
-class StatisticsPage;
-class AddressBookPage;
+class ReceiveCoinsDialog;
 class SendCoinsDialog;
-class SignVerifyMessageDialog;
-class RPCConsole;
+class SendCoinsRecipient;
+class TransactionView;
+class WalletModel;
 
 QT_BEGIN_NAMESPACE
-class QLabel;
 class QModelIndex;
+class QProgressDialog;
 QT_END_NAMESPACE
 
 /*
@@ -37,55 +34,47 @@ class WalletView : public QStackedWidget
     Q_OBJECT
 
 public:
-    explicit WalletView(QWidget *parent, MarscoinGUI *_gui);
+    explicit WalletView(QWidget *parent);
     ~WalletView();
 
-    void setMarscoinGUI(MarscoinGUI *gui);
+    void setBitcoinGUI(BitcoinGUI *gui);
     /** Set the client model.
         The client model represents the part of the core that communicates with the P2P network, and is wallet-agnostic.
     */
     void setClientModel(ClientModel *clientModel);
     /** Set the wallet model.
-        The wallet model represents a marscoin wallet, and offers access to the list of transactions, address book and sending
+        The wallet model represents a bitcoin wallet, and offers access to the list of transactions, address book and sending
         functionality.
     */
     void setWalletModel(WalletModel *walletModel);
 
-    bool handleURI(const QString &uri);
+    bool handlePaymentRequest(const SendCoinsRecipient& recipient);
 
     void showOutOfSyncWarning(bool fShow);
 
 private:
-    MarscoinGUI *gui;
     ClientModel *clientModel;
     WalletModel *walletModel;
 
     OverviewPage *overviewPage;
-    ChatWindow *chatWindow;
-    StatisticsPage *statisticsPage;
     QWidget *transactionsPage;
-    AddressBookPage *addressBookPage;
-    AddressBookPage *receiveCoinsPage;
+    ReceiveCoinsDialog *receiveCoinsPage;
     SendCoinsDialog *sendCoinsPage;
-    SignVerifyMessageDialog *signVerifyMessageDialog;
 
     TransactionView *transactionView;
+
+    QProgressDialog *progressDialog;
 
 public slots:
     /** Switch to overview (home) page */
     void gotoOverviewPage();
     /** Switch to history (transactions) page */
     void gotoHistoryPage();
-    /** Switch to address book page */
-    void gotoAddressBookPage();
     /** Switch to receive coins page */
     void gotoReceiveCoinsPage();
     /** Switch to send coins page */
     void gotoSendCoinsPage(QString addr = "");
-    /** Switch to chat window */
-    void gotoChatWindow();
-    /** Switch to statistics page */
-    void gotoStatisticsPage();
+
     /** Show Sign/Verify Message dialog and switch to sign message tab */
     void gotoSignMessageTab(QString addr = "");
     /** Show Sign/Verify Message dialog and switch to verify message tab */
@@ -95,7 +84,7 @@ public slots:
 
         The new items are those between start and end inclusive, under the given parent item.
     */
-    void incomingTransaction(const QModelIndex& parent, int start, int /*end*/);
+    void processNewTransaction(const QModelIndex& parent, int start, int /*end*/);
     /** Encrypt the wallet */
     void encryptWallet(bool status);
     /** Backup the wallet */
@@ -105,11 +94,26 @@ public slots:
     /** Ask for passphrase to unlock wallet temporarily */
     void unlockWallet();
 
-    void setEncryptionStatus();
+    /** Show used sending addresses */
+    void usedSendingAddresses();
+    /** Show used receiving addresses */
+    void usedReceivingAddresses();
+
+    /** Re-emit encryption status signal */
+    void updateEncryptionStatus();
+
+    /** Show progress dialog e.g. for rescan */
+    void showProgress(const QString &title, int nProgress);
 
 signals:
     /** Signal that we want to show the main window */
     void showNormalIfMinimized();
+    /**  Fired when a message should be reported to the user */
+    void message(const QString &title, const QString &message, unsigned int style);
+    /** Encryption status of wallet changed */
+    void encryptionStatusChanged(int status);
+    /** Notify that a new transaction appeared */
+    void incomingTransaction(const QString& date, int unit, const CAmount& amount, const QString& type, const QString& address);
 };
 
-#endif // WALLETVIEW_H
+#endif // BITCOIN_QT_WALLETVIEW_H

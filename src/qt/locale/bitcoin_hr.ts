@@ -295,8 +295,8 @@
         <translation>Otvori &amp;URI...</translation>
     </message>
     <message>
-        <source>Litecoin Core client</source>
-        <translation>Litecoin Core klijent</translation>
+        <source>Marscoin Client client</source>
+        <translation>Marscoin Client klijent</translation>
     </message>
     <message>
         <source>Importing blocks from disk...</source>
@@ -351,8 +351,8 @@
         <translation>Pri&amp;miti</translation>
     </message>
     <message>
-        <source>Show information about Litecoin Core</source>
-        <translation>Prikaži informacije o Litecoin Coreu</translation>
+        <source>Show information about Marscoin Client</source>
+        <translation>Prikaži informacije o Marscoin Clientu</translation>
     </message>
     <message>
         <source>&amp;Show / Hide</source>
@@ -391,7 +391,7 @@
         <translation>Traka kartica</translation>
     </message>
     <message>
-        <source>Litecoin Core</source>
+        <source>Marscoin Client</source>
         <translation>Litecoin Jezgra</translation>
     </message>
     <message>
@@ -399,7 +399,7 @@
         <translation>Zatraži uplate (Stvara QR kodove i marscoin: URIje)</translation>
     </message>
     <message>
-        <source>&amp;About Litecoin Core</source>
+        <source>&amp;About Marscoin Client</source>
         <translation>&amp;O Litecoin Jezgri</translation>
     </message>
     <message>
@@ -419,7 +419,7 @@
         <translation>Opcije &amp;naredbene linije</translation>
     </message>
     <message>
-        <source>Show the Litecoin Core help message to get a list with possible Litecoin command-line options</source>
+        <source>Show the Marscoin Client help message to get a list with possible Litecoin command-line options</source>
         <translation>Ispis svih opcija naredbene linije programa sa kratkim opisom</translation>
     </message>
     <message numerus="yes">
@@ -698,7 +698,7 @@ Adresa:%4
 <context>
     <name>HelpMessageDialog</name>
     <message>
-        <source>Litecoin Core</source>
+        <source>Marscoin Client</source>
         <translation>Litecoin Jezgra</translation>
     </message>
     <message>
@@ -710,7 +710,7 @@ Adresa:%4
         <translation>(%1-bit)</translation>
     </message>
     <message>
-        <source>About Litecoin Core</source>
+        <source>About Marscoin Client</source>
         <translation>O Litecoin Jezrgu</translation>
     </message>
     <message>
@@ -741,11 +741,11 @@ Adresa:%4
         <translation>Dobrodošli</translation>
     </message>
     <message>
-        <source>Welcome to Litecoin Core.</source>
-        <translation>Dobrodošli u programu Litecoin Core.</translation>
+        <source>Welcome to Marscoin Client.</source>
+        <translation>Dobrodošli u programu Marscoin Client.</translation>
     </message>
     <message>
-        <source>Litecoin Core</source>
+        <source>Marscoin Client</source>
         <translation>Litecoin Jezgra</translation>
     </message>
     <message>
@@ -1365,7 +1365,7 @@ Adresa:%4
 <context>
     <name>SplashScreen</name>
     <message>
-        <source>Litecoin Core</source>
+        <source>Marscoin Client</source>
         <translation>Litecoin Jezgra</translation>
     </message>
     <message>

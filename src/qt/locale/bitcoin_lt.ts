@@ -271,8 +271,8 @@
         <translation>Atidaryti &amp;URI...</translation>
     </message>
     <message>
-        <source>Litecoin Core client</source>
-        <translation>Litecoin Core klientas</translation>
+        <source>Marscoin Client client</source>
+        <translation>Marscoin Client klientas</translation>
     </message>
     <message>
         <source>Importing blocks from disk...</source>
@@ -327,8 +327,8 @@
         <translation>&amp;Gauti</translation>
     </message>
     <message>
-        <source>Show information about Litecoin Core</source>
-        <translation>Rodyti informaciją apie Litecoin Core</translation>
+        <source>Show information about Marscoin Client</source>
+        <translation>Rodyti informaciją apie Marscoin Client</translation>
     </message>
     <message>
         <source>&amp;Show / Hide</source>
@@ -359,12 +359,12 @@
         <translation>Kortelių įrankinė</translation>
     </message>
     <message>
-        <source>Litecoin Core</source>
+        <source>Marscoin Client</source>
         <translation>Litecoin branduolys</translation>
     </message>
     <message>
-        <source>&amp;About Litecoin Core</source>
-        <translation>&amp;Apie Litecoin Core</translation>
+        <source>&amp;About Marscoin Client</source>
+        <translation>&amp;Apie Marscoin Client</translation>
     </message>
     <message numerus="yes">
         <source>%n active connection(s) to Litecoin network</source>
@@ -649,7 +649,7 @@ Adresas: %4</translation>
 <context>
     <name>HelpMessageDialog</name>
     <message>
-        <source>Litecoin Core</source>
+        <source>Marscoin Client</source>
         <translation>Litecoin branduolys</translation>
     </message>
     <message>
@@ -657,8 +657,8 @@ Adresas: %4</translation>
         <translation>versija</translation>
     </message>
     <message>
-        <source>About Litecoin Core</source>
-        <translation>Apie Litecoin Core</translation>
+        <source>About Marscoin Client</source>
+        <translation>Apie Marscoin Client</translation>
     </message>
     <message>
         <source>Command-line options</source>
@@ -692,11 +692,11 @@ Adresas: %4</translation>
         <translation>Sveiki</translation>
     </message>
     <message>
-        <source>Welcome to Litecoin Core.</source>
-        <translation>Sveiki atvykę į Litecoin Core.</translation>
+        <source>Welcome to Marscoin Client.</source>
+        <translation>Sveiki atvykę į Marscoin Client.</translation>
     </message>
     <message>
-        <source>Litecoin Core</source>
+        <source>Marscoin Client</source>
         <translation>Litecoin branduolys</translation>
     </message>
     <message>
@@ -1316,7 +1316,7 @@ Adresas: %4</translation>
 <context>
     <name>SplashScreen</name>
     <message>
-        <source>Litecoin Core</source>
+        <source>Marscoin Client</source>
         <translation>Litecoin branduolys</translation>
     </message>
     <message>

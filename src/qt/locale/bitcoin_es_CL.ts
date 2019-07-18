@@ -235,7 +235,7 @@
         <translation>Abrir y url...</translation>
     </message>
     <message>
-        <source>Litecoin Core client</source>
+        <source>Marscoin Client client</source>
         <translation>cliente marscoin core</translation>
     </message>
     <message>
@@ -307,7 +307,7 @@
         <translation>Barra de pestañas</translation>
     </message>
     <message>
-        <source>Litecoin Core</source>
+        <source>Marscoin Client</source>
         <translation>marscoin core</translation>
     </message>
     <message numerus="yes">
@@ -489,7 +489,7 @@ Dirección: %4</translation>
 <context>
     <name>HelpMessageDialog</name>
     <message>
-        <source>Litecoin Core</source>
+        <source>Marscoin Client</source>
         <translation>marscoin core</translation>
     </message>
     <message>
@@ -517,7 +517,7 @@ Dirección: %4</translation>
         <translation>bienvenido</translation>
     </message>
     <message>
-        <source>Litecoin Core</source>
+        <source>Marscoin Client</source>
         <translation>marscoin core</translation>
     </message>
     <message>
@@ -999,7 +999,7 @@ Dirección: %4</translation>
 <context>
     <name>SplashScreen</name>
     <message>
-        <source>Litecoin Core</source>
+        <source>Marscoin Client</source>
         <translation>marscoin core</translation>
     </message>
     <message>

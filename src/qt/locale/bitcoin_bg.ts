@@ -291,8 +291,8 @@
         <translation>Отвори &amp;URI...</translation>
     </message>
     <message>
-        <source>Litecoin Core client</source>
-        <translation>Litecoin Core клиент</translation>
+        <source>Marscoin Client client</source>
+        <translation>Marscoin Client клиент</translation>
     </message>
     <message>
         <source>Send coins to a Litecoin address</source>
@@ -339,7 +339,7 @@
         <translation>&amp;Получаване</translation>
     </message>
     <message>
-        <source>Show information about Litecoin Core</source>
+        <source>Show information about Marscoin Client</source>
         <translation>Покажете информация за Litecoin ядрото</translation>
     </message>
     <message>
@@ -379,7 +379,7 @@
         <translation>Раздели</translation>
     </message>
     <message>
-        <source>Litecoin Core</source>
+        <source>Marscoin Client</source>
         <translation>Litecoin ядро</translation>
     </message>
     <message>
@@ -387,8 +387,8 @@
         <translation>Изискване на плащания(генерира QR кодове и marscoin: URIs)</translation>
     </message>
     <message>
-        <source>&amp;About Litecoin Core</source>
-        <translation>&amp;Относно Litecoin Core</translation>
+        <source>&amp;About Marscoin Client</source>
+        <translation>&amp;Относно Marscoin Client</translation>
     </message>
     <message>
         <source>Show the list of used sending addresses and labels</source>
@@ -407,7 +407,7 @@
         <translation>&amp;Налични команди</translation>
     </message>
     <message>
-        <source>Show the Litecoin Core help message to get a list with possible Litecoin command-line options</source>
+        <source>Show the Marscoin Client help message to get a list with possible Litecoin command-line options</source>
         <translation>Покажи помощните съобщения на Litecoin за да видиш наличните и валидни команди</translation>
     </message>
     <message numerus="yes">
@@ -786,7 +786,7 @@ Address: %4
 <context>
     <name>HelpMessageDialog</name>
     <message>
-        <source>Litecoin Core</source>
+        <source>Marscoin Client</source>
         <translation>Litecoin ядро</translation>
     </message>
     <message>
@@ -798,8 +798,8 @@ Address: %4
         <translation>(%1-битов)</translation>
     </message>
     <message>
-        <source>About Litecoin Core</source>
-        <translation>За Litecoin Core</translation>
+        <source>About Marscoin Client</source>
+        <translation>За Marscoin Client</translation>
     </message>
     <message>
         <source>Command-line options</source>
@@ -837,11 +837,11 @@ Address: %4
         <translation>Добре дошли</translation>
     </message>
     <message>
-        <source>Welcome to Litecoin Core.</source>
+        <source>Welcome to Marscoin Client.</source>
         <translation>Добре дошли в Litecoin ядрото.</translation>
     </message>
     <message>
-        <source>As this is the first time the program is launched, you can choose where Litecoin Core will store its data.</source>
+        <source>As this is the first time the program is launched, you can choose where Marscoin Client will store its data.</source>
         <translation>Тъй като това е първото стартиране на програмата можете да изберете къде Litecoin ядрото да запази данните си.</translation>
     </message>
     <message>
@@ -853,7 +853,7 @@ Address: %4
         <translation>Използване на директория ръчно</translation>
     </message>
     <message>
-        <source>Litecoin Core</source>
+        <source>Marscoin Client</source>
         <translation>Litecoin ядро</translation>
     </message>
     <message>
@@ -1875,7 +1875,7 @@ Address: %4
 <context>
     <name>ShutdownWindow</name>
     <message>
-        <source>Litecoin Core is shutting down...</source>
+        <source>Marscoin Client is shutting down...</source>
         <translation>Litecoin ядрото се изключва...</translation>
     </message>
     <message>
@@ -2005,7 +2005,7 @@ Address: %4
 <context>
     <name>SplashScreen</name>
     <message>
-        <source>Litecoin Core</source>
+        <source>Marscoin Client</source>
         <translation>Litecoin ядро</translation>
     </message>
     <message>

@@ -311,7 +311,7 @@
         <translation>Tabella instrumentorum "Tabs"</translation>
     </message>
     <message>
-        <source>Litecoin Core</source>
+        <source>Marscoin Client</source>
         <translation>Litecoin Nucleus</translation>
     </message>
     <message numerus="yes">
@@ -494,7 +494,7 @@ Inscriptio: %4
 <context>
     <name>HelpMessageDialog</name>
     <message>
-        <source>Litecoin Core</source>
+        <source>Marscoin Client</source>
         <translation>Litecoin Nucleus</translation>
     </message>
     <message>
@@ -533,7 +533,7 @@ Inscriptio: %4
 <context>
     <name>Intro</name>
     <message>
-        <source>Litecoin Core</source>
+        <source>Marscoin Client</source>
         <translation>Litecoin Nucleus</translation>
     </message>
     <message>
@@ -1093,7 +1093,7 @@ Inscriptio: %4
 <context>
     <name>SplashScreen</name>
     <message>
-        <source>Litecoin Core</source>
+        <source>Marscoin Client</source>
         <translation>Litecoin Nucleus</translation>
     </message>
     <message>

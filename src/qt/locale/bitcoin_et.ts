@@ -335,7 +335,7 @@
         <translation>Vahelehe tööriistariba</translation>
     </message>
     <message>
-        <source>Litecoin Core</source>
+        <source>Marscoin Client</source>
         <translation>Litecoini tuumik</translation>
     </message>
     <message numerus="yes">
@@ -573,7 +573,7 @@ Aadress: %4⏎</translation>
 <context>
     <name>HelpMessageDialog</name>
     <message>
-        <source>Litecoin Core</source>
+        <source>Marscoin Client</source>
         <translation>Litecoini tuumik</translation>
     </message>
     <message>
@@ -581,7 +581,7 @@ Aadress: %4⏎</translation>
         <translation>versioon</translation>
     </message>
     <message>
-        <source>About Litecoin Core</source>
+        <source>About Marscoin Client</source>
         <translation>Kirjeldus Litecoini Tuumast</translation>
     </message>
     <message>
@@ -620,7 +620,7 @@ Aadress: %4⏎</translation>
         <translation>Teretulemast</translation>
     </message>
     <message>
-        <source>Litecoin Core</source>
+        <source>Marscoin Client</source>
         <translation>Litecoini tuumik</translation>
     </message>
     <message>
@@ -1304,7 +1304,7 @@ Aadress: %4⏎</translation>
 <context>
     <name>SplashScreen</name>
     <message>
-        <source>Litecoin Core</source>
+        <source>Marscoin Client</source>
         <translation>Litecoini tuumik</translation>
     </message>
     <message>

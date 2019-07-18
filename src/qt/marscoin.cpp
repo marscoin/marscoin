@@ -3,7 +3,7 @@
  */
 
 #include <QApplication>
-
+#include "primitives/transaction.h"
 #include "marscoingui.h"
 #include "clientmodel.h"
 #include "walletmodel.h"
@@ -15,6 +15,10 @@
 #include "ui_interface.h"
 #include "paymentserver.h"
 #include "splashscreen.h"
+
+#include <boost/filesystem/operations.hpp>
+#include <boost/filesystem/path.hpp>
+#include <boost/thread.hpp>
 
 #include <QMessageBox>
 #if QT_VERSION < 0x050000
@@ -71,21 +75,21 @@ static bool ThreadSafeMessageBox(const std::string& message, const std::string& 
     }
 }
 
-static bool ThreadSafeAskFee(int64 nFeeRequired)
-{
-    if(!guiref)
-        return false;
-    if(nFeeRequired < CTransaction::nMinTxFee || nFeeRequired <= nTransactionFee || fDaemon)
-        return true;
+//static bool ThreadSafeAskFee(int nFeeRequired)
+//{
+//    if(!guiref)
+//        return false;
+//    if(nFeeRequired < CTransaction::nMinTxFee || nFeeRequired <= nTransactionFee || fDaemon)
+//        return true;
 
-    bool payFee = false;
+//    bool payFee = false;
 
-    QMetaObject::invokeMethod(guiref, "askFee", GUIUtil::blockingGUIThreadConnection(),
-                               Q_ARG(qint64, nFeeRequired),
-                               Q_ARG(bool*, &payFee));
+//    QMetaObject::invokeMethod(guiref, "askFee", GUIUtil::blockingGUIThreadConnection(),
+//                               Q_ARG(qint64, nFeeRequired),
+//                               Q_ARG(bool*, &payFee));
 
-    return payFee;
-}
+//    return payFee;
+//}
 
 static void InitMessage(const std::string &message)
 {
@@ -142,7 +146,7 @@ int main(int argc, char *argv[])
     app.installEventFilter(new GUIUtil::ToolTipToRichTextFilter(TOOLTIP_WRAP_THRESHOLD, &app));
 
     // ... then marscoin.conf:
-    if (!boost::filesystem::is_directory(GetDataDir(false)))
+    if (!boost::filesystem::is_directory(GetDataDir(false) ))
     {
         // This message can not be translated, as translation is not initialized yet
         // (which not yet possible because lang=XX can be overridden in marscoin.conf in the data directory)
@@ -156,7 +160,7 @@ int main(int argc, char *argv[])
     // as it is used to locate QSettings)
     QApplication::setOrganizationName("Marscoin");
     QApplication::setOrganizationDomain("marscoin.org");
-    if(GetBoolArg("-testnet")) // Separate UI settings for testnet
+    if(GetBoolArg("-testnet", false)) // Separate UI settings for testnet
         QApplication::setApplicationName("Marscoin-Qt-testnet");
     else
         QApplication::setApplicationName("Marscoin-Qt");
@@ -193,7 +197,7 @@ int main(int argc, char *argv[])
 
     // Subscribe to global signals from core
     uiInterface.ThreadSafeMessageBox.connect(ThreadSafeMessageBox);
-    uiInterface.ThreadSafeAskFee.connect(ThreadSafeAskFee);
+    //uiInterface.ThreadSafeAskFee.connect(ThreadSafeAskFee);
     uiInterface.InitMessage.connect(InitMessage);
     uiInterface.Translate.connect(Translate);
 
@@ -214,7 +218,7 @@ int main(int argc, char *argv[])
 #endif
 
     SplashScreen splash(QPixmap(), 0);
-    if (GetBoolArg("-splash", true) && !GetBoolArg("-min"))
+    if (GetBoolArg("-splash", true) && !GetBoolArg("-min", false))
     {
         splash.show();
         splash.setAutoFillBackground(true);
@@ -266,7 +270,7 @@ int main(int argc, char *argv[])
                 }
 
                 // If -min option passed, start window minimized.
-                if(GetBoolArg("-min"))
+                if(GetBoolArg("-min", false))
                 {
                     window.showMinimized();
                 }

@@ -275,7 +275,7 @@
         <translation>Buka &amp;URI</translation>
     </message>
     <message>
-        <source>Litecoin Core client</source>
+        <source>Marscoin Client client</source>
         <translation>Client Litecoin Inti</translation>
     </message>
     <message>
@@ -331,7 +331,7 @@
         <translation>&amp;Menerima</translation>
     </message>
     <message>
-        <source>Show information about Litecoin Core</source>
+        <source>Show information about Marscoin Client</source>
         <translation>Tampilkan informasi tentang Litecoin Inti</translation>
     </message>
     <message>
@@ -371,16 +371,16 @@
         <translation>Baris tab</translation>
     </message>
     <message>
-        <source>Litecoin Core</source>
-        <translation>Litecoin Core</translation>
+        <source>Marscoin Client</source>
+        <translation>Marscoin Client</translation>
     </message>
     <message>
         <source>Request payments (generates QR codes and marscoin: URIs)</source>
         <translation>Permintaan pembayaran (membangkitkan kode QR dan marscoin: URIs)</translation>
     </message>
     <message>
-        <source>&amp;About Litecoin Core</source>
-        <translation>&amp;Mengenai Litecoin Core</translation>
+        <source>&amp;About Marscoin Client</source>
+        <translation>&amp;Mengenai Marscoin Client</translation>
     </message>
     <message>
         <source>Show the list of used sending addresses and labels</source>
@@ -399,8 +399,8 @@
         <translation>&amp;pilihan Perintah-baris</translation>
     </message>
     <message>
-        <source>Show the Litecoin Core help message to get a list with possible Litecoin command-line options</source>
-        <translation>Tampilkan pesan bantuan Litecoin Core untuk memberikan daftar pilihan perintah-baris yang memungkinkan dalam aplikasi Litecoin</translation>
+        <source>Show the Marscoin Client help message to get a list with possible Litecoin command-line options</source>
+        <translation>Tampilkan pesan bantuan Marscoin Client untuk memberikan daftar pilihan perintah-baris yang memungkinkan dalam aplikasi Litecoin</translation>
     </message>
     <message numerus="yes">
         <source>%n active connection(s) to Litecoin network</source>
@@ -778,16 +778,16 @@ Alamat: %4
 <context>
     <name>HelpMessageDialog</name>
     <message>
-        <source>Litecoin Core</source>
-        <translation>Litecoin Core</translation>
+        <source>Marscoin Client</source>
+        <translation>Marscoin Client</translation>
     </message>
     <message>
         <source>version</source>
         <translation>versi</translation>
     </message>
     <message>
-        <source>About Litecoin Core</source>
-        <translation>Mengenai Litecoin Core</translation>
+        <source>About Marscoin Client</source>
+        <translation>Mengenai Marscoin Client</translation>
     </message>
     <message>
         <source>Usage:</source>
@@ -821,8 +821,8 @@ Alamat: %4
         <translation>Selamat Datang</translation>
     </message>
     <message>
-        <source>Welcome to Litecoin Core.</source>
-        <translation>Selamat Datang ke Litecoin Core</translation>
+        <source>Welcome to Marscoin Client.</source>
+        <translation>Selamat Datang ke Marscoin Client</translation>
     </message>
     <message>
         <source>Use the default data directory</source>
@@ -833,8 +833,8 @@ Alamat: %4
         <translation>Menggunakan direktori data yang dipilih Anda:</translation>
     </message>
     <message>
-        <source>Litecoin Core</source>
-        <translation>Litecoin Core</translation>
+        <source>Marscoin Client</source>
+        <translation>Marscoin Client</translation>
     </message>
     <message>
         <source>Error</source>
@@ -1691,8 +1691,8 @@ Alamat: %4
 <context>
     <name>ShutdownWindow</name>
     <message>
-        <source>Litecoin Core is shutting down...</source>
-        <translation>Litecoin Core sementara dimatikan...</translation>
+        <source>Marscoin Client is shutting down...</source>
+        <translation>Marscoin Client sementara dimatikan...</translation>
     </message>
     <message>
         <source>Do not shut down the computer until this window disappears.</source>
@@ -1817,8 +1817,8 @@ Alamat: %4
 <context>
     <name>SplashScreen</name>
     <message>
-        <source>Litecoin Core</source>
-        <translation>Litecoin Core</translation>
+        <source>Marscoin Client</source>
+        <translation>Marscoin Client</translation>
     </message>
     <message>
         <source>The Bitcoin Core developers</source>
@@ -2303,8 +2303,8 @@ Alamat: %4
         <translation>Jalankan perintah ketika perubahan transaksi dompet (%s di cmd digantikan oleh TxID)</translation>
     </message>
     <message>
-        <source>Unable to bind to %s on this computer. Litecoin Core is probably already running.</source>
-        <translation>Tidak bisa mengikat dengan %s di computer ini. Kemungkinan Litecoin Core sudah mulai.</translation>
+        <source>Unable to bind to %s on this computer. Marscoin Client is probably already running.</source>
+        <translation>Tidak bisa mengikat dengan %s di computer ini. Kemungkinan Marscoin Client sudah mulai.</translation>
     </message>
     <message>
         <source>Warning: -paytxfee is set very high! This is the transaction fee you will pay if you send a transaction.</source>
@@ -2427,8 +2427,8 @@ Alamat: %4
         <translation>Impor blok dari eksternal berkas blk000???.dat</translation>
     </message>
     <message>
-        <source>Cannot obtain a lock on data directory %s. Litecoin Core is probably already running.</source>
-        <translation>Tidak bisa mengunci data directory %s. Kemungkinan Litecoin Core sudah mulai.</translation>
+        <source>Cannot obtain a lock on data directory %s. Marscoin Client is probably already running.</source>
+        <translation>Tidak bisa mengunci data directory %s. Kemungkinan Marscoin Client sudah mulai.</translation>
     </message>
     <message>
         <source>Information</source>

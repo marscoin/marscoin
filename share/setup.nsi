@@ -50,16 +50,16 @@ Var StartMenuGroup
 # Installer attributes
 OutFile /home/novalis78/Archive/marscoin/marscoin-${VERSION}-win-setup.exe
 !if "" == "64"
-InstallDir $PROGRAMFILES64\Litecoin
+InstallDir $PROGRAMFILES64\Marscoin
 !else
-InstallDir $PROGRAMFILES\Litecoin
+InstallDir $PROGRAMFILES\Marscoin
 !endif
 CRCCheck on
 XPStyle on
 BrandingText " "
 ShowInstDetails show
 VIProductVersion ${VERSION}.0
-VIAddVersionKey ProductName "Litecoin Core"
+VIAddVersionKey ProductName "Marscoin Client"
 VIAddVersionKey ProductVersion "${VERSION}"
 VIAddVersionKey CompanyName "${COMPANY}"
 VIAddVersionKey CompanyWebsite "${URL}"
