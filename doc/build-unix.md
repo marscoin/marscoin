@@ -63,11 +63,18 @@ for Ubuntu 12.04 and later or Debian 7 and later libboost-all-dev has to be inst
 
 	sudo apt-get install libboost-all-dev
 
+for Ubuntu 18
+
  db4.8 packages are available [here](https://launchpad.net/~bitcoin/+archive/bitcoin).
  You can add the repository using the following command:
 
         sudo add-apt-repository ppa:bitcoin/bitcoin
         sudo apt-get update
+
+also for Ubuntu 18 you may need to downgrade openssl-dev
+	sudo apt autoremove openssl-dev
+	sudo apt-get install libssl1.0-dev
+
 
  Ubuntu 12.04 and later have packages for libdb5.1-dev and libdb5.1++-dev,
  but using these will break binary wallet compatibility, and is not recommended.
