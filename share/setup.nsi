@@ -1,34 +1,34 @@
-Name "Marscoin (-bit)"
+Name "Bitcoin Core (64-bit)"
 
 RequestExecutionLevel highest
 SetCompressor /SOLID lzma
 
 # General Symbol Definitions
 !define REGKEY "SOFTWARE\$(^Name)"
-!define VERSION 1.5.3.0
+!define VERSION 0.10.0.0
 !define COMPANY "Marscoin project"
 !define URL http://www.marscoin.org/
 
 # MUI Symbol Definitions
-!define MUI_ICON "/home/novalis78/Archive/marscoin/share/pixmaps/bitcoin.ico"
-!define MUI_WELCOMEFINISHPAGE_BITMAP "/home/novalis78/Archive/marscoin/share/pixmaps/nsis-wizard.bmp"
+!define MUI_ICON "/home/marscoin/marscoin/share/pixmaps/bitcoin.ico"
+!define MUI_WELCOMEFINISHPAGE_BITMAP "/home/marscoin/marscoin/share/pixmaps/nsis-wizard.bmp"
 !define MUI_HEADERIMAGE
 !define MUI_HEADERIMAGE_RIGHT
-!define MUI_HEADERIMAGE_BITMAP "/home/novalis78/Archive/marscoin/share/pixmaps/nsis-header.bmp"
+!define MUI_HEADERIMAGE_BITMAP "/home/marscoin/marscoin/share/pixmaps/nsis-header.bmp"
 !define MUI_FINISHPAGE_NOAUTOCLOSE
 !define MUI_STARTMENUPAGE_REGISTRY_ROOT HKLM
 !define MUI_STARTMENUPAGE_REGISTRY_KEY ${REGKEY}
 !define MUI_STARTMENUPAGE_REGISTRY_VALUENAME StartMenuGroup
-!define MUI_STARTMENUPAGE_DEFAULTFOLDER "Marscoin"
+!define MUI_STARTMENUPAGE_DEFAULTFOLDER "Bitcoin Core"
 !define MUI_FINISHPAGE_RUN $INSTDIR\marscoin-qt.exe
 !define MUI_UNICON "${NSISDIR}\Contrib\Graphics\Icons\modern-uninstall.ico"
-!define MUI_UNWELCOMEFINISHPAGE_BITMAP "/home/novalis78/Archive/marscoin/share/pixmaps/nsis-wizard.bmp"
+!define MUI_UNWELCOMEFINISHPAGE_BITMAP "/home/marscoin/marscoin/share/pixmaps/nsis-wizard.bmp"
 !define MUI_UNFINISHPAGE_NOAUTOCLOSE
 
 # Included files
 !include Sections.nsh
 !include MUI2.nsh
-!if "" == "64"
+!if "64" == "64"
 !include x64.nsh
 !endif
 
@@ -48,18 +48,18 @@ Var StartMenuGroup
 !insertmacro MUI_LANGUAGE English
 
 # Installer attributes
-OutFile /home/novalis78/Archive/marscoin/marscoin-${VERSION}-win-setup.exe
-!if "" == "64"
-InstallDir $PROGRAMFILES64\Marscoin
+OutFile /home/marscoin/marscoin/marscoin-${VERSION}-win64-setup.exe
+!if "64" == "64"
+InstallDir $PROGRAMFILES64\Litecoin
 !else
-InstallDir $PROGRAMFILES\Marscoin
+InstallDir $PROGRAMFILES\Litecoin
 !endif
 CRCCheck on
 XPStyle on
 BrandingText " "
 ShowInstDetails show
 VIProductVersion ${VERSION}.0
-VIAddVersionKey ProductName "Marscoin Client"
+VIAddVersionKey ProductName "Litecoin Core"
 VIAddVersionKey ProductVersion "${VERSION}"
 VIAddVersionKey CompanyName "${COMPANY}"
 VIAddVersionKey CompanyWebsite "${URL}"
@@ -73,14 +73,14 @@ ShowUninstDetails show
 Section -Main SEC0000
     SetOutPath $INSTDIR
     SetOverwrite on
-    File /home/novalis78/Archive/marscoin/release/marscoin-qt.exe
-    File /oname=COPYING.txt /home/novalis78/Archive/marscoin/COPYING
-    File /oname=readme.txt /home/novalis78/Archive/marscoin/doc/README_windows.txt
+    File /home/marscoin/marscoin/release/marscoin-qt.exe
+    File /oname=COPYING.txt /home/marscoin/marscoin/COPYING
+    File /oname=readme.txt /home/marscoin/marscoin/doc/README_windows.txt
     SetOutPath $INSTDIR\daemon
-    File /home/novalis78/Archive/marscoin/release/marscoind.exe
-    File /home/novalis78/Archive/marscoin/release/marscoin-cli.exe
+    File /home/marscoin/marscoin/release/marscoind.exe
+    File /home/marscoin/marscoin/release/marscoin-cli.exe
     SetOutPath $INSTDIR\doc
-    File /r /home/novalis78/Archive/marscoin/doc\*.*
+    File /r /home/marscoin/marscoin/doc\*.*
     SetOutPath $INSTDIR
     WriteRegStr HKCU "${REGKEY}\Components" Main 1
 
@@ -160,7 +160,7 @@ SectionEnd
 # Installer functions
 Function .onInit
     InitPluginsDir
-!if "" == "64"
+!if "64" == "64"
     ${If} ${RunningX64}
       ; disable registry redirection (enable access to 64-bit portion of registry)
       SetRegView 64
