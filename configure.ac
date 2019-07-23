@@ -1,12 +1,12 @@
 dnl require autoconf 2.60 (AS_ECHO/AS_ECHO_N)
 AC_PREREQ([2.60])
-define(_CLIENT_VERSION_MAJOR, 1)
-define(_CLIENT_VERSION_MINOR, 5)
-define(_CLIENT_VERSION_REVISION, 3)
+define(_CLIENT_VERSION_MAJOR, 0)
+define(_CLIENT_VERSION_MINOR, 10)
+define(_CLIENT_VERSION_REVISION, 0)
 define(_CLIENT_VERSION_BUILD, 0)
 define(_CLIENT_VERSION_IS_RELEASE, true)
-define(_COPYRIGHT_YEAR, 2019)
-AC_INIT([Marscoin],[_CLIENT_VERSION_MAJOR._CLIENT_VERSION_MINOR._CLIENT_VERSION_REVISION._CLIENT_VERSION_BUILD],[info@marscoin.org],[marscoin])
+define(_COPYRIGHT_YEAR, 2015)
+AC_INIT([Bitcoin Core],[_CLIENT_VERSION_MAJOR._CLIENT_VERSION_MINOR._CLIENT_VERSION_REVISION],[info@bitcoin.org],[bitcoin])
 AC_CONFIG_SRCDIR([src/main.cpp])
 AC_CONFIG_HEADERS([src/config/bitcoin-config.h])
 AC_CONFIG_AUX_DIR([build-aux])
@@ -167,13 +167,13 @@ fi
 ##       compatibility with the legacy buildsystem.
 ##
 if test "x$CXXFLAGS_overridden" = "xno"; then
-  CXXFLAGS="$CXXFLAGS -Wall -Wextra -Wformat -Wformat-security -Wno-unused-parameter -Wno-self-assign"
+  CXXFLAGS="$CXXFLAGS -Wall -Wextra -Wformat -Wformat-security -Wno-unused-parameter"
 fi
 CPPFLAGS="$CPPFLAGS -DBOOST_SPIRIT_THREADSAFE -DHAVE_BUILD_INFO -D__STDC_FORMAT_MACROS"
 
 AC_ARG_WITH([utils],
   [AS_HELP_STRING([--with-utils],
-  [build marscoin-cli marscoin-tx (default=yes)])],
+  [build bitcoin-cli bitcoin-tx (default=yes)])],
   [build_bitcoin_utils=$withval],
   [build_bitcoin_utils=yes])
 
@@ -424,8 +424,8 @@ if test x$use_hardening != xno; then
 
   if test x$TARGET_OS != xwindows; then
     # All windows code is PIC, forcing it on just adds useless compile warnings
-    AX_CHECK_COMPILE_FLAG([-fPIC],[HARDENED_CXXFLAGS="$HARDENED_CXXFLAGS -fPIC"])
-    AX_CHECK_LINK_FLAG([[-pic]], [HARDENED_LDFLAGS="$HARDENED_LDFLAGS -pic"])
+    AX_CHECK_COMPILE_FLAG([-fPIE],[HARDENED_CXXFLAGS="$HARDENED_CXXFLAGS -fPIE"])
+    AX_CHECK_LINK_FLAG([[-pie]], [HARDENED_LDFLAGS="$HARDENED_LDFLAGS -pie"])
   fi
 
   case $host in
@@ -701,44 +701,21 @@ else
   fi
 fi
 
-AC_CHECK_LIB([crypto],[RAND_egd],[],[
-  AC_ARG_WITH([libressl],
-    [AS_HELP_STRING([--with-libressl],[Build with system LibreSSL (default is no; DANGEROUS; NOT SUPPORTED)])],
-    [AC_MSG_WARN([Detected LibreSSL: This is NOT supported, and may break consensus compatibility!])],
-    [AC_MSG_ERROR([Detected LibreSSL: This is NOT supported, and may break consensus compatibility!])]
-  )
-])
-
 CFLAGS_TEMP="$CFLAGS"
 LIBS_TEMP="$LIBS"
 CFLAGS="$CFLAGS $SSL_CFLAGS $CRYPTO_CFLAGS"
 LIBS="$LIBS $SSL_LIBS $CRYPTO_LIBS"
 AC_CHECK_HEADER([openssl/ec.h],, AC_MSG_ERROR(OpenSSL ec header missing),)
-
-AC_MSG_CHECKING(for a supported OpenSSL version)
-AC_LINK_IFELSE([AC_LANG_PROGRAM([[
-  #include <openssl/rand.h>
-  ]],
-  [[RAND_egd(NULL);]])],
-  [AC_MSG_RESULT(yes)],
-  [
-    AC_ARG_WITH([libressl],
-    [AS_HELP_STRING([--with-libressl],[Build with system LibreSSL (default is no; DANGEROUS; NOT SUPPORTED)])],
-    [AC_MSG_WARN([Detected LibreSSL: This is NOT supported, and may break consensus compatibility!])],
-    [AC_MSG_ERROR([Detected LibreSSL: This is NOT supported, and may break consensus compatibility!])]
-    )]
-)
-
 CFLAGS="$CFLAGS_TEMP"
 LIBS="$LIBS_TEMP"
 
 BITCOIN_QT_PATH_PROGS([PROTOC], [protoc],$protoc_bin_path)
 
-AC_MSG_CHECKING([whether to build marscoind])
+AC_MSG_CHECKING([whether to build bitcoind])
 AM_CONDITIONAL([BUILD_BITCOIND], [test x$build_bitcoind = xyes])
 AC_MSG_RESULT($build_bitcoind)
 
-AC_MSG_CHECKING([whether to build utils (marscoin-cli marscoin-tx)])
+AC_MSG_CHECKING([whether to build utils (bitcoin-cli bitcoin-tx)])
 AM_CONDITIONAL([BUILD_BITCOIN_UTILS], [test x$build_bitcoin_utils = xyes])
 AC_MSG_RESULT($build_bitcoin_utils)
 
