@@ -1,4 +1,4 @@
-Name "Marscoin (64-bit)"
+Name "Marscoin (-bit)"
 
 RequestExecutionLevel highest
 SetCompressor /SOLID lzma
@@ -10,11 +10,11 @@ SetCompressor /SOLID lzma
 !define URL http://www.marscoin.org/
 
 # MUI Symbol Definitions
-!define MUI_ICON "/home/marscoin/marscoin/share/pixmaps/bitcoin.ico"
-!define MUI_WELCOMEFINISHPAGE_BITMAP "/home/marscoin/marscoin/share/pixmaps/nsis-wizard.bmp"
+!define MUI_ICON "/home/novalis78/Archive/marscoin/share/pixmaps/bitcoin.ico"
+!define MUI_WELCOMEFINISHPAGE_BITMAP "/home/novalis78/Archive/marscoin/share/pixmaps/nsis-wizard.bmp"
 !define MUI_HEADERIMAGE
 !define MUI_HEADERIMAGE_RIGHT
-!define MUI_HEADERIMAGE_BITMAP "/home/marscoin/marscoin/share/pixmaps/nsis-header.bmp"
+!define MUI_HEADERIMAGE_BITMAP "/home/novalis78/Archive/marscoin/share/pixmaps/nsis-header.bmp"
 !define MUI_FINISHPAGE_NOAUTOCLOSE
 !define MUI_STARTMENUPAGE_REGISTRY_ROOT HKLM
 !define MUI_STARTMENUPAGE_REGISTRY_KEY ${REGKEY}
@@ -22,13 +22,13 @@ SetCompressor /SOLID lzma
 !define MUI_STARTMENUPAGE_DEFAULTFOLDER "Marscoin"
 !define MUI_FINISHPAGE_RUN $INSTDIR\marscoin-qt.exe
 !define MUI_UNICON "${NSISDIR}\Contrib\Graphics\Icons\modern-uninstall.ico"
-!define MUI_UNWELCOMEFINISHPAGE_BITMAP "/home/marscoin/marscoin/share/pixmaps/nsis-wizard.bmp"
+!define MUI_UNWELCOMEFINISHPAGE_BITMAP "/home/novalis78/Archive/marscoin/share/pixmaps/nsis-wizard.bmp"
 !define MUI_UNFINISHPAGE_NOAUTOCLOSE
 
 # Included files
 !include Sections.nsh
 !include MUI2.nsh
-!if "64" == "64"
+!if "" == "64"
 !include x64.nsh
 !endif
 
@@ -48,8 +48,8 @@ Var StartMenuGroup
 !insertmacro MUI_LANGUAGE English
 
 # Installer attributes
-OutFile /home/marscoin/marscoin/marscoin-${VERSION}-win64-setup.exe
-!if "64" == "64"
+OutFile /home/novalis78/Archive/marscoin/marscoin-${VERSION}-win-setup.exe
+!if "" == "64"
 InstallDir $PROGRAMFILES64\Marscoin
 !else
 InstallDir $PROGRAMFILES\Marscoin
@@ -73,14 +73,14 @@ ShowUninstDetails show
 Section -Main SEC0000
     SetOutPath $INSTDIR
     SetOverwrite on
-    File /home/marscoin/marscoin/release/marscoin-qt.exe
-    File /oname=COPYING.txt /home/marscoin/marscoin/COPYING
-    File /oname=readme.txt /home/marscoin/marscoin/doc/README_windows.txt
+    File /home/novalis78/Archive/marscoin/release/marscoin-qt.exe
+    File /oname=COPYING.txt /home/novalis78/Archive/marscoin/COPYING
+    File /oname=readme.txt /home/novalis78/Archive/marscoin/doc/README_windows.txt
     SetOutPath $INSTDIR\daemon
-    File /home/marscoin/marscoin/release/marscoind.exe
-    File /home/marscoin/marscoin/release/marscoin-cli.exe
+    File /home/novalis78/Archive/marscoin/release/marscoind.exe
+    File /home/novalis78/Archive/marscoin/release/marscoin-cli.exe
     SetOutPath $INSTDIR\doc
-    File /r /home/marscoin/marscoin/doc\*.*
+    File /r /home/novalis78/Archive/marscoin/doc\*.*
     SetOutPath $INSTDIR
     WriteRegStr HKCU "${REGKEY}\Components" Main 1
 
@@ -160,7 +160,7 @@ SectionEnd
 # Installer functions
 Function .onInit
     InitPluginsDir
-!if "64" == "64"
+!if "" == "64"
     ${If} ${RunningX64}
       ; disable registry redirection (enable access to 64-bit portion of registry)
       SetRegView 64

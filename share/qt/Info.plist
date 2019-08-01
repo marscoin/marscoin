@@ -17,7 +17,7 @@
   <string>APPL</string>
 
   <key>CFBundleGetInfoString</key>
-  <string>1.5.4.0, Copyright © 2009-2019 The Bitcoin Core developers 2011-2015 The Marscoin developers</string>
+  <string>1.5.4.0, Copyright © 2009-2019 The Bitcoin Core developers 2011-2019 The Marscoin developers</string>
 
   <key>CFBundleShortVersionString</key>
   <string>1.5.4.0</string>
