@@ -1,11 +1,11 @@
-Name "Bitcoin Core (64-bit)"
+Name "Marscoin (64-bit)"
 
 RequestExecutionLevel highest
 SetCompressor /SOLID lzma
 
 # General Symbol Definitions
 !define REGKEY "SOFTWARE\$(^Name)"
-!define VERSION 0.10.0.0
+!define VERSION 1.5.4.0
 !define COMPANY "Marscoin project"
 !define URL http://www.marscoin.org/
 
@@ -19,7 +19,7 @@ SetCompressor /SOLID lzma
 !define MUI_STARTMENUPAGE_REGISTRY_ROOT HKLM
 !define MUI_STARTMENUPAGE_REGISTRY_KEY ${REGKEY}
 !define MUI_STARTMENUPAGE_REGISTRY_VALUENAME StartMenuGroup
-!define MUI_STARTMENUPAGE_DEFAULTFOLDER "Bitcoin Core"
+!define MUI_STARTMENUPAGE_DEFAULTFOLDER "Marscoin"
 !define MUI_FINISHPAGE_RUN $INSTDIR\marscoin-qt.exe
 !define MUI_UNICON "${NSISDIR}\Contrib\Graphics\Icons\modern-uninstall.ico"
 !define MUI_UNWELCOMEFINISHPAGE_BITMAP "/home/marscoin/marscoin/share/pixmaps/nsis-wizard.bmp"
@@ -50,16 +50,16 @@ Var StartMenuGroup
 # Installer attributes
 OutFile /home/marscoin/marscoin/marscoin-${VERSION}-win64-setup.exe
 !if "64" == "64"
-InstallDir $PROGRAMFILES64\Litecoin
+InstallDir $PROGRAMFILES64\Marscoin
 !else
-InstallDir $PROGRAMFILES\Litecoin
+InstallDir $PROGRAMFILES\Marscoin
 !endif
 CRCCheck on
 XPStyle on
 BrandingText " "
 ShowInstDetails show
 VIProductVersion ${VERSION}.0
-VIAddVersionKey ProductName "Litecoin Core"
+VIAddVersionKey ProductName "Marscoin"
 VIAddVersionKey ProductVersion "${VERSION}"
 VIAddVersionKey CompanyName "${COMPANY}"
 VIAddVersionKey CompanyWebsite "${URL}"
@@ -107,7 +107,7 @@ Section -post SEC0001
     WriteRegDWORD HKCU "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\$(^Name)" NoModify 1
     WriteRegDWORD HKCU "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\$(^Name)" NoRepair 1
     WriteRegStr HKCR "marscoin" "URL Protocol" ""
-    WriteRegStr HKCR "marscoin" "" "URL:Litecoin"
+    WriteRegStr HKCR "marscoin" "" "URL:Marscoin"
     WriteRegStr HKCR "marscoin\DefaultIcon" "" $INSTDIR\marscoin-qt.exe
     WriteRegStr HKCR "marscoin\shell\open\command" "" '"$INSTDIR\marscoin-qt.exe" "%1"'
 SectionEnd
@@ -139,7 +139,7 @@ Section -un.post UNSEC0001
     DeleteRegKey HKCU "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\$(^Name)"
     Delete /REBOOTOK "$SMPROGRAMS\$StartMenuGroup\Uninstall $(^Name).lnk"
     Delete /REBOOTOK "$SMPROGRAMS\$StartMenuGroup\$(^Name).lnk"
-    Delete /REBOOTOK "$SMSTARTUP\Litecoin.lnk"
+    Delete /REBOOTOK "$SMSTARTUP\Marscoin.lnk"
     Delete /REBOOTOK $INSTDIR\uninstall.exe
     Delete /REBOOTOK $INSTDIR\debug.log
     Delete /REBOOTOK $INSTDIR\db.log
