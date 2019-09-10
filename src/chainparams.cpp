@@ -188,7 +188,7 @@ public:
         fTestnetToBeDeprecatedFieldRPC = false;
 
         // Marscoin: Mainnet v2 enforced as of block 710k
-        nEnforceV2AfterHeight = 1077777;
+        nEnforceV2AfterHeight = 1312374;
     }
 
     const Checkpoints::CCheckpointData& Checkpoints() const 
