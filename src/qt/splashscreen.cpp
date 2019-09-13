@@ -24,7 +24,6 @@ SplashScreen::SplashScreen(Qt::WindowFlags f, const NetworkStyle *networkStyle) 
     QWidget(0, f), curAlignment(0)
 {
     // set reference point, paddings
-    int paddingRight            = 190;
     int paddingRightCopyright   = 220;
     int paddingTop              = 170;
     int paddingCopyrightTop     = 70;
@@ -33,7 +32,7 @@ SplashScreen::SplashScreen(Qt::WindowFlags f, const NetworkStyle *networkStyle) 
     float fontFactor            = 1.0;
 
     // define text to place
-    QString versionText     = QString("Version %1").arg(QString::fromStdString(FormatFullVersion()));
+    QString versionText     = QString("Version 1.5.4");
     QString copyrightText1   = QChar(0xA9)+QString(" 2009-%1 ").arg(COPYRIGHT_YEAR) + QString(tr("Bitcoin/Litecoin developers"));
     QString copyrightText2   = QChar(0xA9)+QString(" 2014-%1 ").arg(COPYRIGHT_YEAR) + QString(tr("The Marscoin developers"));
     QString titleAddText    = networkStyle->getTitleAddText();
@@ -43,18 +42,19 @@ SplashScreen::SplashScreen(Qt::WindowFlags f, const NetworkStyle *networkStyle) 
     pixmap     = networkStyle->getSplashImage();
 
     QPainter pixPaint(&pixmap);
-    pixPaint.setPen(QColor(100,100,100));
+    pixPaint.setPen(QColor(Qt::white));
     pixPaint.setFont(QFont(font, 8*fontFactor));
 
     QFontMetrics fm = pixPaint.fontMetrics();
 
-    // draw version
-    pixPaint.drawText(pixmap.width()-paddingRight+2,paddingTop,versionText);
+ 
 
     // draw copyright stuff
-    pixPaint.setFont(QFont(font, 8*fontFactor));
-    pixPaint.drawText(pixmap.width()-paddingRightCopyright,paddingTop+paddingCopyrightTop,copyrightText1);
-    pixPaint.drawText(pixmap.width()-paddingRightCopyright,paddingTop+paddingCopyrightTop+titleCopyrightVSpace,copyrightText2);
+    pixPaint.setFont(QFont(font, 10*fontFactor));
+       // draw version
+    pixPaint.drawText(pixmap.width()-paddingRightCopyright,paddingTop+paddingCopyrightTop,versionText);
+    pixPaint.drawText(pixmap.width()-paddingRightCopyright,paddingTop+paddingCopyrightTop+14,copyrightText1);
+    pixPaint.drawText(pixmap.width()-paddingRightCopyright,paddingTop+paddingCopyrightTop+14+titleCopyrightVSpace,copyrightText2);
 
     // draw additional text if special network
     if(!titleAddText.isEmpty()) {
@@ -97,7 +97,7 @@ static void InitMessage(SplashScreen *splash, const std::string &message)
         Qt::QueuedConnection,
         Q_ARG(QString, QString::fromStdString(message)),
         Q_ARG(int, Qt::AlignBottom|Qt::AlignHCenter),
-        Q_ARG(QColor, QColor(55,55,55)));
+        Q_ARG(QColor, QColor(Qt::white)));
 }
 
 static void ShowProgress(SplashScreen *splash, const std::string &title, int nProgress)
