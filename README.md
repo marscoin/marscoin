@@ -67,7 +67,8 @@ lots of money.
 Development tips and tricks
 ---------------------------
 
-Take a look at the /doc folder and Marscoin wiki page.
+Take a look at the /doc folder and Marscoin [wiki page](https://github.com/marscoin/marscoin/wiki).
+
 
 **compiling for debugging**
 
