@@ -104,4 +104,6 @@ CXXFLAGS="-DDEBUG_LOCKORDER -g") inserts run-time checks to keep track of which 
 Screenshot
 ----------
 
-![alt tag](http://marscoinfoundation.org/assets/img/screenshot1.png)
+![alt text](http://www.marscoin.org/wp-content/uploads/2019/09/2019-09-18_1039.jpg "Marscoin QT client startup version 1.5")
+
+
