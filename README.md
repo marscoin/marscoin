@@ -1,5 +1,3 @@
-Marscoin integration/staging tree
-================================
 
 http://www.marscoin.org
 
@@ -68,6 +66,8 @@ lots of money.
 
 Development tips and tricks
 ---------------------------
+
+Take a look at the /doc folder and Marscoin wiki page.
 
 **compiling for debugging**
 
