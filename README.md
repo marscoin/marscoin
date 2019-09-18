@@ -83,4 +83,5 @@ Unit tests for the GUI code are in `src/qt/test/`. To compile and run them:
 Screenshot
 ----------
 
-![alt tag](http://marscoinfoundation.org/assets/img/screenshot1.png)
+![alt text](http://www.marscoin.org/wp-content/uploads/2019/09/2019-09-18_1039.jpg "Marscoin Client Startup")
+
