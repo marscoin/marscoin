@@ -1,6 +1,6 @@
 UNIX BUILD NOTES
 ====================
-Some notes on how to build Marscoin in Unix. 
+Some notes on how to build Marscoin in Unix. Recommended OS for Marscoin 1.5 is Ubuntu 18
 
 Note
 ---------------------
