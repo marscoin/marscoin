@@ -72,6 +72,7 @@ for Ubuntu 18
         sudo apt-get update
 
 also for Ubuntu 18 you may need to downgrade openssl-dev
+
 	sudo apt autoremove openssl-dev
 	sudo apt-get install libssl1.0-dev
 
