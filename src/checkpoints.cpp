@@ -7,11 +7,11 @@
 #include "chainparams.h"
 #include "main.h"
 #include "uint256.h"
-
+#include "util.h"
 #include <stdint.h>
 
 #include <boost/foreach.hpp>
-#include <util.h>
+
 
 namespace Checkpoints {
 
