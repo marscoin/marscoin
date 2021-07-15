@@ -7,7 +7,6 @@
 #include "chainparams.h"
 #include "main.h"
 #include "uint256.h"
-#include "util.h"
 #include <stdint.h>
 
 #include <boost/foreach.hpp>
@@ -36,7 +35,6 @@ namespace Checkpoints {
         MapCheckpoints::const_iterator i = checkpoints.find(nHeight);
         if (i == checkpoints.end()) return true;
         if (hash == uint256("0xcff587cac4cf30e32efd6340700888f692a054da67c9021f7e15edc217c8bd91")){
-            LogPrintf("Blacklisted block, keep searching for better chain: %d!\n", hash);
             return false;
         }
         return hash == i->second;
