@@ -1,6 +1,6 @@
-Marscoin 1.5.4
+Marscoin 1.5.5
 
-Copyright (c) 2014-2019 Marscoin Developers
+Copyright (c) 2014-2021 Marscoin Developers
 Distributed under the MIT/X11 software license, see the accompanying
 file COPYING or http://www.opensource.org/licenses/mit-license.php.
 This product includes software developed by the OpenSSL Project for use in
