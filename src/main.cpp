@@ -2579,7 +2579,7 @@ bool ContextualCheckBlockHeader(const CBlockHeader& block, CValidationState& sta
     // Check that the block chain matches the known block chain up to a checkpoint
     if (!Checkpoints::CheckBlock(nHeight, hash))
         return state.DoS(100, error("%s : rejected by checkpoint lock-in at %d", __func__, nHeight),
-                         REJECT_CHECKPOINT, "checkpoint mismatch");
+                         REJECT_CHECKPOINT, "checkpoint mismatch or blacklisted");
 
     // Don't accept any forks from the main chain prior to last checkpoint
     CBlockIndex* pcheckpoint = Checkpoints::GetLastCheckpoint();
