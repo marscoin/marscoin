@@ -2581,14 +2581,6 @@ bool ContextualCheckBlockHeader(const CBlockHeader& block, CValidationState& sta
         return state.DoS(100, error("%s : rejected by checkpoint lock-in at %d", __func__, nHeight),
                          REJECT_CHECKPOINT, "checkpoint mismatch or blacklisted");
 
-    if (!Checkpoints::CheckBlockBlacklist(hash)){
-        return state.DoS(100, error("%s : rejected by checkpoint lock-in at %d", __func__, nHeight),
-                         REJECT_CHECKPOINT, "block blacklisted");
-    }else{
-        LogPrintf("SanityCheck passed...\n");
-    }
-    
-
     // Don't accept any forks from the main chain prior to last checkpoint
     CBlockIndex* pcheckpoint = Checkpoints::GetLastCheckpoint();
     if (pcheckpoint && nHeight < pcheckpoint->nHeight)
