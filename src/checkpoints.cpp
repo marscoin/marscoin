@@ -34,16 +34,10 @@ namespace Checkpoints {
 
         MapCheckpoints::const_iterator i = checkpoints.find(nHeight);
         if (i == checkpoints.end()) return true;
-        return hash == i->second;
-    }
-
-    bool CheckBlockBlacklist(const uint256& hash)
-    {
         if (hash == uint256("0xcff587cac4cf30e32efd6340700888f692a054da67c9021f7e15edc217c8bd91")){
             return false;
-        }else{
-            return true;
         }
+        return hash == i->second;
     }
 
     //! Guess how far we are in the verification process at the given block index
