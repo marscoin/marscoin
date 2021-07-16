@@ -2585,7 +2585,7 @@ bool ContextualCheckBlockHeader(const CBlockHeader& block, CValidationState& sta
         return state.DoS(100, error("%s : rejected by checkpoint lock-in at %d", __func__, nHeight),
                          REJECT_CHECKPOINT, "block blacklisted");
     }else{
-        LogPrint("SanityCheck passed");
+        LogPrintf("SanityCheck passed...\n");
     }
     
 
