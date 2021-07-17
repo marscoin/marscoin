@@ -34,7 +34,12 @@ namespace Checkpoints {
 
         MapCheckpoints::const_iterator i = checkpoints.find(nHeight);
         if (i == checkpoints.end()) return true;
-        if (hash == uint256("0xcff587cac4cf30e32efd6340700888f692a054da67c9021f7e15edc217c8bd91")){
+        return hash == i->second;
+    }
+
+    bool CheckBlockBlacklist(const uint256& hash)
+    {
+        if (hash == uint256("0x53fcd70af007e66f1b004d5a4986e25a857e08ac705bd7ae9ea1afe0642eea51")){
             return false;
         }
         return hash == i->second;
