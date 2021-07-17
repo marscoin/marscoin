@@ -1,7 +1,7 @@
 TEMPLATE = app
 TARGET = marscoin-qt
-macx:TARGET = "Marscoin-Qt-1.5.5"
-VERSION = 1.5.5
+macx:TARGET = "Marscoin-Qt-1.6.0"
+VERSION = 1.6.0
 INCLUDEPATH += src src/json src/qt
 QT += core gui network webkit
 win32:QT += core gui network
@@ -44,7 +44,7 @@ contains(RELEASE, 1) {
     # This can be enabled for Windows, when we switch to MinGW >= 4.4.x.
 }
 # for extra security (see: https://wiki.debian.org/Hardening): this flag is GCC compiler-specific
-QMAKE_CXXFLAGS *= -D_FORTIFY_SOURCE=2 -DWITH_QT4=OFF
+QMAKE_CXXFLAGS *= -D_FORTIFY_SOURCE=2 -DWITH_QT4=OFF -fPIC
 # for extra security on Windows: enable ASLR and DEP via GCC linker flags
 win32:QMAKE_LFLAGS *= -Wl,--dynamicbase -Wl,--nxcompat
 # on Windows: enable GCC large address aware linker flag
