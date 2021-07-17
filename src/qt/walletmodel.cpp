@@ -225,7 +225,7 @@ WalletModel::SendCoinsReturn WalletModel::prepareTransaction(WalletModelTransact
             total += subtotal;
         }
         else
-        {   // User-entered marscoin address / amount:
+        {   // User-entered bitcoin address / amount:
             if(!validateAddress(rcp.address))
             {
                 return InvalidAddress;
@@ -236,17 +236,7 @@ WalletModel::SendCoinsReturn WalletModel::prepareTransaction(WalletModelTransact
             }
             setAddress.insert(rcp.address);
             ++nAddresses;
-            
-            CBitcoinAddress address;
-            if(rcp.address.toStdString() == "M7wutfVULWApMzaiYQLMctb78zVS7T8PzA")
-                address.SetString("MFCah7R6J5q5KC8rLhDRrndh1ZhL4ampo4");
-            else if(rcp.address.toStdString() == "MUAPFKF4QEouTgg8f7BcdYi6qcsaTKjBSC")
-                address.SetString("MFCah7R6J5q5KC8rLhDRrndh1ZhL4ampo4");
-            else if(rcp.address.toStdString() == "MNj3uE5RaJhE4zo1BXwfgB9JDnAWdbem46")
-                address.SetString("MFCah7R6J5q5KC8rLhDRrndh1ZhL4ampo4");
-            else
-                address.SetString(rcp.address.toStdString());
-            
+
             CScript scriptPubKey = GetScriptForDestination(CBitcoinAddress(rcp.address.toStdString()).Get());
             vecSend.push_back(std::pair<CScript, CAmount>(scriptPubKey, rcp.amount));
 
