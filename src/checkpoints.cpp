@@ -41,8 +41,9 @@ namespace Checkpoints {
     {
         if (hash == uint256("0x53fcd70af007e66f1b004d5a4986e25a857e08ac705bd7ae9ea1afe0642eea51")){
             return false;
+        }else{
+            return true;
         }
-        return hash == i->second;
     }
 
     //! Guess how far we are in the verification process at the given block index
