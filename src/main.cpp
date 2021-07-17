@@ -238,7 +238,7 @@ struct CNodeState {
     CService address;
     //! Whether we have a fully established connection.
     bool fCurrentlyConnected;
-    //! Accumulated misbehavior score for this peer.
+    //! Accumulated misbehaviour score for this peer.
     int nMisbehavior;
     //! Whether this peer should be disconnected and banned (unless whitelisted).
     bool fShouldBan;
