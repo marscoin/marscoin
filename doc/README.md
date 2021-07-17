@@ -1,4 +1,4 @@
-Marscoin 1.5.5
+Marscoin 1.6.0
 =====================
 
 Setup
@@ -11,15 +11,9 @@ The following are some helpful notes on how to run Marscoin on your native platf
 
 ### Unix
 
-You need the Qt4 run-time libraries to run Marscoin-Qt. On Debian or Ubuntu:
+You need the Qt5 run-time libraries to run Marscoin-Qt. On Debian or Ubuntu:
 
-	sudo apt-get install libqtgui4
-
-Unpack the files into a directory and run:
-
-- bin/32/marscoin-qt (GUI, 32-bit) or bin/32/marscoind (headless, 32-bit)
-- bin/64/marscoin-qt (GUI, 64-bit) or bin/64/marscoind (headless, 64-bit)
-
+	sudo apt-get install libqtgui5
 
 
 ### Windows
