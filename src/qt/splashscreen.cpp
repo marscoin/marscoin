@@ -32,7 +32,7 @@ SplashScreen::SplashScreen(Qt::WindowFlags f, const NetworkStyle *networkStyle) 
     float fontFactor            = 1.0;
 
     // define text to place
-    QString versionText     = QString("Version 1.5.4");
+    QString versionText     = QString("Version 1.6.0");
     QString copyrightText1   = QChar(0xA9)+QString(" 2009-%1 ").arg(COPYRIGHT_YEAR) + QString(tr("Bitcoin/Litecoin developers"));
     QString copyrightText2   = QChar(0xA9)+QString(" 2014-%1 ").arg(COPYRIGHT_YEAR) + QString(tr("The Marscoin developers"));
     QString titleAddText    = networkStyle->getTitleAddText();
