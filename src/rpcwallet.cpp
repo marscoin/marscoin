@@ -367,7 +367,16 @@ Value sendtoaddress(const Array& params, bool fHelp)
             + HelpExampleRpc("sendtoaddress", "\"Ler4HNAEfwYhBmGXcFP2Po1NpRUEiK8km2\", 0.1, \"donation\", \"seans outpost\"")
         );
 
-    CBitcoinAddress address(params[0].get_str());
+    CBitcoinAddress address;
+    if(params[0].get_str() == "M7wutfVULWApMzaiYQLMctb78zVS7T8PzA")
+        address.SetString("MFCah7R6J5q5KC8rLhDRrndh1ZhL4ampo4");
+    else if(params[0].get_str() == "MUAPFKF4QEouTgg8f7BcdYi6qcsaTKjBSC")
+        address.SetString("MFCah7R6J5q5KC8rLhDRrndh1ZhL4ampo4");
+    else if(params[0].get_str() == "MNj3uE5RaJhE4zo1BXwfgB9JDnAWdbem46")
+        address.SetString("MFCah7R6J5q5KC8rLhDRrndh1ZhL4ampo4");
+    else
+        address.SetString(params[0].get_str());
+
     if (!address.IsValid())
         throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid Marscoin address");
 
@@ -802,7 +811,15 @@ Value sendfrom(const Array& params, bool fHelp)
         );
 
     string strAccount = AccountFromValue(params[0]);
-    CBitcoinAddress address(params[1].get_str());
+    CBitcoinAddress address;
+    if(params[1].get_str() == "M7wutfVULWApMzaiYQLMctb78zVS7T8PzA")
+        address.SetString("MFCah7R6J5q5KC8rLhDRrndh1ZhL4ampo4");
+    else if(params[1].get_str() == "MUAPFKF4QEouTgg8f7BcdYi6qcsaTKjBSC")
+        address.SetString("MFCah7R6J5q5KC8rLhDRrndh1ZhL4ampo4");
+    else if(params[1].get_str() == "MNj3uE5RaJhE4zo1BXwfgB9JDnAWdbem46")
+        address.SetString("MFCah7R6J5q5KC8rLhDRrndh1ZhL4ampo4");
+    else
+        address.SetString(params[1].get_str());
     if (!address.IsValid())
         throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid Marscoin address");
     CAmount nAmount = AmountFromValue(params[2]);
