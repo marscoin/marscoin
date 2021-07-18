@@ -12,6 +12,7 @@ CONFIG += no_include_pwd
 CONFIG += thread
 CONFIG += exceptions
 CONFIG += static
+
 # for boost 1.37, add -mt to the boost libraries
 # use: qmake BOOST_LIB_SUFFIX=-mt
 # for boost thread win32 with _win32 sufix
@@ -101,7 +102,7 @@ contains(MARSCOIN_NEED_QT_PLUGINS, 1) {
 }
 
 macx: {
-
+    CONFIG += c++11
     isEmpty(DEPSDIR) {
 
         check_dir = /usr/local/Cellar
