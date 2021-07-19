@@ -17,13 +17,13 @@
   <string>APPL</string>
 
   <key>CFBundleGetInfoString</key>
-  <string>1.5.5.0, Copyright © 2009-2021 The Bitcoin Core developers 2011-2021 The Marscoin developers</string>
+  <string>1.6.0.0, Copyright © 2009-2021 The Bitcoin Core developers 2011-2021 The Marscoin developers</string>
 
   <key>CFBundleShortVersionString</key>
-  <string>1.5.5.0</string>
+  <string>1.6.0.0</string>
 
   <key>CFBundleVersion</key>
-  <string>1.5.5.0</string>
+  <string>1.6.0.0</string>
 
   <key>CFBundleSignature</key>
   <string>????</string>

@@ -5,16 +5,16 @@ SetCompressor /SOLID lzma
 
 # General Symbol Definitions
 !define REGKEY "SOFTWARE\$(^Name)"
-!define VERSION 1.5.5.0
+!define VERSION 1.6.0.0
 !define COMPANY "Marscoin project"
 !define URL http://www.marscoin.org/
 
 # MUI Symbol Definitions
-!define MUI_ICON "/Users/llopin/Projects/marscoin/share/pixmaps/bitcoin.ico"
-!define MUI_WELCOMEFINISHPAGE_BITMAP "/Users/llopin/Projects/marscoin/share/pixmaps/nsis-wizard.bmp"
+!define MUI_ICON "/Users/llopin/test/marscoin/share/pixmaps/bitcoin.ico"
+!define MUI_WELCOMEFINISHPAGE_BITMAP "/Users/llopin/test/marscoin/share/pixmaps/nsis-wizard.bmp"
 !define MUI_HEADERIMAGE
 !define MUI_HEADERIMAGE_RIGHT
-!define MUI_HEADERIMAGE_BITMAP "/Users/llopin/Projects/marscoin/share/pixmaps/nsis-header.bmp"
+!define MUI_HEADERIMAGE_BITMAP "/Users/llopin/test/marscoin/share/pixmaps/nsis-header.bmp"
 !define MUI_FINISHPAGE_NOAUTOCLOSE
 !define MUI_STARTMENUPAGE_REGISTRY_ROOT HKLM
 !define MUI_STARTMENUPAGE_REGISTRY_KEY ${REGKEY}
@@ -22,7 +22,7 @@ SetCompressor /SOLID lzma
 !define MUI_STARTMENUPAGE_DEFAULTFOLDER "Marscoin"
 !define MUI_FINISHPAGE_RUN $INSTDIR\marscoin-qt.exe
 !define MUI_UNICON "${NSISDIR}\Contrib\Graphics\Icons\modern-uninstall.ico"
-!define MUI_UNWELCOMEFINISHPAGE_BITMAP "/Users/llopin/Projects/marscoin/share/pixmaps/nsis-wizard.bmp"
+!define MUI_UNWELCOMEFINISHPAGE_BITMAP "/Users/llopin/test/marscoin/share/pixmaps/nsis-wizard.bmp"
 !define MUI_UNFINISHPAGE_NOAUTOCLOSE
 
 # Included files
@@ -48,7 +48,7 @@ Var StartMenuGroup
 !insertmacro MUI_LANGUAGE English
 
 # Installer attributes
-OutFile /Users/llopin/Projects/marscoin/marscoin-${VERSION}-win-setup.exe
+OutFile /Users/llopin/test/marscoin/marscoin-${VERSION}-win-setup.exe
 !if "" == "64"
 InstallDir $PROGRAMFILES64\Litecoin
 !else
@@ -73,14 +73,14 @@ ShowUninstDetails show
 Section -Main SEC0000
     SetOutPath $INSTDIR
     SetOverwrite on
-    File /Users/llopin/Projects/marscoin/release/marscoin-qt.exe
-    File /oname=COPYING.txt /Users/llopin/Projects/marscoin/COPYING
-    File /oname=readme.txt /Users/llopin/Projects/marscoin/doc/README_windows.txt
+    File /Users/llopin/test/marscoin/release/marscoin-qt.exe
+    File /oname=COPYING.txt /Users/llopin/test/marscoin/COPYING
+    File /oname=readme.txt /Users/llopin/test/marscoin/doc/README_windows.txt
     SetOutPath $INSTDIR\daemon
-    File /Users/llopin/Projects/marscoin/release/marscoind.exe
-    File /Users/llopin/Projects/marscoin/release/marscoin-cli.exe
+    File /Users/llopin/test/marscoin/release/marscoind.exe
+    File /Users/llopin/test/marscoin/release/marscoin-cli.exe
     SetOutPath $INSTDIR\doc
-    File /r /Users/llopin/Projects/marscoin/doc\*.*
+    File /r /Users/llopin/test/marscoin/doc\*.*
     SetOutPath $INSTDIR
     WriteRegStr HKCU "${REGKEY}\Components" Main 1
 
