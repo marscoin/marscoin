@@ -314,7 +314,7 @@ case $host in
      fi
 
      AX_CHECK_LINK_FLAG([[-Wl,-headerpad_max_install_names]], [LDFLAGS="$LDFLAGS -Wl,-headerpad_max_install_names"])
-     CPPFLAGS="$CPPFLAGS -DMAC_OSX"
+     CPPFLAGS="$CPPFLAGS -DMAC_OSX -std=c++11 -stdlib=libc++ -DBOOST_NO_CXX11_SCOPED_ENUMS " 
      ;;
    *linux*)
      TARGET_OS=linux
