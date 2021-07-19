@@ -1,8 +1,8 @@
 package=boost
-$(package)_version=1_55_0
-$(package)_download_path=http://sourceforge.net/projects/boost/files/boost/1.55.0
+$(package)_version=1_70_0
+$(package)_download_path=http://sourceforge.net/projects/boost/files/boost/1.70.0
 $(package)_file_name=$(package)_$($(package)_version).tar.bz2
-$(package)_sha256_hash=fff00023dd79486d444c8e29922f4072e1d451fc5a4d2b6075852ead7f2b7b52
+$(package)_sha256_hash=430ae8354789de4fd19ee52f3b1f739e1fba576f0aded0897c3c2bc00fb38778
 $(package)_patches=darwin_boost_atomic-1.patch darwin_boost_atomic-2.patch
 
 define $(package)_set_vars
