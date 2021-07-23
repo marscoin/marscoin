@@ -102,7 +102,7 @@ public:
     CBigNum(unsigned int n)     { init(); setulong(n); }
 //    CBigNum(unsigned long n)    { init(); setulong(n); }
     CBigNum(uint64_t n)           { init(); setuint64(n); }
-    CBigNum(long long int n)      { init(); setuint64(n); }
+//  CBigNum(long long int n)      { init(); setuint64(n); }
     explicit CBigNum(uint256 n) { init(); setuint256(n); }
 
     //CBigNum(char n) is not portable.  Use 'signed char' or 'unsigned char'.

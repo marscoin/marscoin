@@ -160,7 +160,9 @@ bool PaymentRequestPlus::getMerchant(X509_STORE* certStore, QString& merchant) c
         std::string data_to_verify;                     // Everything but the signature
         rcopy.SerializeToString(&data_to_verify);
 
-        EVP_MD_CTX *ctx;
+        EVP_MD_CTX *ctx = EVP_MD_CTX_new();
+	if (!ctx) throw SSLVerifyError("Error allocating OpenSSL context.");
+
         EVP_PKEY *pubkey = X509_get_pubkey(signing_cert);
         EVP_MD_CTX_init(ctx);
         if (!EVP_VerifyInit_ex(ctx, digestAlgorithm, NULL) ||
