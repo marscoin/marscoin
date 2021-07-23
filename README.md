@@ -1,3 +1,4 @@
+[![Gitter](https://badges.gitter.im/marscoin-dev/community.svg)](https://gitter.im/marscoin-dev/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
 
 http://www.marscoin.org
 
@@ -43,6 +44,6 @@ info at marscoin.org/community
 Screenshot
 ----------
 
-![alt text](http://www.marscoin.org/wp-content/uploads/2019/09/2019-09-18_1039.jpg "Marscoin QT client startup version 1.5")
+![alt text](https://i.imgur.com/wb0X0Ox.jpg "Marscoin QT client startup version 1.5")
 
 
