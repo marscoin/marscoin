@@ -33,7 +33,12 @@ CMessageHeader::CMessageHeader(const char* pszCommand, unsigned int nMessageSize
 {
     memcpy(pchMessageStart, Params().MessageStart(), MESSAGE_START_SIZE);
     memset(pchCommand, 0, sizeof(pchCommand));
-    strncpy(pchCommand, pszCommand, COMMAND_SIZE);
+
+    size_t i = 0;
+    for (; i < COMMAND_SIZE && pszCommand[i] !=0; ++i) pchCommand[i] = pszCommand[i];
+    assert(pszCommand[i] == 0);
+    for(; i < COMMAND_SIZE; ++i) pchCommand[i] = 0;
+
     nMessageSize = nMessageSizeIn;
     nChecksum = 0;
 }

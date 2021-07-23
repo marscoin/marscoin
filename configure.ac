@@ -171,6 +171,9 @@ if test "x$CXXFLAGS_overridden" = "xno"; then
 fi
 CPPFLAGS="$CPPFLAGS -DBOOST_SPIRIT_THREADSAFE -DHAVE_BUILD_INFO -D__STDC_FORMAT_MACROS"
 
+AX_CHECK_COMPILE_FLAG([-Wdeprecated-copy],[CXXFLAGS="$CXXFLAGS -Wno-deprecated-copy"],,[[$CXXFLAG_WERROR]])
+AC_SUBST(CXXFLAGS)
+
 AC_ARG_WITH([utils],
   [AS_HELP_STRING([--with-utils],
   [build bitcoin-cli bitcoin-tx (default=yes)])],
@@ -314,7 +317,7 @@ case $host in
      fi
 
      AX_CHECK_LINK_FLAG([[-Wl,-headerpad_max_install_names]], [LDFLAGS="$LDFLAGS -Wl,-headerpad_max_install_names"])
-     CPPFLAGS="$CPPFLAGS -DMAC_OSX"
+     CPPFLAGS="$CPPFLAGS -DMAC_OSX -std=c++11 -stdlib=libc++ -DBOOST_NO_CXX11_SCOPED_ENUMS " 
      ;;
    *linux*)
      TARGET_OS=linux
