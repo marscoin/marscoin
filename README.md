@@ -22,7 +22,7 @@ Marscoin targets to become the blockchain for Mars, and functions as a proof of 
 - 721 blocks per sol
 - 6.25 coins per block
 - 40 million total coins by 2024
-- 1M donation for non-profit MarsOne
+- 1M donation for non-profit The Mars Society
 - developed and supported by The Marscoin Foundation, LLC (a non-profit).
 
 For more information, as well as an immediately useable, binary version of
