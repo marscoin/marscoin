@@ -58,7 +58,7 @@ bool CCrypter::Encrypt(const CKeyingMaterial& vchPlaintext, std::vector<unsigned
     int nCLen = nLen + AES_BLOCK_SIZE, nFLen = 0;
     vchCiphertext = std::vector<unsigned char> (nCLen);
 
-    EVP_CIPHER_CTX *ctx;
+    EVP_CIPHER_CTX *ctx = EVP_CIPHER_CTX_new();
 
     bool fOk = true;
 
@@ -85,7 +85,7 @@ bool CCrypter::Decrypt(const std::vector<unsigned char>& vchCiphertext, CKeyingM
 
     vchPlaintext = CKeyingMaterial(nPLen);
 
-    EVP_CIPHER_CTX *ctx;
+    EVP_CIPHER_CTX *ctx = EVP_CIPHER_CTX_new();
 
     bool fOk = true;
 
