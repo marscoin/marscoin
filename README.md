@@ -1,4 +1,4 @@
-[![Gitter](https://badges.gitter.im/marscoin-dev/community.svg)](https://gitter.im/marscoin-dev/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge) [![Discord](https://img.shields.io/discord/591914197219016707.svg?label=&logo=discord&logoColor=ffffff&color=7389D8&labelColor=6A7EC2)](https://discord.gg/nU3NkGVNbV) [![Chat on Telegram](https://img.shields.io/badge/Chat%20on-Telegram-brightgreen.svg)](https://t.me/realmarscoin)
+[![Gitter](https://badges.gitter.im/marscoin-dev/community.svg)](https://gitter.im/marscoin-dev/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge) [![Discord](https://img.shields.io/discord/591914197219016707.svg?label=&logo=discord&logoColor=ffffff&color=7389D8&labelColor=6A7EC2)](https://discord.gg/WuUJYBr) [![Chat on Telegram](https://img.shields.io/badge/Chat%20on-Telegram-brightgreen.svg)](https://t.me/realmarscoin)
 
 http://www.marscoin.org
 
@@ -45,5 +45,3 @@ Screenshot
 ----------
 
 ![alt text](https://i.imgur.com/wb0X0Ox.jpg "Marscoin QT client startup version 1.5")
-
-
