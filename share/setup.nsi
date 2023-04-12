@@ -5,24 +5,25 @@ SetCompressor /SOLID lzma
 
 # General Symbol Definitions
 !define REGKEY "SOFTWARE\$(^Name)"
-!define VERSION 1.6.0.0
+!define VERSION 0.17.1
 !define COMPANY "Marscoin project"
-!define URL http://www.marscoin.org/
+!define URL https://marscoin.org/
 
 # MUI Symbol Definitions
-!define MUI_ICON "/Users/llopin/test/marscoin/share/pixmaps/bitcoin.ico"
-!define MUI_WELCOMEFINISHPAGE_BITMAP "/Users/llopin/test/marscoin/share/pixmaps/nsis-wizard.bmp"
+!define MUI_ICON "/home/llopin/OSS/marscoin17/share/pixmaps/bitcoin.ico"
+!define MUI_WELCOMEFINISHPAGE_BITMAP "/home/llopin/OSS/marscoin17/share/pixmaps/nsis-wizard.bmp"
 !define MUI_HEADERIMAGE
 !define MUI_HEADERIMAGE_RIGHT
-!define MUI_HEADERIMAGE_BITMAP "/Users/llopin/test/marscoin/share/pixmaps/nsis-header.bmp"
+!define MUI_HEADERIMAGE_BITMAP "/home/llopin/OSS/marscoin17/share/pixmaps/nsis-header.bmp"
 !define MUI_FINISHPAGE_NOAUTOCLOSE
 !define MUI_STARTMENUPAGE_REGISTRY_ROOT HKLM
 !define MUI_STARTMENUPAGE_REGISTRY_KEY ${REGKEY}
 !define MUI_STARTMENUPAGE_REGISTRY_VALUENAME StartMenuGroup
 !define MUI_STARTMENUPAGE_DEFAULTFOLDER "Marscoin"
-!define MUI_FINISHPAGE_RUN $INSTDIR\marscoin-qt.exe
+!define MUI_FINISHPAGE_RUN "$WINDIR\explorer.exe"
+!define MUI_FINISHPAGE_RUN_PARAMETERS $INSTDIR\marscoin-qt
 !define MUI_UNICON "${NSISDIR}\Contrib\Graphics\Icons\modern-uninstall.ico"
-!define MUI_UNWELCOMEFINISHPAGE_BITMAP "/Users/llopin/test/marscoin/share/pixmaps/nsis-wizard.bmp"
+!define MUI_UNWELCOMEFINISHPAGE_BITMAP "/home/llopin/OSS/marscoin17/share/pixmaps/nsis-wizard.bmp"
 !define MUI_UNFINISHPAGE_NOAUTOCLOSE
 
 # Included files
@@ -48,18 +49,18 @@ Var StartMenuGroup
 !insertmacro MUI_LANGUAGE English
 
 # Installer attributes
-OutFile /Users/llopin/test/marscoin/marscoin-${VERSION}-win-setup.exe
+OutFile /home/llopin/OSS/marscoin17/marscoin-${VERSION}-win-setup.exe
 !if "" == "64"
-InstallDir $PROGRAMFILES64\Litecoin
+InstallDir $PROGRAMFILES64\Marscoin
 !else
-InstallDir $PROGRAMFILES\Litecoin
+InstallDir $PROGRAMFILES\Marscoin
 !endif
 CRCCheck on
 XPStyle on
 BrandingText " "
 ShowInstDetails show
 VIProductVersion ${VERSION}.0
-VIAddVersionKey ProductName "Litecoin Core"
+VIAddVersionKey ProductName "Marscoin"
 VIAddVersionKey ProductVersion "${VERSION}"
 VIAddVersionKey CompanyName "${COMPANY}"
 VIAddVersionKey CompanyWebsite "${URL}"
@@ -73,20 +74,17 @@ ShowUninstDetails show
 Section -Main SEC0000
     SetOutPath $INSTDIR
     SetOverwrite on
-    File /Users/llopin/test/marscoin/release/marscoin-qt.exe
-    File /oname=COPYING.txt /Users/llopin/test/marscoin/COPYING
-    File /oname=readme.txt /Users/llopin/test/marscoin/doc/README_windows.txt
+    File /home/llopin/OSS/marscoin17/release/marscoin-qt
+    File /oname=COPYING.txt /home/llopin/OSS/marscoin/COPYING
+    File /oname=readme.txt /home/llopin/OSS/marscoin/doc/README_windows.txt
     SetOutPath $INSTDIR\daemon
-    File /Users/llopin/test/marscoin/release/marscoind.exe
-    File /Users/llopin/test/marscoin/release/marscoin-cli.exe
+    File /home/llopin/OSS/marscoin17/release/marscoind
+    File /home/llopin/OSS/marscoin17/release/marscoin-cli
+    File /home/llopin/OSS/marscoin17/release/marscoin-tx
     SetOutPath $INSTDIR\doc
-    File /r /Users/llopin/test/marscoin/doc\*.*
+    File /r /x Makefile* /home/llopin/OSS/marscoin17/doc\*.*
     SetOutPath $INSTDIR
     WriteRegStr HKCU "${REGKEY}\Components" Main 1
-
-    # Remove old wxwidgets-based-marscoin executable and locales:
-    Delete /REBOOTOK $INSTDIR\marscoin.exe
-    RMDir /r /REBOOTOK $INSTDIR\locale
 SectionEnd
 
 Section -post SEC0001
@@ -95,7 +93,8 @@ Section -post SEC0001
     WriteUninstaller $INSTDIR\uninstall.exe
     !insertmacro MUI_STARTMENU_WRITE_BEGIN Application
     CreateDirectory $SMPROGRAMS\$StartMenuGroup
-    CreateShortcut "$SMPROGRAMS\$StartMenuGroup\$(^Name).lnk" $INSTDIR\marscoin-qt.exe
+    CreateShortcut "$SMPROGRAMS\$StartMenuGroup\$(^Name).lnk" $INSTDIR\marscoin-qt
+    CreateShortcut "$SMPROGRAMS\$StartMenuGroup\Marscoin (testnet, -bit).lnk" "$INSTDIR\marscoin-qt" "-testnet" "$INSTDIR\marscoin-qt" 1
     CreateShortcut "$SMPROGRAMS\$StartMenuGroup\Uninstall $(^Name).lnk" $INSTDIR\uninstall.exe
     !insertmacro MUI_STARTMENU_WRITE_END
     WriteRegStr HKCU "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\$(^Name)" DisplayName "$(^Name)"
@@ -107,9 +106,9 @@ Section -post SEC0001
     WriteRegDWORD HKCU "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\$(^Name)" NoModify 1
     WriteRegDWORD HKCU "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\$(^Name)" NoRepair 1
     WriteRegStr HKCR "marscoin" "URL Protocol" ""
-    WriteRegStr HKCR "marscoin" "" "URL:Litecoin"
-    WriteRegStr HKCR "marscoin\DefaultIcon" "" $INSTDIR\marscoin-qt.exe
-    WriteRegStr HKCR "marscoin\shell\open\command" "" '"$INSTDIR\marscoin-qt.exe" "%1"'
+    WriteRegStr HKCR "marscoin" "" "URL:Marscoin"
+    WriteRegStr HKCR "marscoin\DefaultIcon" "" $INSTDIR\marscoin-qt
+    WriteRegStr HKCR "marscoin\shell\open\command" "" '"$INSTDIR\marscoin-qt" "%1"'
 SectionEnd
 
 # Macro for selecting uninstaller sections
@@ -127,7 +126,7 @@ done${UNSECTION_ID}:
 
 # Uninstaller sections
 Section /o -un.Main UNSEC0000
-    Delete /REBOOTOK $INSTDIR\marscoin-qt.exe
+    Delete /REBOOTOK $INSTDIR\marscoin-qt
     Delete /REBOOTOK $INSTDIR\COPYING.txt
     Delete /REBOOTOK $INSTDIR\readme.txt
     RMDir /r /REBOOTOK $INSTDIR\daemon
@@ -139,7 +138,8 @@ Section -un.post UNSEC0001
     DeleteRegKey HKCU "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\$(^Name)"
     Delete /REBOOTOK "$SMPROGRAMS\$StartMenuGroup\Uninstall $(^Name).lnk"
     Delete /REBOOTOK "$SMPROGRAMS\$StartMenuGroup\$(^Name).lnk"
-    Delete /REBOOTOK "$SMSTARTUP\Litecoin.lnk"
+    Delete /REBOOTOK "$SMPROGRAMS\$StartMenuGroup\Marscoin (testnet, -bit).lnk"
+    Delete /REBOOTOK "$SMSTARTUP\Marscoin.lnk"
     Delete /REBOOTOK $INSTDIR\uninstall.exe
     Delete /REBOOTOK $INSTDIR\debug.log
     Delete /REBOOTOK $INSTDIR\db.log

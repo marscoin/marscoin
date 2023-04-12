@@ -1,161 +1,286 @@
 Release Process
 ====================
 
-* * *
+Before every release candidate:
 
-###update (commit) version in sources
+* Update translations (ping wumpus on IRC) see [translation_process.md](https://github.com/bitcoin/bitcoin/blob/master/doc/translation_process.md#synchronising-translations).
 
+* Update manpages, see [gen-manpages.sh](https://github.com/marscoin/marscoin/blob/master/contrib/devtools/README.md#gen-manpagessh).
 
-	marscoin-qt.pro
-	contrib/verifysfbinaries/verify.sh
-	doc/README*
-	share/setup.nsi
-	src/clientversion.h (change CLIENT_VERSION_IS_RELEASE to true)
+Before every minor and major release:
 
-###tag version in git
+* Update [bips.md](bips.md) to account for changes since the last release.
+* Update version in `configure.ac` (don't forget to set `CLIENT_VERSION_IS_RELEASE` to `true`)
+* Write release notes (see below)
+* Update `src/chainparams.cpp` nMinimumChainWork with information from the getblockchaininfo rpc.
+* Update `src/chainparams.cpp` defaultAssumeValid with information from the getblockhash rpc.
+  - The selected value must not be orphaned so it may be useful to set the value two blocks back from the tip.
+  - Testnet should be set some tens of thousands back from the tip due to reorgs there.
+  - This update should be reviewed with a reindex-chainstate with assumevalid=0 to catch any defect
+     that causes rejection of blocks in the past history.
 
-	git tag -a v0.8.0
+Before every major release:
 
-###write release notes. git shortlog helps a lot, for example:
+* Update hardcoded [seeds](/contrib/seeds/README.md), see [this pull request](https://github.com/bitcoin/bitcoin/pull/7415) for an example.
+* Update [`BLOCK_CHAIN_SIZE`](/src/qt/intro.cpp) to the current size plus some overhead.
+* Update `src/chainparams.cpp` chainTxData with statistics about the transaction count and rate. Use the output of the RPC `getchaintxstats`, see
+  [this pull request](https://github.com/bitcoin/bitcoin/pull/12270) for an example. Reviewers can verify the results by running `getchaintxstats <window_block_count> <window_last_block_hash>` with the `window_block_count` and `window_last_block_hash` from your output.
+* Update version of `contrib/gitian-descriptors/*.yml`: usually one'd want to do this on master after branching off the release - but be sure to at least do it before a new major release
 
-	git shortlog --no-merges v0.7.2..v0.8.0
+### First time / New builders
 
-* * *
+If you're using the automated script (found in [contrib/gitian-build.py](/contrib/gitian-build.py)), then at this point you should run it with the "--setup" command. Otherwise ignore this.
 
-##perform gitian builds
+Check out the source code in the following directory hierarchy.
 
- From a directory containing the marscoin source, gitian-builder and gitian.sigs
-  
-	export SIGNER=(your gitian key, ie bluematt, sipa, etc)
-	export VERSION=0.8.0
-	cd ./gitian-builder
+    cd /path/to/your/toplevel/build
+    git clone https://github.com/marscoin/gitian.sigs.ltc.git
+    git clone https://github.com/marscoin/marscoin-detached-sigs.git
+    git clone https://github.com/devrandom/gitian-builder.git
+    git clone https://github.com/marscoin/marscoin.git
 
- Fetch and build inputs: (first time, or when dependency versions change)
+### Marscoin maintainers/release engineers, suggestion for writing release notes
 
-	mkdir -p inputs; cd inputs/
-	wget 'http://miniupnp.free.fr/files/download.php?file=miniupnpc-1.6.tar.gz' -O miniupnpc-1.6.tar.gz
-	wget 'http://www.openssl.org/source/openssl-1.0.1c.tar.gz'
-	wget 'http://download.oracle.com/berkeley-db/db-4.8.30.NC.tar.gz'
-	wget 'http://zlib.net/zlib-1.2.6.tar.gz'
-	wget 'ftp://ftp.simplesystems.org/pub/libpng/png/src/libpng-1.5.9.tar.gz'
-	wget 'http://fukuchi.org/works/qrencode/qrencode-3.2.0.tar.bz2'
-	wget 'http://downloads.sourceforge.net/project/boost/boost/1.50.0/boost_1_50_0.tar.bz2'
-	wget 'http://releases.qt-project.org/qt4/source/qt-everywhere-opensource-src-4.8.3.tar.gz'
-	cd ..
-	./bin/gbuild ../marscoin/contrib/gitian-descriptors/boost-win32.yml
-	mv build/out/boost-win32-1.50.0-gitian2.zip inputs/
-	./bin/gbuild ../marscoin/contrib/gitian-descriptors/qt-win32.yml
-	mv build/out/qt-win32-4.8.3-gitian-r1.zip inputs/
-	./bin/gbuild ../marscoin/contrib/gitian-descriptors/deps-win32.yml
-	mv build/out/marscoin-deps-0.0.5.zip inputs/
+Write release notes. git shortlog helps a lot, for example:
 
- Build marscoind and marscoin-qt on Linux32, Linux64, and Win32:
-  
-	./bin/gbuild --commit marscoin=v${VERSION} ../marscoin/contrib/gitian-descriptors/gitian.yml
-	./bin/gsign --signer $SIGNER --release ${VERSION} --destination ../gitian.sigs/ ../marscoin/contrib/gitian-descriptors/gitian.yml
-	pushd build/out
-	zip -r marscoin-${VERSION}-linux-gitian.zip *
-	mv marscoin-${VERSION}-linux-gitian.zip ../../
-	popd
-	./bin/gbuild --commit marscoin=v${VERSION} ../marscoin/contrib/gitian-descriptors/gitian-win32.yml
-	./bin/gsign --signer $SIGNER --release ${VERSION}-win32 --destination ../gitian.sigs/ ../marscoin/contrib/gitian-descriptors/gitian-win32.yml
-	pushd build/out
-	zip -r marscoin-${VERSION}-win32-gitian.zip *
-	mv marscoin-${VERSION}-win32-gitian.zip ../../
-	popd
+    git shortlog --no-merges v(current version, e.g. 0.7.2)..v(new version, e.g. 0.8.0)
 
-  Build output expected:
+(or ping @wumpus on IRC, he has specific tooling to generate the list of merged pulls
+and sort them into categories based on labels)
 
-  1. linux 32-bit and 64-bit binaries + source (marscoin-${VERSION}-linux-gitian.zip)
-  2. windows 32-bit binary, installer + source (marscoin-${VERSION}-win32-gitian.zip)
-  3. Gitian signatures (in gitian.sigs/${VERSION}[-win32]/(your gitian key)/
+Generate list of authors:
 
-repackage gitian builds for release as stand-alone zip/tar/installer exe
+    git log --format='- %aN' v(current version, e.g. 0.16.0)..v(new version, e.g. 0.16.1) | sort -fiu
 
-**Linux .tar.gz:**
+Tag version (or release candidate) in git
 
-	unzip marscoin-${VERSION}-linux-gitian.zip -d marscoin-${VERSION}-linux
-	tar czvf marscoin-${VERSION}-linux.tar.gz marscoin-${VERSION}-linux
-	rm -rf marscoin-${VERSION}-linux
+    git tag -s v(new version, e.g. 0.8.0)
 
-**Windows .zip and setup.exe:**
+### Setup and perform Gitian builds
 
-	unzip marscoin-${VERSION}-win32-gitian.zip -d marscoin-${VERSION}-win32
-	mv marscoin-${VERSION}-win32/marscoin-*-setup.exe .
-	zip -r marscoin-${VERSION}-win32.zip marscoin-${VERSION}-win32
-	rm -rf marscoin-${VERSION}-win32
+If you're using the automated script (found in [contrib/gitian-build.py](/contrib/gitian-build.py)), then at this point you should run it with the "--build" command. Otherwise ignore this.
 
-**Perform Mac build:**
+Setup Gitian descriptors:
 
-  OSX binaries are created by Gavin Andresen on a 32-bit, OSX 10.6 machine.
+    pushd ./marscoin
+    export SIGNER="(your Gitian key, ie bluematt, sipa, etc)"
+    export VERSION=(new version, e.g. 0.8.0)
+    git fetch
+    git checkout v${VERSION}
+    popd
 
-	qmake RELEASE=1 USE_UPNP=1 USE_QRCODE=1 marscoin-qt.pro
-	make
-	export QTDIR=/opt/local/share/qt4  # needed to find translations/qt_*.qm files
-	T=$(contrib/qt_translations.py $QTDIR/translations src/qt/locale)
-	python2.7 share/qt/clean_mac_info_plist.py
-	python2.7 contrib/macdeploy/macdeployqtplus Marscoin-Qt.app -add-qt-tr $T -dmg -fancy contrib/macdeploy/fancy.plist
+Ensure your gitian.sigs.ltc are up-to-date if you wish to gverify your builds against other Gitian signatures.
 
- Build output expected: Marscoin-Qt.dmg
+    pushd ./gitian.sigs.ltc
+    git pull
+    popd
 
-###Next steps:
+Ensure gitian-builder is up-to-date:
 
-* Code-sign Windows -setup.exe (in a Windows virtual machine) and
-  OSX Marscoin-Qt.app (Note: only Gavin has the code-signing keys currently)
+    pushd ./gitian-builder
+    git pull
+    popd
 
-* upload builds to SourceForge
+### Fetch and create inputs: (first time, or when dependency versions change)
 
-* create SHA256SUMS for builds, and PGP-sign it
+    pushd ./gitian-builder
+    mkdir -p inputs
+    wget -P inputs https://bitcoincore.org/cfields/osslsigncode-Backports-to-1.7.1.patch
+    wget -P inputs http://downloads.sourceforge.net/project/osslsigncode/osslsigncode/osslsigncode-1.7.1.tar.gz
+    popd
 
-* update marscoin.org version
-  make sure all OS download links go to the right versions
+Create the macOS SDK tarball, see the [macOS readme](README_osx.md) for details, and copy it into the inputs directory.
 
-* update forum version
+### Optional: Seed the Gitian sources cache and offline git repositories
 
-* update wiki download links
+NOTE: Gitian is sometimes unable to download files. If you have errors, try the step below.
 
-* update wiki changelog: [https://en.marscoin.it/wiki/Changelog](https://en.marscoin.it/wiki/Changelog)
+By default, Gitian will fetch source files as needed. To cache them ahead of time, make sure you have checked out the tag you want to build in litecoin, then:
 
-Commit your signature to gitian.sigs:
+    pushd ./gitian-builder
+    make -C ../marscoin/depends download SOURCES_PATH=`pwd`/cache/common
+    popd
 
-	pushd gitian.sigs
-	git add ${VERSION}/${SIGNER}
-	git add ${VERSION}-win32/${SIGNER}
-	git commit -a
-	git push  # Assuming you can push to the gitian.sigs tree
-	popd
+Only missing files will be fetched, so this is safe to re-run for each build.
 
--------------------------------------------------------------------------
+NOTE: Offline builds must use the --url flag to ensure Gitian fetches only from local URLs. For example:
 
-### After 3 or more people have gitian-built, repackage gitian-signed zips:
+    pushd ./gitian-builder
+    ./bin/gbuild --url marscoin=/path/to/marscoin,signature=/path/to/sigs {rest of arguments}
+    popd
 
-From a directory containing marscoin source, gitian.sigs and gitian zips
+The gbuild invocations below <b>DO NOT DO THIS</b> by default.
 
-	export VERSION=0.5.1
-	mkdir marscoin-${VERSION}-linux-gitian
-	pushd marscoin-${VERSION}-linux-gitian
-	unzip ../marscoin-${VERSION}-linux-gitian.zip
-	mkdir gitian
-	cp ../marscoin/contrib/gitian-downloader/*.pgp ./gitian/
-	for signer in $(ls ../gitian.sigs/${VERSION}/); do
-	 cp ../gitian.sigs/${VERSION}/${signer}/marscoin-build.assert ./gitian/${signer}-build.assert
-	 cp ../gitian.sigs/${VERSION}/${signer}/marscoin-build.assert.sig ./gitian/${signer}-build.assert.sig
-	done
-	zip -r marscoin-${VERSION}-linux-gitian.zip *
-	cp marscoin-${VERSION}-linux-gitian.zip ../
-	popd
-	mkdir marscoin-${VERSION}-win32-gitian
-	pushd marscoin-${VERSION}-win32-gitian
-	unzip ../marscoin-${VERSION}-win32-gitian.zip
-	mkdir gitian
-	cp ../marscoin/contrib/gitian-downloader/*.pgp ./gitian/
-	for signer in $(ls ../gitian.sigs/${VERSION}-win32/); do
-	 cp ../gitian.sigs/${VERSION}-win32/${signer}/marscoin-build.assert ./gitian/${signer}-build.assert
-	 cp ../gitian.sigs/${VERSION}-win32/${signer}/marscoin-build.assert.sig ./gitian/${signer}-build.assert.sig
-	done
-	zip -r marscoin-${VERSION}-win32-gitian.zip *
-	cp marscoin-${VERSION}-win32-gitian.zip ../
-	popd
+### Build and sign Marscoin for Linux, Windows, and macOS:
 
-- Upload gitian zips to SourceForge
-- Celebrate 
+    export GITIAN_THREADS=2
+    export GITIAN_MEMORY=3000
+    
+    pushd ./gitian-builder
+    ./bin/gbuild --num-make $GITIAN_THREADS --memory $GITIAN_MEMORY --commit marscoin=v${VERSION} ../marscoin/contrib/gitian-descriptors/gitian-linux.yml
+    ./bin/gsign --signer "$SIGNER" --release ${VERSION}-linux --destination ../gitian.sigs.ltc/ ../marscoin/contrib/gitian-descriptors/gitian-linux.yml
+    mv build/out/marscoin-*.tar.gz build/out/src/marscoin-*.tar.gz ../
+
+    ./bin/gbuild --num-make $GITIAN_THREADS --memory $GITIAN_MEMORY --commit marscoin=v${VERSION} ../marscoin/contrib/gitian-descriptors/gitian-win.yml
+    ./bin/gsign --signer "$SIGNER" --release ${VERSION}-win-unsigned --destination ../gitian.sigs.ltc/ ../marscoin/contrib/gitian-descriptors/gitian-win.yml
+    mv build/out/marscoin-*-win-unsigned.tar.gz inputs/marscoin-win-unsigned.tar.gz
+    mv build/out/marscoin-*.zip build/out/marscoin-*.exe ../
+
+    ./bin/gbuild --num-make $GITIAN_THREADS --memory $GITIAN_MEMORY --commit marscoin=v${VERSION} ../marscoin/contrib/gitian-descriptors/gitian-osx.yml
+    ./bin/gsign --signer "$SIGNER" --release ${VERSION}-osx-unsigned --destination ../gitian.sigs.ltc/ ../marscoin/contrib/gitian-descriptors/gitian-osx.yml
+    mv build/out/marscoin-*-osx-unsigned.tar.gz inputs/marscoin-osx-unsigned.tar.gz
+    mv build/out/marscoin-*.tar.gz build/out/marscoin-*.dmg ../
+    popd
+
+Build output expected:
+
+  1. source tarball (`marscoin-${VERSION}.tar.gz`)
+  2. linux 32-bit and 64-bit dist tarballs (`marscoin-${VERSION}-linux[32|64].tar.gz`)
+  3. windows 32-bit and 64-bit unsigned installers and dist zips (`marscoin-${VERSION}-win[32|64]-setup-unsigned.exe`, `marscoin-${VERSION}-win[32|64].zip`)
+  4. macOS unsigned installer and dist tarball (`marscoin-${VERSION}-osx-unsigned.dmg`, `marscoin-${VERSION}-osx64.tar.gz`)
+  5. Gitian signatures (in `gitian.sigs.ltc/${VERSION}-<linux|{win,osx}-unsigned>/(your Gitian key)/`)
+
+### Verify other gitian builders signatures to your own. (Optional)
+
+Add other gitian builders keys to your gpg keyring, and/or refresh keys: See `../marscoin/contrib/gitian-keys/README.md`.
+
+Verify the signatures
+
+    pushd ./gitian-builder
+    ./bin/gverify -v -d ../gitian.sigs.ltc/ -r ${VERSION}-linux ../marscoin/contrib/gitian-descriptors/gitian-linux.yml
+    ./bin/gverify -v -d ../gitian.sigs.ltc/ -r ${VERSION}-win-unsigned ../marscoin/contrib/gitian-descriptors/gitian-win.yml
+    ./bin/gverify -v -d ../gitian.sigs.ltc/ -r ${VERSION}-osx-unsigned ../marscoin/contrib/gitian-descriptors/gitian-osx.yml
+    popd
+
+### Next steps:
+
+Commit your signature to gitian.sigs.ltc:
+
+    pushd gitian.sigs.ltc
+    git add ${VERSION}-linux/"${SIGNER}"
+    git add ${VERSION}-win-unsigned/"${SIGNER}"
+    git add ${VERSION}-osx-unsigned/"${SIGNER}"
+    git commit -m "Add ${VERSION} unsigned sigs for ${SIGNER}"
+    git push  # Assuming you can push to the gitian.sigs tree
+    popd
+
+Codesigner only: Create Windows/macOS detached signatures:
+- Only one person handles codesigning. Everyone else should skip to the next step.
+- Only once the Windows/macOS builds each have 3 matching signatures may they be signed with their respective release keys.
+
+Codesigner only: Sign the macOS binary:
+
+    transfer marscoin-osx-unsigned.tar.gz to macOS for signing
+    tar xf marscoin-osx-unsigned.tar.gz
+    ./detached-sig-create.sh -s "Key ID"
+    Enter the keychain password and authorize the signature
+    Move signature-osx.tar.gz back to the gitian host
+
+Codesigner only: Sign the windows binaries:
+
+    tar xf marscoin-win-unsigned.tar.gz
+    ./detached-sig-create.sh -key /path/to/codesign.key
+    Enter the passphrase for the key when prompted
+    signature-win.tar.gz will be created
+
+Codesigner only: Commit the detached codesign payloads:
+
+    cd ~/marscoin-detached-sigs
+    checkout the appropriate branch for this release series
+    rm -rf *
+    tar xf signature-osx.tar.gz
+    tar xf signature-win.tar.gz
+    git add -a
+    git commit -m "point to ${VERSION}"
+    git tag -s v${VERSION} HEAD
+    git push the current branch and new tag
+
+Non-codesigners: wait for Windows/macOS detached signatures:
+
+- Once the Windows/macOS builds each have 3 matching signatures, they will be signed with their respective release keys.
+- Detached signatures will then be committed to the [marscoin-detached-sigs](https://github.com/marscoin-project/marscoin-detached-sigs) repository, which can be combined with the unsigned apps to create signed binaries.
+
+Create (and optionally verify) the signed macOS binary:
+
+    pushd ./gitian-builder
+    ./bin/gbuild -i --commit signature=v${VERSION} ../marscoin/contrib/gitian-descriptors/gitian-osx-signer.yml
+    ./bin/gsign --signer "$SIGNER" --release ${VERSION}-osx-signed --destination ../gitian.sigs.ltc/ ../marscoin/contrib/gitian-descriptors/gitian-osx-signer.yml
+    ./bin/gverify -v -d ../gitian.sigs.ltc/ -r ${VERSION}-osx-signed ../marscoin/contrib/gitian-descriptors/gitian-osx-signer.yml
+    mv build/out/marscoin-osx-signed.dmg ../marscoin-${VERSION}-osx.dmg
+    popd
+
+Create (and optionally verify) the signed Windows binaries:
+
+    pushd ./gitian-builder
+    ./bin/gbuild -i --commit signature=v${VERSION} ../marscoin/contrib/gitian-descriptors/gitian-win-signer.yml
+    ./bin/gsign --signer "$SIGNER" --release ${VERSION}-win-signed --destination ../gitian.sigs.ltc/ ../marscoin/contrib/gitian-descriptors/gitian-win-signer.yml
+    ./bin/gverify -v -d ../gitian.sigs.ltc/ -r ${VERSION}-win-signed ../marscoin/contrib/gitian-descriptors/gitian-win-signer.yml
+    mv build/out/marscoin-*win64-setup.exe ../marscoin-${VERSION}-win64-setup.exe
+    mv build/out/marscoin-*win32-setup.exe ../marscoin-${VERSION}-win32-setup.exe
+    popd
+
+Commit your signature for the signed macOS/Windows binaries:
+
+    pushd gitian.sigs.ltc
+    git add ${VERSION}-osx-signed/"${SIGNER}"
+    git add ${VERSION}-win-signed/"${SIGNER}"
+    git commit -a
+    git push  # Assuming you can push to the gitian.sigs.ltc tree
+    popd
+
+### After 3 or more people have gitian-built and their results match:
+
+- Create `SHA256SUMS.asc` for the builds, and GPG-sign it:
+
+```bash
+sha256sum * > SHA256SUMS
+```
+
+The list of files should be:
+```
+marscoin-${VERSION}-aarch64-linux-gnu.tar.gz
+marscoin-${VERSION}-arm-linux-gnueabihf.tar.gz
+marscoin-${VERSION}-i686-pc-linux-gnu.tar.gz
+marscoin-${VERSION}-x86_64-linux-gnu.tar.gz
+marscoin-${VERSION}-osx64.tar.gz
+marscoin-${VERSION}-osx.dmg
+marscoin-${VERSION}.tar.gz
+marscoin-${VERSION}-win32-setup.exe
+marscoin-${VERSION}-win32.zip
+marscoin-${VERSION}-win64-setup.exe
+marscoin-${VERSION}-win64.zip
+```
+The `*-debug*` files generated by the gitian build contain debug symbols
+for troubleshooting by developers. It is assumed that anyone that is interested
+in debugging can run gitian to generate the files for themselves. To avoid
+end-user confusion about which file to pick, as well as save storage
+space *do not upload these to the marscoin.org server, nor put them in the torrent*.
+
+- GPG-sign it, delete the unsigned file:
+```
+gpg --digest-algo sha256 --clearsign SHA256SUMS # outputs SHA256SUMS.asc
+rm SHA256SUMS
+```
+(the digest algorithm is forced to sha256 to avoid confusion of the `Hash:` header that GPG adds with the SHA256 used for the files)
+Note: check that SHA256SUMS itself doesn't end up in SHA256SUMS, which is a spurious/nonsensical entry.
+
+- Upload zips and installers, as well as `SHA256SUMS.asc` from last step, to the marscoin.org server.
+
+```
+- Update marscoin.org version
+
+- Announce the release:
+
+  - marscoin-dev and marscoin-dev mailing list
+
+  - blog.marscoin.org blog post
+
+  - Update title of #marscoin and #marscoin-dev on Freenode IRC
+
+  - Optionally twitter, reddit /r/marscoin, ... but this will usually sort out itself
+
+  - Archive release notes for the new version to `doc/release-notes/` (branch `master` and branch of the release)
+
+  - Create a [new GitHub release](https://github.com/marscoin/marscoin/releases/new) with a link to the archived release notes.
+
+  - Celebrate

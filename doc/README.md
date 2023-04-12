@@ -1,9 +1,11 @@
-Marscoin 1.6.0
-=====================
+Marscoin
+=============
 
 Setup
 ---------------------
-[Marscoin](http://www.marscoin.org/buy-hold/) is the original Marscoin client and it builds the backbone of the network. However, it downloads and stores the entire history of Marscoin transactions (which is currently several GBs); depending on the speed of your computer and network connection, the synchronization process can take anywhere from a few hours to a day or more. Thankfully you only have to do this once. If you would like the process to go faster you can [download the blockchain directly](bootstrap.md).
+Marscoin is the original Marscoin client and it builds the backbone of the network. It downloads and, by default, stores the entire history of Marscoin transactions (which is currently more than 20 GBs); depending on the speed of your computer and network connection, the synchronization process can take anywhere from a few hours to a day or more.
+
+To download Marscoin, visit [marscoin.org](https://marscoin.org).
 
 Running
 ---------------------
@@ -11,56 +13,67 @@ The following are some helpful notes on how to run Marscoin on your native platf
 
 ### Unix
 
-You need the Qt5 run-time libraries to run Marscoin-Qt. On Debian or Ubuntu:
+Unpack the files into a directory and run:
 
-	sudo apt-get install libqtgui5
-
+- `bin/marscoin-qt` (GUI) or
+- `bin/marscoind` (headless)
 
 ### Windows
 
 Unpack the files into a directory, and then run marscoin-qt.exe.
 
-### OS X
+### macOS
 
-Drag Marscoin-Qt to your applications folder, and then run Marscoin-Qt.
+Drag Marscoin to your applications folder, and then run Marscoin.
 
 ### Need Help?
 
-* Ask for help on [#marscoin](http://webchat.freenode.net?channels=marscoin) on Freenode. If you don't have an IRC client use [webchat here](http://webchat.freenode.net?channels=marscoin).
-* Ask for help on the [BitcoinTalk](https://bitcointalk.org/index.php?topic=721263.0) forums
+* See the documentation at the [Marscoin Wiki](https://github.com/marscoin)
+for help and more information.
+* Ask for help on Discord/Gitter
 
 Building
 ---------------------
 The following are developer notes on how to build Marscoin on your native platform. They are not complete guides, but include notes on the necessary libraries, compile flags, etc.
 
-- [OS X Build Notes](build-osx.md)
+- [Dependencies](dependencies.md)
+- [macOS Build Notes](build-osx.md)
 - [Unix Build Notes](build-unix.md)
+- [Windows Build Notes](build-windows.md)
+- [OpenBSD Build Notes](build-openbsd.md)
+- [NetBSD Build Notes](build-netbsd.md)
+- [Gitian Building Guide](gitian-building.md)
 
 Development
 ---------------------
-The Marscoin repo's [root README](https://github.com/marscoin/marscoin/blob/master/README.md) contains relevant information on the development process and automated testing.
+The Marscoin repo's [root README](/README.md) contains relevant information on the development process and automated testing.
 
-- [Coding Guidelines](coding.md)
-- [Multiwallet Qt Development](multiwallet-qt.md)
+- [Developer Notes](developer-notes.md)
 - [Release Notes](release-notes.md)
 - [Release Process](release-process.md)
-- [Source Code Documentation (External Link)](https://dev.visucore.com/marscoin/doxygen/)
 - [Translation Process](translation_process.md)
-- [Unit Tests](unit-tests.md)
+- [Translation Strings Policy](translation_strings_policy.md)
+- [Travis CI](travis-ci.md)
+- [Unauthenticated REST Interface](REST-interface.md)
+- [Shared Libraries](shared-libraries.md)
+- [BIPS](bips.md)
+- [Dnsseed Policy](dnsseed-policy.md)
+- [Benchmarking](benchmarking.md)
 
 ### Resources
-* Discuss on the [Reddit](https://reddit.com/r/marscoin) forums
-* Discuss on [#marscoin-dev](http://webchat.freenode.net/?channels=marscoin) on Freenode. If you don't have an IRC client use [webchat here](http://webchat.freenode.net/?channels=marscoin-dev).
-* Discuss on Discord [Discord](https://discordapp.com/channels/598732363232706570/598732363740086281)
+* Discuss on Discord / Gitter
 
 ### Miscellaneous
 - [Assets Attribution](assets-attribution.md)
 - [Files](files.md)
+- [Fuzz-testing](fuzzing.md)
+- [Reduce Traffic](reduce-traffic.md)
 - [Tor Support](tor.md)
 - [Init Scripts (systemd/upstart/openrc)](init.md)
+- [ZMQ](zmq.md)
 
 License
 ---------------------
-Distributed under the [MIT/X11 software license](http://www.opensource.org/licenses/mit-license.php).
+Distributed under the [MIT software license](/COPYING).
 This product includes software developed by the OpenSSL Project for use in the [OpenSSL Toolkit](https://www.openssl.org/). This product includes
 cryptographic software written by Eric Young ([eay@cryptsoft.com](mailto:eay@cryptsoft.com)), and UPnP software written by Thomas Bernard.
