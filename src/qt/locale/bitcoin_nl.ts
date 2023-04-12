@@ -3,11 +3,11 @@
     <name>AddressBookPage</name>
     <message>
         <source>Right-click to edit address or label</source>
-        <translation>Klik met de rechtermuisknop om het adres of label te wijzigen</translation>
+        <translation>Rechtermuisklik om het adres of label te wijzigen</translation>
     </message>
     <message>
         <source>Create a new address</source>
-        <translation>Maak een nieuw adres</translation>
+        <translation>Maak een nieuw adres aan</translation>
     </message>
     <message>
         <source>&amp;New</source>
@@ -26,12 +26,12 @@
         <translation>S&amp;luiten</translation>
     </message>
     <message>
-        <source>&amp;Copy Address</source>
-        <translation>&amp;Kopiëer Adres</translation>
-    </message>
-    <message>
         <source>Delete the currently selected address from the list</source>
         <translation>Verwijder het geselecteerde adres van de lijst</translation>
+    </message>
+    <message>
+        <source>Enter address or label to search</source>
+        <translation>Vul adres of label in om te zoeken</translation>
     </message>
     <message>
         <source>Export the data in the current tab to a file</source>
@@ -59,23 +59,27 @@
     </message>
     <message>
         <source>Sending addresses</source>
-        <translation>Verstuur adressen</translation>
+        <translation>Verzendadressen</translation>
     </message>
     <message>
         <source>Receiving addresses</source>
-        <translation>Ontvang adressen</translation>
+        <translation>Ontvangstadressen</translation>
     </message>
     <message>
-        <source>These are your Litecoin addresses for sending payments. Always check the amount and the receiving address before sending coins.</source>
-        <translation>Dit zijn uw Litecoinadressen om betalingen mee te verzenden. Controleer altijd het bedrag en het ontvang adres voordat u uw marscoins verzendt.</translation>
+        <source>These are your Marscoin addresses for sending payments. Always check the amount and the receiving address before sending coins.</source>
+        <translation>Dit zijn uw Marscoinadressen om betalingen mee te verzenden. Controleer altijd het bedrag en het ontvangstadres voordat u uw marscoins verzendt.</translation>
     </message>
     <message>
-        <source>These are your Litecoin addresses for receiving payments. It is recommended to use a new receiving address for each transaction.</source>
-        <translation>Dit zijn uw Litecoin-adressen waarmee u kunt betalen. We raden u aan om een nieuw ontvangstadres voor elke transactie te gebruiken.</translation>
+        <source>These are your Marscoin addresses for receiving payments. It is recommended to use a new receiving address for each transaction.</source>
+        <translation>Dit zijn uw Marscoin-adressen waarmee u betalingen kunt ontvangen. We raden u aan om een nieuw ontvangstadres voor elke transactie te gebruiken.</translation>
+    </message>
+    <message>
+        <source>&amp;Copy Address</source>
+        <translation>&amp;Kopiëer adres</translation>
     </message>
     <message>
         <source>Copy &amp;Label</source>
-        <translation>Kopiëer &amp;Label</translation>
+        <translation>Kopieer &amp;label</translation>
     </message>
     <message>
         <source>&amp;Edit</source>
@@ -91,7 +95,7 @@
     </message>
     <message>
         <source>Exporting Failed</source>
-        <translation>Export Mislukt</translation>
+        <translation>Exporteren mislukt</translation>
     </message>
     <message>
         <source>There was an error trying to save the address list to %1. Please try again.</source>
@@ -117,19 +121,27 @@
     <name>AskPassphraseDialog</name>
     <message>
         <source>Passphrase Dialog</source>
-        <translation>Wachtwoorddialoog</translation>
+        <translation>Wachtwoordzindialoog</translation>
     </message>
     <message>
         <source>Enter passphrase</source>
-        <translation>Voer wachtwoord in</translation>
+        <translation>Voer wachtwoordzin in</translation>
     </message>
     <message>
         <source>New passphrase</source>
-        <translation>Nieuw wachtwoord</translation>
+        <translation>Nieuwe wachtwoordzin</translation>
     </message>
     <message>
         <source>Repeat new passphrase</source>
-        <translation>Herhaal nieuw wachtwoord</translation>
+        <translation>Herhaal nieuwe wachtwoordzin</translation>
+    </message>
+    <message>
+        <source>Show password</source>
+        <translation>Laat wachtwoord zien</translation>
+    </message>
+    <message>
+        <source>Enter the new passphrase to the wallet.&lt;br/&gt;Please use a passphrase of &lt;b&gt;ten or more random characters&lt;/b&gt;, or &lt;b&gt;eight or more words&lt;/b&gt;.</source>
+        <translation>Voer een nieuw wachtwoord in voor uw portemonnee.&lt;br/&gt;Gebruik een wachtwoord van &lt;b&gt;tien of meer willekeurige karakters&lt;/b&gt;, of &lt;b&gt;acht of meer woorden&lt;/b&gt;.</translation>
     </message>
     <message>
         <source>Encrypt wallet</source>
@@ -156,8 +168,8 @@
         <translation>Wijzig wachtwoord</translation>
     </message>
     <message>
-        <source>Enter the old and new passphrase to the wallet.</source>
-        <translation>Vul uw oude en nieuwe portemonneewachtwoord in.</translation>
+        <source>Enter the old passphrase and new passphrase to the wallet.</source>
+        <translation>Voer het oude en nieuwe wachtwoord in voor uw portemonnee.</translation>
     </message>
     <message>
         <source>Confirm wallet encryption</source>
@@ -172,24 +184,16 @@
         <translation>Weet u zeker dat u uw portemonnee wilt versleutelen?</translation>
     </message>
     <message>
-        <source>IMPORTANT: Any previous backups you have made of your wallet file should be replaced with the newly generated, encrypted wallet file. For security reasons, previous backups of the unencrypted wallet file will become useless as soon as you start using the new, encrypted wallet.</source>
-        <translation>BELANGRIJK: Elke eerder gemaakte backup van uw portemonneebestand dient u te vervangen door het nieuw gegenereerde, versleutelde portemonneebestand. Om veiligheidsredenen zullen eerdere backups van het niet-versleutelde portemonneebestand onbruikbaar worden zodra u uw nieuwe, versleutelde, portemonnee begint te gebruiken.</translation>
-    </message>
-    <message>
-        <source>Warning: The Caps Lock key is on!</source>
-        <translation>Waarschuwing: De Caps-Lock-toets staat aan!</translation>
-    </message>
-    <message>
         <source>Wallet encrypted</source>
         <translation>Portemonnee versleuteld</translation>
     </message>
     <message>
-        <source>Enter the new passphrase to the wallet.&lt;br/&gt;Please use a passphrase of &lt;b&gt;ten or more random characters&lt;/b&gt;, or &lt;b&gt;eight or more words&lt;/b&gt;.</source>
-        <translation>Voer een nieuw wachtwoord in voor uw portomonee.&lt;br/&gt;Gebruik een wachtwoord van &lt;b&gt;tien of meer willekeurige karakters&lt;/b&gt;, of &lt;b&gt;acht of meer woorden&lt;/b&gt;.</translation>
+        <source>%1 will close now to finish the encryption process. Remember that encrypting your wallet cannot fully protect your marscoins from being stolen by malware infecting your computer.</source>
+        <translation>%1 zal nu afsluiten om het versleutelingsproces te voltooien. Onthoud dat het versleutelen van uw portemonnee u niet volledig kan beschermen: Malware kan uw computer infecteren en uw marscoins stelen.</translation>
     </message>
     <message>
-        <source>Litecoin will close now to finish the encryption process. Remember that encrypting your wallet cannot fully protect your marscoins from being stolen by malware infecting your computer.</source>
-        <translation>Litecoin zal nu afsluiten om het versleutelingsproces te voltooien. Onthoudt dat het versleutelen van uw portemonnee u niet volledig kan beschermen: Malware kan uw computer infecteren en uw marscoins stelen.</translation>
+        <source>IMPORTANT: Any previous backups you have made of your wallet file should be replaced with the newly generated, encrypted wallet file. For security reasons, previous backups of the unencrypted wallet file will become useless as soon as you start using the new, encrypted wallet.</source>
+        <translation>BELANGRIJK: Elke eerder gemaakte backup van uw portemonneebestand dient u te vervangen door het nieuw gegenereerde, versleutelde portemonneebestand. Om veiligheidsredenen zullen eerdere backups van het niet-versleutelde portemonneebestand onbruikbaar worden zodra u uw nieuwe, versleutelde, portemonnee begint te gebruiken.</translation>
     </message>
     <message>
         <source>Wallet encryption failed</source>
@@ -218,6 +222,21 @@
     <message>
         <source>Wallet passphrase was successfully changed.</source>
         <translation>Portemonneewachtwoord is met succes gewijzigd.</translation>
+    </message>
+    <message>
+        <source>Warning: The Caps Lock key is on!</source>
+        <translation>Waarschuwing: De Caps-Lock-toets staat aan!</translation>
+    </message>
+</context>
+<context>
+    <name>BanTableModel</name>
+    <message>
+        <source>IP/Netmask</source>
+        <translation>IP/Netmasker</translation>
+    </message>
+    <message>
+        <source>Banned Until</source>
+        <translation>Geband tot</translation>
     </message>
 </context>
 <context>
@@ -248,15 +267,23 @@
     </message>
     <message>
         <source>Browse transaction history</source>
-        <translation>Blader door transactieverleden</translation>
+        <translation>Blader door transactiegescheidenis</translation>
     </message>
     <message>
         <source>E&amp;xit</source>
-        <translation>&amp;Afsluiten</translation>
+        <translation>A&amp;fsluiten</translation>
     </message>
     <message>
         <source>Quit application</source>
         <translation>Programma afsluiten</translation>
+    </message>
+    <message>
+        <source>&amp;About %1</source>
+        <translation>&amp;Over %1</translation>
+    </message>
+    <message>
+        <source>Show information about %1</source>
+        <translation>Toon informatie over %1</translation>
     </message>
     <message>
         <source>About &amp;Qt</source>
@@ -268,15 +295,19 @@
     </message>
     <message>
         <source>&amp;Options...</source>
-        <translation>O&amp;pties...</translation>
+        <translation>&amp;Opties...</translation>
+    </message>
+    <message>
+        <source>Modify configuration options for %1</source>
+        <translation>Wijzig configuratieopties voor %1</translation>
     </message>
     <message>
         <source>&amp;Encrypt Wallet...</source>
-        <translation>&amp;Versleutel Portemonnee...</translation>
+        <translation>&amp;Versleutel portemonnee...</translation>
     </message>
     <message>
         <source>&amp;Backup Wallet...</source>
-        <translation>&amp;Backup Portemonnee...</translation>
+        <translation>&amp;Backup portemonnee...</translation>
     </message>
     <message>
         <source>&amp;Change Passphrase...</source>
@@ -284,35 +315,51 @@
     </message>
     <message>
         <source>&amp;Sending addresses...</source>
-        <translation>V&amp;erstuur adressen...</translation>
+        <translation>&amp;Verstuuradressen...</translation>
     </message>
     <message>
         <source>&amp;Receiving addresses...</source>
-        <translation>O&amp;ntvang adressen...</translation>
+        <translation>&amp;Ontvangstadressen...</translation>
     </message>
     <message>
         <source>Open &amp;URI...</source>
         <translation>Open &amp;URI...</translation>
     </message>
     <message>
-        <source>Marscoin Client client</source>
-        <translation>Litecoin Kern applicatie</translation>
+        <source>Wallet:</source>
+        <translation>Portemonnee:</translation>
     </message>
     <message>
-        <source>Importing blocks from disk...</source>
-        <translation>Blokken aan het importeren vanaf harde schijf...</translation>
+        <source>default wallet</source>
+        <translation>standaard portemonnee</translation>
+    </message>
+    <message>
+        <source>Click to disable network activity.</source>
+        <translation>Klik om de netwerkactiviteit te stoppen.</translation>
+    </message>
+    <message>
+        <source>Network activity disabled.</source>
+        <translation>Netwerkactiviteit gestopt.</translation>
+    </message>
+    <message>
+        <source>Click to enable network activity again.</source>
+        <translation>Klik om de netwerkactiviteit opnieuw te starten.</translation>
+    </message>
+    <message>
+        <source>Syncing Headers (%1%)...</source>
+        <translation>Blokhoofden synchroniseren (%1%)...</translation>
     </message>
     <message>
         <source>Reindexing blocks on disk...</source>
         <translation>Bezig met herindexeren van blokken op harde schijf...</translation>
     </message>
     <message>
-        <source>Send coins to a Litecoin address</source>
-        <translation>Verstuur munten naar een Litecoinadres</translation>
+        <source>Proxy is &lt;b&gt;enabled&lt;/b&gt;: %1</source>
+        <translation>Proxy is &lt;b&gt;ingeschakeld&lt;/b&gt;: %1</translation>
     </message>
     <message>
-        <source>Modify configuration options for Litecoin</source>
-        <translation>Wijzig instellingen van Litecoin</translation>
+        <source>Send coins to a Marscoin address</source>
+        <translation>Verstuur munten naar een Marscoinadres</translation>
     </message>
     <message>
         <source>Backup wallet to another location</source>
@@ -335,8 +382,8 @@
         <translation>&amp;Verifiëer bericht...</translation>
     </message>
     <message>
-        <source>Litecoin</source>
-        <translation>Litecoin</translation>
+        <source>Marscoin</source>
+        <translation>Marscoin</translation>
     </message>
     <message>
         <source>Wallet</source>
@@ -344,19 +391,15 @@
     </message>
     <message>
         <source>&amp;Send</source>
-        <translation>&amp;Versturen</translation>
+        <translation>&amp;Verstuur</translation>
     </message>
     <message>
         <source>&amp;Receive</source>
         <translation>&amp;Ontvangen</translation>
     </message>
     <message>
-        <source>Show information about Marscoin Client</source>
-        <translation>Toon informatie over marscoin kern</translation>
-    </message>
-    <message>
         <source>&amp;Show / Hide</source>
-        <translation>&amp;Toon / Verberg</translation>
+        <translation>&amp;Toon / verberg</translation>
     </message>
     <message>
         <source>Show or hide the main Window</source>
@@ -367,12 +410,12 @@
         <translation>Versleutel de geheime sleutels die bij uw portemonnee horen</translation>
     </message>
     <message>
-        <source>Sign messages with your Litecoin addresses to prove you own them</source>
-        <translation>Onderteken berichten met uw Litecoinadressen om te bewijzen dat u deze adressen bezit</translation>
+        <source>Sign messages with your Marscoin addresses to prove you own them</source>
+        <translation>Onderteken berichten met uw Marscoinadressen om te bewijzen dat u deze adressen bezit</translation>
     </message>
     <message>
-        <source>Verify messages to ensure they were signed with specified Litecoin addresses</source>
-        <translation>Verifiëer handtekeningen om zeker te zijn dat de berichten zijn ondertekend met de gespecificeerde Litecoinadressen</translation>
+        <source>Verify messages to ensure they were signed with specified Marscoin addresses</source>
+        <translation>Verifiëer handtekeningen om zeker te zijn dat de berichten zijn ondertekend met de gespecificeerde Marscoinadressen</translation>
     </message>
     <message>
         <source>&amp;File</source>
@@ -391,24 +434,16 @@
         <translation>Tab-werkbalk</translation>
     </message>
     <message>
-        <source>Marscoin Client</source>
-        <translation>Litecoin Kern</translation>
-    </message>
-    <message>
         <source>Request payments (generates QR codes and marscoin: URIs)</source>
-        <translation>Vraag betaling aan (genereert QR codes en marscoin: URIs)</translation>
-    </message>
-    <message>
-        <source>&amp;About Marscoin Client</source>
-        <translation>&amp;Over Marscoin Client</translation>
+        <translation>Vraag betaling aan (genereert QR-codes en marscoin: URI's)</translation>
     </message>
     <message>
         <source>Show the list of used sending addresses and labels</source>
-        <translation>Toon de lijst met gebruikt verzend adressen en labels</translation>
+        <translation>Toon de lijst met gebruikte verstuuradressen en -labels</translation>
     </message>
     <message>
         <source>Show the list of used receiving addresses and labels</source>
-        <translation>Toon de lijst met gebruikte ontvangst adressen en labels</translation>
+        <translation>Toon de lijst met gebruikte ontvangstadressen en labels</translation>
     </message>
     <message>
         <source>Open a marscoin: URI or payment request</source>
@@ -416,39 +451,23 @@
     </message>
     <message>
         <source>&amp;Command-line options</source>
-        <translation>&amp;Commandoregel-opties</translation>
+        <translation>&amp;Opdrachtregelopties</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n active connection(s) to Marscoin network</source>
+        <translation><numerusform>%n actieve verbinding met Marscoinnetwerk</numerusform><numerusform>%n actieve verbindingen met Marscoinnetwerk</numerusform></translation>
     </message>
     <message>
-        <source>Show the Marscoin Client help message to get a list with possible Litecoin command-line options</source>
-        <translation>Toon het Marscoin Client hulpbericht om een lijst te krijgen met mogelijke Litecoin commandoregelopties</translation>
-    </message>
-    <message numerus="yes">
-        <source>%n active connection(s) to Litecoin network</source>
-        <translation><numerusform>%n actieve connectie naar Litecoin netwerk</numerusform><numerusform>%n actieve connecties naar Litecoin netwerk</numerusform></translation>
+        <source>Indexing blocks on disk...</source>
+        <translation>Bezig met indexeren van blokken op harde schijf...</translation>
     </message>
     <message>
-        <source>No block source available...</source>
-        <translation>Geen bron voor blokken beschikbaar...</translation>
+        <source>Processing blocks on disk...</source>
+        <translation>Bezig met verwerken van blokken op harde schijf...</translation>
     </message>
     <message numerus="yes">
-        <source>%n hour(s)</source>
-        <translation><numerusform>%n uur</numerusform><numerusform>%n uur</numerusform></translation>
-    </message>
-    <message numerus="yes">
-        <source>%n day(s)</source>
-        <translation><numerusform>%n dag</numerusform><numerusform>%n dagen</numerusform></translation>
-    </message>
-    <message numerus="yes">
-        <source>%n week(s)</source>
-        <translation><numerusform>%n week</numerusform><numerusform>%n weken</numerusform></translation>
-    </message>
-    <message>
-        <source>%1 and %2</source>
-        <translation>%1 en %2</translation>
-    </message>
-    <message numerus="yes">
-        <source>%n year(s)</source>
-        <translation><numerusform>%n jaar</numerusform><numerusform>%n jaar</numerusform></translation>
+        <source>Processed %n block(s) of transaction history.</source>
+        <translation><numerusform>%n blok aan transactiegeschiedenis verwerkt.</numerusform><numerusform>%n blokken aan transactiegeschiedenis verwerkt.</numerusform></translation>
     </message>
     <message>
         <source>%1 behind</source>
@@ -478,33 +497,73 @@
         <source>Up to date</source>
         <translation>Bijgewerkt</translation>
     </message>
-    <message numerus="yes">
-        <source>Processed %n blocks of transaction history.</source>
-        <translation><numerusform>%n Blok transactie geschiedenis verwerkt.</numerusform><numerusform>%n Blokken transactie geschiedenis verwerkt.</numerusform></translation>
+    <message>
+        <source>Show the %1 help message to get a list with possible Marscoin command-line options</source>
+        <translation>Toon het %1 hulpbericht om een lijst te krijgen met mogelijke Marscoin commandoregelopties</translation>
+    </message>
+    <message>
+        <source>%1 client</source>
+        <translation>%1 client</translation>
+    </message>
+    <message>
+        <source>Connecting to peers...</source>
+        <translation>Verbinden met peers...</translation>
     </message>
     <message>
         <source>Catching up...</source>
         <translation>Aan het bijwerken...</translation>
     </message>
     <message>
+        <source>Date: %1
+</source>
+        <translation>Datum: %1
+</translation>
+    </message>
+    <message>
+        <source>Amount: %1
+</source>
+        <translation>Aantal: %1
+</translation>
+    </message>
+    <message>
+        <source>Wallet: %1
+</source>
+        <translation>Portemonnee: %1
+</translation>
+    </message>
+    <message>
+        <source>Type: %1
+</source>
+        <translation>Type: %1
+</translation>
+    </message>
+    <message>
+        <source>Label: %1
+</source>
+        <translation>Label: %1
+</translation>
+    </message>
+    <message>
+        <source>Address: %1
+</source>
+        <translation>Adres: %1
+</translation>
+    </message>
+    <message>
         <source>Sent transaction</source>
-        <translation>Verzonden transactie</translation>
+        <translation>Verstuurde transactie</translation>
     </message>
     <message>
         <source>Incoming transaction</source>
         <translation>Binnenkomende transactie</translation>
     </message>
     <message>
-        <source>Date: %1
-Amount: %2
-Type: %3
-Address: %4
-</source>
-        <translation>Datum: %1
-Bedrag: %2
-Type: %3
-Adres: %4
-</translation>
+        <source>HD key generation is &lt;b&gt;enabled&lt;/b&gt;</source>
+        <translation>HD-sleutel voortbrenging is &lt;b&gt;ingeschakeld&lt;/b&gt;</translation>
+    </message>
+    <message>
+        <source>HD key generation is &lt;b&gt;disabled&lt;/b&gt;</source>
+        <translation>HD-sleutel voortbrenging is &lt;b&gt;uitgeschakeld&lt;/b&gt;</translation>
     </message>
     <message>
         <source>Wallet is &lt;b&gt;encrypted&lt;/b&gt; and currently &lt;b&gt;unlocked&lt;/b&gt;</source>
@@ -514,12 +573,9 @@ Adres: %4
         <source>Wallet is &lt;b&gt;encrypted&lt;/b&gt; and currently &lt;b&gt;locked&lt;/b&gt;</source>
         <translation>Portemonnee is &lt;b&gt;versleuteld&lt;/b&gt; en momenteel &lt;b&gt;gesloten&lt;/b&gt;</translation>
     </message>
-</context>
-<context>
-    <name>ClientModel</name>
     <message>
-        <source>Network Alert</source>
-        <translation>Netwerkwaarschuwing</translation>
+        <source>A fatal error occurred. Marscoin can no longer continue safely and will quit.</source>
+        <translation>Een fatale fout heeft zich voorgedaan. Marscoin kan niet veilig worden verdergezet en wordt afgesloten.</translation>
     </message>
 </context>
 <context>
@@ -541,10 +597,6 @@ Adres: %4
         <translation>Bedrag:</translation>
     </message>
     <message>
-        <source>Priority:</source>
-        <translation>Prioriteit:</translation>
-    </message>
-    <message>
         <source>Fee:</source>
         <translation>Vergoeding:</translation>
     </message>
@@ -554,7 +606,7 @@ Adres: %4
     </message>
     <message>
         <source>After Fee:</source>
-        <translation>Na vergoeding:</translation>
+        <translation>Naheffing:</translation>
     </message>
     <message>
         <source>Change:</source>
@@ -597,10 +649,6 @@ Adres: %4
         <translation>Bevestigd</translation>
     </message>
     <message>
-        <source>Priority</source>
-        <translation>Prioriteit</translation>
-    </message>
-    <message>
         <source>Copy address</source>
         <translation>Kopieer adres</translation>
     </message>
@@ -641,64 +689,16 @@ Adres: %4
         <translation>Kopieer bytes</translation>
     </message>
     <message>
-        <source>Copy priority</source>
-        <translation>Kopieer prioriteit</translation>
-    </message>
-    <message>
         <source>Copy dust</source>
         <translation>Kopieër stof</translation>
     </message>
     <message>
         <source>Copy change</source>
-        <translation>Kopieer wisselgeld</translation>
-    </message>
-    <message>
-        <source>highest</source>
-        <translation>hoogste</translation>
-    </message>
-    <message>
-        <source>higher</source>
-        <translation>hoger</translation>
-    </message>
-    <message>
-        <source>high</source>
-        <translation>hoog</translation>
-    </message>
-    <message>
-        <source>medium-high</source>
-        <translation>gemiddeld hoog</translation>
-    </message>
-    <message>
-        <source>medium</source>
-        <translation>gemiddeld</translation>
-    </message>
-    <message>
-        <source>low-medium</source>
-        <translation>laag gemiddeld</translation>
-    </message>
-    <message>
-        <source>low</source>
-        <translation>laag</translation>
-    </message>
-    <message>
-        <source>lower</source>
-        <translation>lager</translation>
-    </message>
-    <message>
-        <source>lowest</source>
-        <translation>laagste</translation>
+        <translation>Kopieer wijziging</translation>
     </message>
     <message>
         <source>(%1 locked)</source>
-        <translation>(%1 geblokeerd)</translation>
-    </message>
-    <message>
-        <source>none</source>
-        <translation>geen</translation>
-    </message>
-    <message>
-        <source>Can vary +/- %1 satoshi(s) per input.</source>
-        <translation>Kan per input +/- %1 satoshi(s)  variëren.</translation>
+        <translation>(%1 geblokkeerd)</translation>
     </message>
     <message>
         <source>yes</source>
@@ -709,28 +709,12 @@ Adres: %4
         <translation>nee</translation>
     </message>
     <message>
-        <source>This label turns red, if the transaction size is greater than 1000 bytes.</source>
-        <translation>Dit label wordt rood, als de transactie grootte meer dan 1000 bytes is.</translation>
+        <source>This label turns red if any recipient receives an amount smaller than the current dust threshold.</source>
+        <translation>Dit label wordt rood, als een ontvanger een bedrag van minder dan de huidige dust-drempel gekregen heeft.</translation>
     </message>
     <message>
-        <source>This means a fee of at least %1 per kB is required.</source>
-        <translation>Dit betekent dat een vergoeding van minimaal %1 per kB nodig is.</translation>
-    </message>
-    <message>
-        <source>Can vary +/- 1 byte per input.</source>
-        <translation>Kan +/- byte per invoer variëren.</translation>
-    </message>
-    <message>
-        <source>Transactions with higher priority are more likely to get included into a block.</source>
-        <translation>Transacties met een hogere prioriteit zullen eerder in een block gezet worden.</translation>
-    </message>
-    <message>
-        <source>This label turns red, if the priority is smaller than "medium".</source>
-        <translation>Als dit label rood is, is de prioriteit minder dan "medium".</translation>
-    </message>
-    <message>
-        <source>This label turns red, if any recipient receives an amount smaller than %1.</source>
-        <translation>Dit label wordt rood, als een ontvanger een bedrag van minder dan %1 gekregen heeft.</translation>
+        <source>Can vary +/- %1 satoshi(s) per input.</source>
+        <translation>Kan per input +/- %1 satoshi(s)  variëren.</translation>
     </message>
     <message>
         <source>(no label)</source>
@@ -749,7 +733,7 @@ Adres: %4
     <name>EditAddressDialog</name>
     <message>
         <source>Edit Address</source>
-        <translation>Bewerk Adres</translation>
+        <translation>Bewerk adres</translation>
     </message>
     <message>
         <source>&amp;Label</source>
@@ -761,19 +745,15 @@ Adres: %4
     </message>
     <message>
         <source>The address associated with this address list entry. This can only be modified for sending addresses.</source>
-        <translation>Het adres dat bij dit adres item hoort. Dit kan alleen bewerkt worden voor verstuur adressen.</translation>
+        <translation>Het adres dat bij dit adresitem hoort. Dit kan alleen bewerkt worden voor verstuuradressen.</translation>
     </message>
     <message>
         <source>&amp;Address</source>
         <translation>&amp;Adres</translation>
     </message>
     <message>
-        <source>New receiving address</source>
-        <translation>Nieuw ontvangstadres</translation>
-    </message>
-    <message>
         <source>New sending address</source>
-        <translation>Nieuw adres om naar te verzenden</translation>
+        <translation>Nieuw verzendadres</translation>
     </message>
     <message>
         <source>Edit receiving address</source>
@@ -781,15 +761,19 @@ Adres: %4
     </message>
     <message>
         <source>Edit sending address</source>
-        <translation>Bewerk adres om naar te verzenden</translation>
+        <translation>Bewerk verzendadres</translation>
     </message>
     <message>
-        <source>The entered address "%1" is already in the address book.</source>
-        <translation>Het opgegeven adres "%1" bestaat al in uw adresboek.</translation>
+        <source>The entered address "%1" is not a valid Marscoin address.</source>
+        <translation>Het opgegeven adres "%1" is een ongeldig Marscoinadres.</translation>
     </message>
     <message>
-        <source>The entered address "%1" is not a valid Litecoin address.</source>
-        <translation>Het opgegeven adres "%1" is een ongeldig Litecoinadres</translation>
+        <source>Address "%1" already exists as a receiving address with label "%2" and so cannot be added as a sending address.</source>
+        <translation>Adres "%1" bestaat al als ontvang adres met label "%2" en kan dus niet toegevoegd worden als verzend adres.</translation>
+    </message>
+    <message>
+        <source>The entered address "%1" is already in the address book with label "%2".</source>
+        <translation>Het opgegeven adres "%1" bestaat al in uw adresboek onder label "%2".</translation>
     </message>
     <message>
         <source>Could not unlock wallet.</source>
@@ -816,7 +800,7 @@ Adres: %4
     </message>
     <message>
         <source>Path already exists, and is not a directory.</source>
-        <translation>Communicatiepad bestaat al, en is geen folder.</translation>
+        <translation>Pad bestaat al en is geen map.</translation>
     </message>
     <message>
         <source>Cannot create data directory here.</source>
@@ -826,10 +810,6 @@ Adres: %4
 <context>
     <name>HelpMessageDialog</name>
     <message>
-        <source>Marscoin Client</source>
-        <translation>Litecoin Kern</translation>
-    </message>
-    <message>
         <source>version</source>
         <translation>versie</translation>
     </message>
@@ -838,44 +818,12 @@ Adres: %4
         <translation>(%1-bit)</translation>
     </message>
     <message>
-        <source>About Marscoin Client</source>
-        <translation>Over Marscoin Client</translation>
+        <source>About %1</source>
+        <translation>Over %1</translation>
     </message>
     <message>
         <source>Command-line options</source>
-        <translation>Commandoregel-opties</translation>
-    </message>
-    <message>
-        <source>Usage:</source>
-        <translation>Gebruik:</translation>
-    </message>
-    <message>
-        <source>command-line options</source>
-        <translation>commandoregel-opties</translation>
-    </message>
-    <message>
-        <source>UI options</source>
-        <translation>gebruikersinterfaceopties</translation>
-    </message>
-    <message>
-        <source>Set language, for example "de_DE" (default: system locale)</source>
-        <translation>Stel taal in, bijvoorbeeld ''de_DE" (standaard: systeeminstellingen)</translation>
-    </message>
-    <message>
-        <source>Start minimized</source>
-        <translation>Geminimaliseerd starten</translation>
-    </message>
-    <message>
-        <source>Set SSL root certificates for payment request (default: -system-)</source>
-        <translation>Zet SSL root certificaten voor betalingsverzoek (standaard: -sytem-)</translation>
-    </message>
-    <message>
-        <source>Show splash screen on startup (default: 1)</source>
-        <translation>Laat laadscherm zien bij het opstarten. (standaard: 1)</translation>
-    </message>
-    <message>
-        <source>Choose data directory on startup (default: 0)</source>
-        <translation>Kies de gegevensmap tijdens het opstarten (standaard: 0)</translation>
+        <translation>Opdrachtregelopties</translation>
     </message>
 </context>
 <context>
@@ -885,16 +833,24 @@ Adres: %4
         <translation>Welkom</translation>
     </message>
     <message>
-        <source>Welcome to Marscoin Client.</source>
-        <translation>Welkom bij Marscoin Client</translation>
+        <source>Welcome to %1.</source>
+        <translation>Welkom bij %1.</translation>
     </message>
     <message>
-        <source>As this is the first time the program is launched, you can choose where Marscoin Client will store its data.</source>
-        <translation>Omdat dit de eerste keer is dat het programma gestart is, kunt u nu kiezen waar Marscoin Client de data moet opslaan.</translation>
+        <source>As this is the first time the program is launched, you can choose where %1 will store its data.</source>
+        <translation>Omdat dit de eerste keer is dat het programma gestart is, kunt u nu kiezen waar %1 de data moet opslaan.</translation>
     </message>
     <message>
-        <source>Marscoin Client will download and store a copy of the Litecoin block chain. At least %1GB of data will be stored in this directory, and it will grow over time. The wallet will also be stored in this directory.</source>
-        <translation>Marscoin Client zal een kopie van de Litecoin blokketen downloaden en opslaan. Tenminste %1 GB aan data wordt opgeslagen in deze map en het zal groeien in de tijd. De portemonnee wordt ook in deze map opgeslagen.</translation>
+        <source>When you click OK, %1 will begin to download and process the full %4 block chain (%2GB) starting with the earliest transactions in %3 when %4 initially launched.</source>
+        <translation>Als u op OK klikt, dan zal %1 beginnen met downloaden en verwerken van de volledige %4 blokketen (%2GB) startend met de eerste transacties in %3 toen %4 initeel werd gestart.</translation>
+    </message>
+    <message>
+        <source>This initial synchronisation is very demanding, and may expose hardware problems with your computer that had previously gone unnoticed. Each time you run %1, it will continue downloading where it left off.</source>
+        <translation>Deze initiële synchronisatie is heel veeleisend, en kan hardware problemen met uw computer blootleggen die voorheen onopgemerkt bleven. Elke keer dat %1 gebruikt word, zal verdergegaan worden waar gebleven is.</translation>
+    </message>
+    <message>
+        <source>If you have chosen to limit block chain storage (pruning), the historical data must still be downloaded and processed, but will be deleted afterward to keep your disk usage low.</source>
+        <translation>Als u gekozen heeft om de blokketenopslag te beperken (pruning), dan moet de historische data nog steeds gedownload en verwerkt worden, maar zal verwijderd worden naderhand om schijf gebruik zo laag mogelijk te houden.</translation>
     </message>
     <message>
         <source>Use the default data directory</source>
@@ -902,15 +858,31 @@ Adres: %4
     </message>
     <message>
         <source>Use a custom data directory:</source>
-        <translation>Gebruik een persoonlijke gegevensmap:</translation>
+        <translation>Gebruik een aangepaste gegevensmap:</translation>
     </message>
     <message>
-        <source>Marscoin Client</source>
-        <translation>Litecoin Kern</translation>
+        <source>Marscoin</source>
+        <translation>Marscoin</translation>
+    </message>
+    <message>
+        <source>At least %1 GB of data will be stored in this directory, and it will grow over time.</source>
+        <translation>Tenminste %1 GB aan data zal worden opgeslagen in deze map, en dit zal naarmate de tijd voortschrijdt groeien.</translation>
+    </message>
+    <message>
+        <source>Approximately %1 GB of data will be stored in this directory.</source>
+        <translation>Gemiddeld %1 GB aan data zal worden opgeslagen in deze map.</translation>
+    </message>
+    <message>
+        <source>%1 will download and store a copy of the Marscoin block chain.</source>
+        <translation>%1 zal een kopie van de blokketen van Marscoin downloaden en opslaan.</translation>
+    </message>
+    <message>
+        <source>The wallet will also be stored in this directory.</source>
+        <translation>De portemonnee wordt ook in deze map opgeslagen.</translation>
     </message>
     <message>
         <source>Error: Specified data directory "%1" cannot be created.</source>
-        <translation>Fout: De gespecificeerde directory "%1" kan niet worden gecreëerd.</translation>
+        <translation>Fout: De gespecificeerde map "%1" kan niet worden gecreëerd.</translation>
     </message>
     <message>
         <source>Error</source>
@@ -918,11 +890,62 @@ Adres: %4
     </message>
     <message numerus="yes">
         <source>%n GB of free space available</source>
-        <translation><numerusform>%n GB aan vrije oplsagruimte beschikbaar</numerusform><numerusform>%n GB aan vrije oplsagruimte beschikbaar</numerusform></translation>
+        <translation><numerusform>%n GB aan vrije opslagruimte beschikbaar</numerusform><numerusform>%n GB aan vrije opslagruimte beschikbaar</numerusform></translation>
     </message>
     <message numerus="yes">
         <source>(of %n GB needed)</source>
         <translation><numerusform>(van %n GB nodig)</numerusform><numerusform>(van %n GB nodig)</numerusform></translation>
+    </message>
+</context>
+<context>
+    <name>ModalOverlay</name>
+    <message>
+        <source>Form</source>
+        <translation>Vorm</translation>
+    </message>
+    <message>
+        <source>Recent transactions may not yet be visible, and therefore your wallet's balance might be incorrect. This information will be correct once your wallet has finished synchronizing with the marscoin network, as detailed below.</source>
+        <translation>Recente transacties zijn mogelijk nog niet zichtbaar. De balans van de portemonnee is daarom mogelijk niet correct. Deze informatie is correct van zodra de synchronisatie met het Marscoin-netwerk werd voltooid, zoals onderaan beschreven.</translation>
+    </message>
+    <message>
+        <source>Attempting to spend marscoins that are affected by not-yet-displayed transactions will not be accepted by the network.</source>
+        <translation>Poging om marscoins te besteden die door "nog niet weergegeven" transacties worden beïnvloed, worden niet door het netwerk geaccepteerd.</translation>
+    </message>
+    <message>
+        <source>Number of blocks left</source>
+        <translation>Aantal blokken resterend.</translation>
+    </message>
+    <message>
+        <source>Unknown...</source>
+        <translation>Onbekend...</translation>
+    </message>
+    <message>
+        <source>Last block time</source>
+        <translation>Tijd laatste blok</translation>
+    </message>
+    <message>
+        <source>Progress</source>
+        <translation>Vooruitgang</translation>
+    </message>
+    <message>
+        <source>Progress increase per hour</source>
+        <translation>Vooruitgang per uur</translation>
+    </message>
+    <message>
+        <source>calculating...</source>
+        <translation>Berekenen...</translation>
+    </message>
+    <message>
+        <source>Estimated time left until synced</source>
+        <translation>Geschatte tijd tot volledig synchroon</translation>
+    </message>
+    <message>
+        <source>Hide</source>
+        <translation>Verbergen</translation>
+    </message>
+    <message>
+        <source>Unknown. Syncing Headers (%1)...</source>
+        <translation>Onbekend. Blokhoofden synchroniseren (%1%)...</translation>
     </message>
 </context>
 <context>
@@ -945,7 +968,7 @@ Adres: %4
     </message>
     <message>
         <source>Select payment request file to open</source>
-        <translation>Selecteer betalingsverzoek bestand om te openen</translation>
+        <translation>Selecteer betalingsverzoekbestand om te openen</translation>
     </message>
 </context>
 <context>
@@ -959,16 +982,16 @@ Adres: %4
         <translation>&amp;Algemeen</translation>
     </message>
     <message>
-        <source>Automatically start Litecoin after logging in to the system.</source>
-        <translation>Start Litecoin automatisch na inloggen in het systeem</translation>
+        <source>Automatically start %1 after logging in to the system.</source>
+        <translation>Start %1 automatisch na inloggen in het systeem.</translation>
     </message>
     <message>
-        <source>&amp;Start Litecoin on system login</source>
-        <translation>Start &amp;Litecoin bij het inloggen in het systeem</translation>
+        <source>&amp;Start %1 on system login</source>
+        <translation>&amp;Start %1 bij het inloggen op het systeem</translation>
     </message>
     <message>
         <source>Size of &amp;database cache</source>
-        <translation>Grootte van de &amp;database cache</translation>
+        <translation>Grootte van de &amp;databasecache</translation>
     </message>
     <message>
         <source>MB</source>
@@ -979,28 +1002,44 @@ Adres: %4
         <translation>Aantal threads voor &amp;scriptverificatie</translation>
     </message>
     <message>
-        <source>Accept connections from outside</source>
-        <translation>Accepteer binnenkomende verbindingen</translation>
-    </message>
-    <message>
-        <source>Allow incoming connections</source>
-        <translation>Sta inkomende verbindingen toe</translation>
-    </message>
-    <message>
         <source>IP address of the proxy (e.g. IPv4: 127.0.0.1 / IPv6: ::1)</source>
         <translation>IP-adres van de proxy (bijv. IPv4: 127.0.0.1 / IPv6: ::1)</translation>
     </message>
     <message>
-        <source>Third party URLs (e.g. a block explorer) that appear in the transactions tab as context menu items. %s in the URL is replaced by transaction hash. Multiple URLs are separated by vertical bar |.</source>
-        <translation>Derde partijen URL's (bijvoorbeeld block explorer) dat in de transacties tab verschijnen als contextmenu elementen. %s in de URL is vervangen door transactie hash. Verscheidene URL's zijn gescheiden door een verticale streep |.  </translation>
+        <source>Shows if the supplied default SOCKS5 proxy is used to reach peers via this network type.</source>
+        <translation>Toont aan of de aangeleverde standaard SOCKS5 proxy gebruikt word om peers te bereiken via dit netwerktype.</translation>
     </message>
     <message>
-        <source>Third party transaction URLs</source>
-        <translation>Transactie-URLs van derde partijen</translation>
+        <source>Use separate SOCKS&amp;5 proxy to reach peers via Tor hidden services:</source>
+        <translation>Gebruik aparte SOCKS&amp;5-proxy om peers te bereiken via verborgen Tor-diensten:</translation>
+    </message>
+    <message>
+        <source>Hide the icon from the system tray.</source>
+        <translation>Verberg het icoon van de systeembalk.</translation>
+    </message>
+    <message>
+        <source>&amp;Hide tray icon</source>
+        <translation>&amp;Verberg systeembalkicoon</translation>
+    </message>
+    <message>
+        <source>Minimize instead of exit the application when the window is closed. When this option is enabled, the application will be closed only after selecting Exit in the menu.</source>
+        <translation>Minimaliseren in plaats van de applicatie af te sluiten wanneer het venster is afgesloten. Als deze optie is ingeschakeld, zal de toepassing pas worden afgesloten na het selecteren van Exit in het menu.</translation>
+    </message>
+    <message>
+        <source>Third party URLs (e.g. a block explorer) that appear in the transactions tab as context menu items. %s in the URL is replaced by transaction hash. Multiple URLs are separated by vertical bar |.</source>
+        <translation>URL's van derden (bijvoorbeeld blokexplorer) die in de transacties tab verschijnen als contextmenuelementen. %s in de URL is vervangen door transactiehash. Verscheidene URL's zijn gescheiden door een verticale streep |.  </translation>
     </message>
     <message>
         <source>Active command-line options that override above options:</source>
-        <translation>Actieve commandoregelopties die bovenstaande opties overschrijven:</translation>
+        <translation>Actieve opdrachtregelopties die bovenstaande opties overschrijven:</translation>
+    </message>
+    <message>
+        <source>Open the %1 configuration file from the working directory.</source>
+        <translation>Open het %1 configuratiebestand van de werkmap.</translation>
+    </message>
+    <message>
+        <source>Open Configuration File</source>
+        <translation>Open configuratiebestand</translation>
     </message>
     <message>
         <source>Reset all client options to default.</source>
@@ -1008,11 +1047,27 @@ Adres: %4
     </message>
     <message>
         <source>&amp;Reset Options</source>
-        <translation>&amp;Reset Opties</translation>
+        <translation>&amp;Reset opties</translation>
     </message>
     <message>
         <source>&amp;Network</source>
         <translation>&amp;Netwerk</translation>
+    </message>
+    <message>
+        <source>Disables some advanced features but all blocks will still be fully validated. Reverting this setting requires re-downloading the entire blockchain. Actual disk usage may be somewhat higher.</source>
+        <translation>Geavanceerde functionaliteit wordt uitgeschakeld maar alle blokken worden nog steed volledig gevalideerd. Om deze instelling weer ongedaan te maken, moet de volledige blockchain opnieuw gedownload worden. Schijfgebruik kan iets toenemen.</translation>
+    </message>
+    <message>
+        <source>Prune &amp;block storage to</source>
+        <translation>Prune &amp; block opslag op</translation>
+    </message>
+    <message>
+        <source>GB</source>
+        <translation>GB</translation>
+    </message>
+    <message>
+        <source>Reverting this setting requires re-downloading the entire blockchain.</source>
+        <translation>Deze instelling terugzetten vereist het opnieuw downloaden van de gehele blockchain.</translation>
     </message>
     <message>
         <source>(0 = auto, &lt;0 = leave that many cores free)</source>
@@ -1028,7 +1083,7 @@ Adres: %4
     </message>
     <message>
         <source>Enable coin &amp;control features</source>
-        <translation>Coin &amp;Control activeren</translation>
+        <translation>Coin &amp;control activeren</translation>
     </message>
     <message>
         <source>If you disable the spending of unconfirmed change, the change from a transaction cannot be used until that transaction has at least one confirmation. This also affects how your balance is computed.</source>
@@ -1039,16 +1094,24 @@ Adres: %4
         <translation>&amp;Spendeer onbevestigd wisselgeld</translation>
     </message>
     <message>
-        <source>Automatically open the Litecoin client port on the router. This only works when your router supports UPnP and it is enabled.</source>
-        <translation>Open de Litecoin-poort automatisch op de router. Dit werkt alleen als de router UPnP ondersteunt en het aanstaat.</translation>
+        <source>Automatically open the Marscoin client port on the router. This only works when your router supports UPnP and it is enabled.</source>
+        <translation>Open de Marscoinpoort automatisch op de router. Dit werkt alleen als de router UPnP ondersteunt en het aanstaat.</translation>
     </message>
     <message>
         <source>Map port using &amp;UPnP</source>
         <translation>Portmapping via &amp;UPnP</translation>
     </message>
     <message>
-        <source>Connect to the Litecoin network through a SOCKS5 proxy.</source>
-        <translation>Verbind met het Litecoin netwerk via een SOCKS5 proxy.</translation>
+        <source>Accept connections from outside.</source>
+        <translation>Accepteer verbindingen van buiten.</translation>
+    </message>
+    <message>
+        <source>Allow incomin&amp;g connections</source>
+        <translation>Sta inkomende verbindingen toe</translation>
+    </message>
+    <message>
+        <source>Connect to the Marscoin network through a SOCKS5 proxy.</source>
+        <translation>Verbind met het Marscoinnetwerk via een SOCKS5 proxy.</translation>
     </message>
     <message>
         <source>&amp;Connect through SOCKS5 proxy (default proxy):</source>
@@ -1067,24 +1130,40 @@ Adres: %4
         <translation>Poort van de proxy (bijv. 9050)</translation>
     </message>
     <message>
+        <source>Used for reaching peers via:</source>
+        <translation>Gebruikt om peers te bereiken via:</translation>
+    </message>
+    <message>
+        <source>IPv4</source>
+        <translation>IPv4</translation>
+    </message>
+    <message>
+        <source>IPv6</source>
+        <translation>IPv6</translation>
+    </message>
+    <message>
+        <source>Tor</source>
+        <translation>Tor</translation>
+    </message>
+    <message>
+        <source>Connect to the Marscoin network through a separate SOCKS5 proxy for Tor hidden services.</source>
+        <translation>Maak verbinding met Marscoinnetwerk door een aparte SOCKS5-proxy voor verborgen diensten van Tor.</translation>
+    </message>
+    <message>
         <source>&amp;Window</source>
         <translation>&amp;Scherm</translation>
     </message>
     <message>
         <source>Show only a tray icon after minimizing the window.</source>
-        <translation>Laat alleen een systeemvak-icoon zien wanneer het venster geminimaliseerd is</translation>
+        <translation>Laat alleen een systeemvakicoon zien wanneer het venster geminimaliseerd is</translation>
     </message>
     <message>
         <source>&amp;Minimize to the tray instead of the taskbar</source>
         <translation>&amp;Minimaliseer naar het systeemvak in plaats van de taakbalk</translation>
     </message>
     <message>
-        <source>Minimize instead of exit the application when the window is closed. When this option is enabled, the application will be closed only after selecting Quit in the menu.</source>
-        <translation>Minimaliseer het venster in de plaats van de applicatie af te sluiten als het venster gesloten wordt. Wanneer deze optie aan staan, kan de applicatie alleen worden afgesloten door Afsluiten te kiezen in het menu.</translation>
-    </message>
-    <message>
         <source>M&amp;inimize on close</source>
-        <translation>Minimaliseer bij sluiten van het &amp;venster</translation>
+        <translation>M&amp;inimaliseer bij sluiten van het venster</translation>
     </message>
     <message>
         <source>&amp;Display</source>
@@ -1092,11 +1171,11 @@ Adres: %4
     </message>
     <message>
         <source>User Interface &amp;language:</source>
-        <translation>Taal &amp;Gebruikersinterface:</translation>
+        <translation>Taal &amp;gebruikersinterface:</translation>
     </message>
     <message>
-        <source>The user interface language can be set here. This setting will take effect after restarting Litecoin.</source>
-        <translation>De taal van de gebruikersinterface kan hier ingesteld worden. Deze instelling zal pas van kracht worden nadat Litecoin herstart wordt.</translation>
+        <source>The user interface language can be set here. This setting will take effect after restarting %1.</source>
+        <translation>De taal van de gebruikersinterface kan hier ingesteld worden. Deze instelling zal pas van kracht worden nadat %1 herstart wordt.</translation>
     </message>
     <message>
         <source>&amp;Unit to show amounts in:</source>
@@ -1104,19 +1183,23 @@ Adres: %4
     </message>
     <message>
         <source>Choose the default subdivision unit to show in the interface and when sending coins.</source>
-        <translation>Kies de standaard onderverdelingseenheid om weer te geven in uw programma, en voor het versturen van munten</translation>
+        <translation>Kies de standaardonderverdelingseenheid om weer te geven in uw programma, en voor het versturen van munten</translation>
     </message>
     <message>
         <source>Whether to show coin control features or not.</source>
         <translation>Munt controle functies weergeven of niet.</translation>
     </message>
     <message>
+        <source>&amp;Third party transaction URLs</source>
+        <translation>Transactie-URL's van &amp;derden</translation>
+    </message>
+    <message>
         <source>&amp;OK</source>
-        <translation>&amp;OK</translation>
+        <translation>&amp;Oké</translation>
     </message>
     <message>
         <source>&amp;Cancel</source>
-        <translation>Ann&amp;uleren</translation>
+        <translation>&amp;Annuleren</translation>
     </message>
     <message>
         <source>default</source>
@@ -1135,8 +1218,24 @@ Adres: %4
         <translation>Herstart van de client is vereist om veranderingen door te voeren.</translation>
     </message>
     <message>
-        <source>Client will be shutdown, do you want to proceed?</source>
-        <translation>De client zal worden afgesloten, wilt u doorgaan?</translation>
+        <source>Client will be shut down. Do you want to proceed?</source>
+        <translation>Applicatie zal worden afgesloten. Wilt u doorgaan?</translation>
+    </message>
+    <message>
+        <source>Configuration options</source>
+        <translation>Configuratieopties</translation>
+    </message>
+    <message>
+        <source>The configuration file is used to specify advanced user options which override GUI settings. Additionally, any command-line options will override this configuration file.</source>
+        <translation>Het configuratiebestand wordt gebruikt om geavanceerde gebruikersopties te specificeren welke de GUI instellingen overschrijd. Daarnaast, zullen alle command-line opties dit configuratiebestand overschrijven.</translation>
+    </message>
+    <message>
+        <source>Error</source>
+        <translation>Fout</translation>
+    </message>
+    <message>
+        <source>The configuration file could not be opened.</source>
+        <translation>Het configuratiebestand kon niet worden geopend.</translation>
     </message>
     <message>
         <source>This change would require a client restart.</source>
@@ -1154,8 +1253,8 @@ Adres: %4
         <translation>Vorm</translation>
     </message>
     <message>
-        <source>The displayed information may be out of date. Your wallet automatically synchronizes with the Litecoin network after a connection is established, but this process has not completed yet.</source>
-        <translation>De weergegeven informatie kan verouderd zijn. Uw portemonnee synchroniseert automaticsh met het Litecoinnetwerk nadat een verbinding is gelegd, maar dit proces is nog niet voltooid.</translation>
+        <source>The displayed information may be out of date. Your wallet automatically synchronizes with the Marscoin network after a connection is established, but this process has not completed yet.</source>
+        <translation>De weergegeven informatie kan verouderd zijn. Uw portemonnee synchroniseert automatisch met het Marscoinnetwerk nadat een verbinding is gelegd, maar dit proces is nog niet voltooid.</translation>
     </message>
     <message>
         <source>Watch-only:</source>
@@ -1221,20 +1320,44 @@ Adres: %4
         <source>Current total balance in watch-only addresses</source>
         <translation>Huidige balans in alleen-bekijkbare adressen.</translation>
     </message>
-    <message>
-        <source>out of sync</source>
-        <translation>niet gesynchroniseerd</translation>
-    </message>
 </context>
 <context>
     <name>PaymentServer</name>
+    <message>
+        <source>Payment request error</source>
+        <translation>Fout bij betalingsverzoek</translation>
+    </message>
+    <message>
+        <source>Cannot start marscoin: click-to-pay handler</source>
+        <translation>Kan marscoin niet starten: click-to-pay handler</translation>
+    </message>
     <message>
         <source>URI handling</source>
         <translation>URI-behandeling</translation>
     </message>
     <message>
+        <source>'marscoin://' is not a valid URI. Use 'marscoin:' instead.</source>
+        <translation>'marscoin://' is niet een geldige URI. Gebruik 'marscoin:' in plaats daarvan.</translation>
+    </message>
+    <message>
+        <source>Payment request fetch URL is invalid: %1</source>
+        <translation>URL om betalingsverzoek te verkrijgen is ongeldig: %1</translation>
+    </message>
+    <message>
         <source>Invalid payment address %1</source>
         <translation>Ongeldig betalingsadres %1</translation>
+    </message>
+    <message>
+        <source>URI cannot be parsed! This can be caused by an invalid Marscoin address or malformed URI parameters.</source>
+        <translation>URI kan niet verwerkt worden! Dit kan het gevolg zijn van een ongeldig Marscoin adres of misvormde URI parameters.</translation>
+    </message>
+    <message>
+        <source>Payment request file handling</source>
+        <translation>Betalingsverzoek bestandsafhandeling</translation>
+    </message>
+    <message>
+        <source>Payment request file cannot be read! This can be caused by an invalid payment request file.</source>
+        <translation>Betalingsverzoekbestand kan niet gelezen of verwerkt worden! Dit kan veroorzaakt worden door een ongeldig betalingsverzoekbestand.</translation>
     </message>
     <message>
         <source>Payment request rejected</source>
@@ -1245,44 +1368,24 @@ Adres: %4
         <translation>Betalingsaanvraagnetwerk komt niet overeen met klantennetwerk.</translation>
     </message>
     <message>
-        <source>Payment request has expired.</source>
-        <translation>Betalingsverzoek is verlopen.</translation>
+        <source>Payment request expired.</source>
+        <translation>Betalingsverzoek verlopen.</translation>
     </message>
     <message>
         <source>Payment request is not initialized.</source>
         <translation>Betalingsaanvraag is niet geïnitialiseerd.</translation>
     </message>
     <message>
+        <source>Unverified payment requests to custom payment scripts are unsupported.</source>
+        <translation>Niet-geverifieerde betalingsverzoeken naar aangepaste betalingsscripts worden niet ondersteund.</translation>
+    </message>
+    <message>
+        <source>Invalid payment request.</source>
+        <translation>Ongeldig betalingsverzoek.</translation>
+    </message>
+    <message>
         <source>Requested payment amount of %1 is too small (considered dust).</source>
         <translation>Het gevraagde betalingsbedrag van %1 is te weinig (beschouwd als stof).</translation>
-    </message>
-    <message>
-        <source>Payment request error</source>
-        <translation>Fout bij betalingsverzoek</translation>
-    </message>
-    <message>
-        <source>Cannot start marscoin: click-to-pay handler</source>
-        <translation>Kan marscoin niet starten: click-to-pay handler</translation>
-    </message>
-    <message>
-        <source>Payment request fetch URL is invalid: %1</source>
-        <translation>URL om betalingsverzoek te verkrijgen is ongeldig: %1</translation>
-    </message>
-    <message>
-        <source>URI cannot be parsed! This can be caused by an invalid Litecoin address or malformed URI parameters.</source>
-        <translation>URI kan niet verwerkt worden! Dit kan het gevolg zijn van een ongeldig Litecoin adres of misvormde URI parameters.</translation>
-    </message>
-    <message>
-        <source>Payment request file handling</source>
-        <translation>Betalingsverzoek bestandsafhandeling</translation>
-    </message>
-    <message>
-        <source>Payment request file cannot be read! This can be caused by an invalid payment request file.</source>
-        <translation>Betalingsverzoek-bestand kan niet gelezen of verwerkt worden! Dit kan veroorzaakt worden door een ongeldig betalingsverzoek-bestand.</translation>
-    </message>
-    <message>
-        <source>Unverified payment requests to custom payment scripts are unsupported.</source>
-        <translation>Niet-geverifieerde betalingsverzoeken naar aangepaste betaling scripts worden niet ondersteund.</translation>
     </message>
     <message>
         <source>Refund from %1</source>
@@ -1293,28 +1396,24 @@ Adres: %4
         <translation>Betalingsverzoek %1 is te groot (%2 bytes, toegestaan ​​%3 bytes).</translation>
     </message>
     <message>
-        <source>Payment request DoS protection</source>
-        <translation>Betalingsaanvraag DoS bescherming</translation>
-    </message>
-    <message>
         <source>Error communicating with %1: %2</source>
         <translation>Fout bij communiceren met %1: %2</translation>
     </message>
     <message>
         <source>Payment request cannot be parsed!</source>
-        <translation>Betalingsverzoek kan niet juist worden ontleed of verwerkt!</translation>
+        <translation>Betalingsverzoek kan niet worden verwerkt!</translation>
     </message>
     <message>
         <source>Bad response from server %1</source>
         <translation>Ongeldige respons van server %1</translation>
     </message>
     <message>
-        <source>Payment acknowledged</source>
-        <translation>Betaling bevestigd</translation>
+        <source>Network request error</source>
+        <translation>Fout bij netwerkverzoek</translation>
     </message>
     <message>
-        <source>Network request error</source>
-        <translation>Netwerkfout bij verzoek</translation>
+        <source>Payment acknowledged</source>
+        <translation>Betaling bevestigd</translation>
     </message>
 </context>
 <context>
@@ -1324,12 +1423,24 @@ Adres: %4
         <translation>User Agent</translation>
     </message>
     <message>
-        <source>Address/Hostname</source>
-        <translation>Adres/Hostnaam</translation>
+        <source>Node/Service</source>
+        <translation>Node/Dienst</translation>
     </message>
     <message>
-        <source>Ping Time</source>
-        <translation>Ping tijd</translation>
+        <source>NodeId</source>
+        <translation>Node ID</translation>
+    </message>
+    <message>
+        <source>Ping</source>
+        <translation>Ping</translation>
+    </message>
+    <message>
+        <source>Sent</source>
+        <translation>Verstuurd</translation>
+    </message>
+    <message>
+        <source>Received</source>
+        <translation>Ontvangen</translation>
     </message>
 </context>
 <context>
@@ -1339,12 +1450,12 @@ Adres: %4
         <translation>Bedrag</translation>
     </message>
     <message>
-        <source>Enter a Litecoin address (e.g. %1)</source>
-        <translation>Voer een Litecoin-adres in (bijv. %1)</translation>
+        <source>Enter a Marscoin address (e.g. %1)</source>
+        <translation>Voer een Marscoinadres in (bijv. %1)</translation>
     </message>
     <message>
         <source>%1 d</source>
-        <translation>%1d</translation>
+        <translation>%1 d</translation>
     </message>
     <message>
         <source>%1 h</source>
@@ -1356,15 +1467,7 @@ Adres: %4
     </message>
     <message>
         <source>%1 s</source>
-        <translation>%1s</translation>
-    </message>
-    <message>
-        <source>NETWORK</source>
-        <translation>Netwerk</translation>
-    </message>
-    <message>
-        <source>UNKNOWN</source>
-        <translation>ONBEKEND</translation>
+        <translation>%1 s</translation>
     </message>
     <message>
         <source>None</source>
@@ -1378,12 +1481,83 @@ Adres: %4
         <source>%1 ms</source>
         <translation>%1 ms</translation>
     </message>
+    <message numerus="yes">
+        <source>%n second(s)</source>
+        <translation><numerusform>%n seconde</numerusform><numerusform>%n seconden</numerusform></translation>
+    </message>
+    <message numerus="yes">
+        <source>%n minute(s)</source>
+        <translation><numerusform>%n minuut</numerusform><numerusform>%n minuten</numerusform></translation>
+    </message>
+    <message numerus="yes">
+        <source>%n hour(s)</source>
+        <translation><numerusform>%n uur</numerusform><numerusform>%n uren</numerusform></translation>
+    </message>
+    <message numerus="yes">
+        <source>%n day(s)</source>
+        <translation><numerusform>%n dag</numerusform><numerusform>%n dagen</numerusform></translation>
+    </message>
+    <message numerus="yes">
+        <source>%n week(s)</source>
+        <translation><numerusform>%n week</numerusform><numerusform>%n weken</numerusform></translation>
+    </message>
+    <message>
+        <source>%1 and %2</source>
+        <translation>%1 en %2</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n year(s)</source>
+        <translation><numerusform>%n jaar</numerusform><numerusform>%n jaren</numerusform></translation>
+    </message>
+    <message>
+        <source>%1 B</source>
+        <translation>%1 B</translation>
+    </message>
+    <message>
+        <source>%1 KB</source>
+        <translation>%1 Kb</translation>
+    </message>
+    <message>
+        <source>%1 MB</source>
+        <translation>%1 MB</translation>
+    </message>
+    <message>
+        <source>%1 GB</source>
+        <translation>%1 Gb</translation>
+    </message>
+    <message>
+        <source>%1 didn't yet exit safely...</source>
+        <translation>%1 sloot nog niet veilig af...</translation>
+    </message>
+    <message>
+        <source>unknown</source>
+        <translation>onbekend</translation>
+    </message>
+</context>
+<context>
+    <name>QObject::QObject</name>
+    <message>
+        <source>Error parsing command line arguments: %1.</source>
+        <translation>Fout bij het parsen van command line arguments: %1.</translation>
+    </message>
+    <message>
+        <source>Error: Specified data directory "%1" does not exist.</source>
+        <translation>Fout: Opgegeven gegevensmap "%1" bestaat niet.</translation>
+    </message>
+    <message>
+        <source>Error: Cannot parse configuration file: %1.</source>
+        <translation>Fout: Kan niet het configuratie bestand parsen: %1.</translation>
+    </message>
+    <message>
+        <source>Error: %1</source>
+        <translation>Fout: %1</translation>
+    </message>
 </context>
 <context>
     <name>QRImageWidget</name>
     <message>
         <source>&amp;Save Image...</source>
-        <translation>&amp;Afbeelding opslaan...</translation>
+        <translation>&amp;Sla afbeelding op...</translation>
     </message>
     <message>
         <source>&amp;Copy Image</source>
@@ -1400,10 +1574,6 @@ Adres: %4
 </context>
 <context>
     <name>RPCConsole</name>
-    <message>
-        <source>Client name</source>
-        <translation>Clientnaam</translation>
-    </message>
     <message>
         <source>N/A</source>
         <translation>N.v.t.</translation>
@@ -1425,12 +1595,12 @@ Adres: %4
         <translation>Algemeen</translation>
     </message>
     <message>
-        <source>Using OpenSSL version</source>
-        <translation>Gebruikt OpenSSL versie</translation>
-    </message>
-    <message>
         <source>Using BerkeleyDB version</source>
         <translation>Gebruikt BerkeleyDB versie</translation>
+    </message>
+    <message>
+        <source>Datadir</source>
+        <translation>Gegevensmap</translation>
     </message>
     <message>
         <source>Startup time</source>
@@ -1457,6 +1627,30 @@ Adres: %4
         <translation>Huidig aantal blokken</translation>
     </message>
     <message>
+        <source>Memory Pool</source>
+        <translation>Geheugenpoel</translation>
+    </message>
+    <message>
+        <source>Current number of transactions</source>
+        <translation>Huidig aantal transacties</translation>
+    </message>
+    <message>
+        <source>Memory usage</source>
+        <translation>Geheugengebruik</translation>
+    </message>
+    <message>
+        <source>Wallet: </source>
+        <translation>Portemonnee:</translation>
+    </message>
+    <message>
+        <source>(none)</source>
+        <translation>(geen)</translation>
+    </message>
+    <message>
+        <source>&amp;Reset</source>
+        <translation>&amp;Reset</translation>
+    </message>
+    <message>
         <source>Received</source>
         <translation>Ontvangen</translation>
     </message>
@@ -1469,8 +1663,16 @@ Adres: %4
         <translation>&amp;Peers</translation>
     </message>
     <message>
+        <source>Banned peers</source>
+        <translation>Gebande peers</translation>
+    </message>
+    <message>
         <source>Select a peer to view detailed information.</source>
         <translation>Selecteer een peer om gedetailleerde informatie te bekijken.</translation>
+    </message>
+    <message>
+        <source>Whitelisted</source>
+        <translation>Toegestaan</translation>
     </message>
     <message>
         <source>Direction</source>
@@ -1481,20 +1683,36 @@ Adres: %4
         <translation>Versie</translation>
     </message>
     <message>
+        <source>Starting Block</source>
+        <translation>Start Blok</translation>
+    </message>
+    <message>
+        <source>Synced Headers</source>
+        <translation>Gesynchroniseerde headers</translation>
+    </message>
+    <message>
+        <source>Synced Blocks</source>
+        <translation>Gesynchroniseerde blokken</translation>
+    </message>
+    <message>
         <source>User Agent</source>
         <translation>User Agent</translation>
     </message>
     <message>
+        <source>Open the %1 debug log file from the current data directory. This can take a few seconds for large log files.</source>
+        <translation>Open het %1 debug-logbestand van de huidige gegevensmap. Dit kan een aantal seconden duren voor grote logbestanden.</translation>
+    </message>
+    <message>
+        <source>Decrease font size</source>
+        <translation>Verklein lettergrootte</translation>
+    </message>
+    <message>
+        <source>Increase font size</source>
+        <translation>Vergroot lettergrootte</translation>
+    </message>
+    <message>
         <source>Services</source>
-        <translation>Services</translation>
-    </message>
-    <message>
-        <source>Starting Height</source>
-        <translation>Aanvangshoogte</translation>
-    </message>
-    <message>
-        <source>Sync Height</source>
-        <translation>Synchronisatiehoogte</translation>
+        <translation>Diensten</translation>
     </message>
     <message>
         <source>Ban Score</source>
@@ -1513,16 +1731,24 @@ Adres: %4
         <translation>Laatst ontvangen</translation>
     </message>
     <message>
-        <source>Bytes Sent</source>
-        <translation>Bytes Verzonden</translation>
-    </message>
-    <message>
-        <source>Bytes Received</source>
-        <translation>Bytes Ontvangen</translation>
-    </message>
-    <message>
         <source>Ping Time</source>
         <translation>Ping Tijd</translation>
+    </message>
+    <message>
+        <source>The duration of a currently outstanding ping.</source>
+        <translation>De tijdsduur van een op het moment openstaande ping.</translation>
+    </message>
+    <message>
+        <source>Ping Wait</source>
+        <translation>Pingwachttijd</translation>
+    </message>
+    <message>
+        <source>Min Ping</source>
+        <translation>Min Ping</translation>
+    </message>
+    <message>
+        <source>Time Offset</source>
+        <translation>Tijdcompensatie</translation>
     </message>
     <message>
         <source>Last block time</source>
@@ -1541,64 +1767,92 @@ Adres: %4
         <translation>&amp;Netwerkverkeer</translation>
     </message>
     <message>
-        <source>&amp;Clear</source>
-        <translation>&amp;Wissen</translation>
-    </message>
-    <message>
         <source>Totals</source>
         <translation>Totalen</translation>
     </message>
     <message>
         <source>In:</source>
-        <translation>In;</translation>
+        <translation>In:</translation>
     </message>
     <message>
         <source>Out:</source>
         <translation>Uit:</translation>
     </message>
     <message>
-        <source>Build date</source>
-        <translation>Bouwdatum</translation>
-    </message>
-    <message>
         <source>Debug log file</source>
-        <translation>Debug-logbestand</translation>
-    </message>
-    <message>
-        <source>Open the Litecoin debug log file from the current data directory. This can take a few seconds for large log files.</source>
-        <translation>Open het Litecoindebug-logbestand van de huidige datamap. Dit kan een aantal seconden duren voor grote logbestanden.</translation>
+        <translation>Debuglogbestand</translation>
     </message>
     <message>
         <source>Clear console</source>
         <translation>Maak console leeg</translation>
     </message>
     <message>
-        <source>Welcome to the Litecoin RPC console.</source>
-        <translation>Welkom bij de Litecoin RPC-console.</translation>
+        <source>1 &amp;hour</source>
+        <translation>1 &amp;uur</translation>
     </message>
     <message>
-        <source>Use up and down arrows to navigate history, and &lt;b&gt;Ctrl-L&lt;/b&gt; to clear screen.</source>
-        <translation>Gebruik de pijltjestoetsen om door de geschiedenis te navigeren, en &lt;b&gt;Ctrl-L&lt;/b&gt; om het scherm leeg te maken.</translation>
+        <source>1 &amp;day</source>
+        <translation>1 &amp;dag</translation>
     </message>
     <message>
-        <source>Type &lt;b&gt;help&lt;/b&gt; for an overview of available commands.</source>
-        <translation>Typ &lt;b&gt;help&lt;/b&gt; voor een overzicht van de beschikbare commando's.</translation>
+        <source>1 &amp;week</source>
+        <translation>1 &amp;week</translation>
     </message>
     <message>
-        <source>%1 B</source>
-        <translation>%1 B</translation>
+        <source>1 &amp;year</source>
+        <translation>1 &amp;jaar</translation>
     </message>
     <message>
-        <source>%1 KB</source>
-        <translation>%1 Kb</translation>
+        <source>&amp;Disconnect</source>
+        <translation>&amp;Verbreek verbinding</translation>
     </message>
     <message>
-        <source>%1 MB</source>
-        <translation>%1 MB</translation>
+        <source>Ban for</source>
+        <translation>Ban Node voor</translation>
     </message>
     <message>
-        <source>%1 GB</source>
-        <translation>%1 Gb</translation>
+        <source>&amp;Unban</source>
+        <translation>&amp;Maak ban voor node ongedaan</translation>
+    </message>
+    <message>
+        <source>default wallet</source>
+        <translation>standaard portemonnee</translation>
+    </message>
+    <message>
+        <source>Welcome to the %1 RPC console.</source>
+        <translation>Welkom bij de %1 RPC-console.</translation>
+    </message>
+    <message>
+        <source>Use up and down arrows to navigate history, and %1 to clear screen.</source>
+        <translation>Gebruik pijltjes omhoog en omlaag om door de geschiedenis te navigeren en %1 om het scherm te wissen.</translation>
+    </message>
+    <message>
+        <source>Type %1 for an overview of available commands.</source>
+        <translation>Typ %1  voor een overzicht van de beschikbare commando's.</translation>
+    </message>
+    <message>
+        <source>For more information on using this console type %1.</source>
+        <translation>Typ %1 voor meer informatie over het gebruik van deze console.</translation>
+    </message>
+    <message>
+        <source>WARNING: Scammers have been active, telling users to type commands here, stealing their wallet contents. Do not use this console without fully understanding the ramifications of a command.</source>
+        <translation>WAARSCHUWING: Er zijn Scammers actief geweest, die gebruikers vragen om hier commando's te typen, waardoor de inhoud van hun portemonnee werd gestolen. Gebruik deze console niet zonder de gevolgen van een commando volledig te begrijpen.</translation>
+    </message>
+    <message>
+        <source>Network activity disabled</source>
+        <translation>Netwerkactiviteit uitgeschakeld</translation>
+    </message>
+    <message>
+        <source>Executing command without any wallet</source>
+        <translation>Uitvoeren van commando zonder gebruik van een portemonnee</translation>
+    </message>
+    <message>
+        <source>Executing command using "%1" wallet</source>
+        <translation>Uitvoeren van commando met portemonnee "%1"</translation>
+    </message>
+    <message>
+        <source>(node id: %1)</source>
+        <translation>(node id: %1)</translation>
     </message>
     <message>
         <source>via %1</source>
@@ -1617,12 +1871,16 @@ Adres: %4
         <translation>Uitgaand</translation>
     </message>
     <message>
-        <source>Unknown</source>
-        <translation>Onbekend</translation>
+        <source>Yes</source>
+        <translation>Ja</translation>
     </message>
     <message>
-        <source>Fetching...</source>
-        <translation>Ophalen...</translation>
+        <source>No</source>
+        <translation>Nee</translation>
+    </message>
+    <message>
+        <source>Unknown</source>
+        <translation>Onbekend</translation>
     </message>
 </context>
 <context>
@@ -1640,20 +1898,12 @@ Adres: %4
         <translation>&amp;Bericht</translation>
     </message>
     <message>
-        <source>Reuse one of the previously used receiving addresses. Reusing addresses has security and privacy issues. Do not use this unless re-generating a payment request made before.</source>
-        <translation>Gebruik een van de eerder gebruikte ontvangstadressen opnieuw. Het opnieuw gebruiken van adressen heeft beveiliging- en privacy problemen. Gebruik dit niet, behalve als er eerder een betalingsverzoek opnieuw gegenereerd is.</translation>
-    </message>
-    <message>
-        <source>R&amp;euse an existing receiving address (not recommended)</source>
-        <translation>H&amp;ergebruik en bestaand ontvangstadres (niet aanbevolen)</translation>
-    </message>
-    <message>
-        <source>An optional message to attach to the payment request, which will be displayed when the request is opened. Note: The message will not be sent with the payment over the Litecoin network.</source>
-        <translation>Een optioneel bericht om bij te voegen aan het betalingsverzoek, dewelke zal getoond worden wanneer het verzoek is geopend. Opermerking: Het bericht zal niet worden verzonden met de betaling over het Litecoin netwerk.</translation>
+        <source>An optional message to attach to the payment request, which will be displayed when the request is opened. Note: The message will not be sent with the payment over the Marscoin network.</source>
+        <translation>Een optioneel bericht om bij te voegen aan het betalingsverzoek, welke zal getoond worden wanneer het verzoek is geopend. Opmerking: Het bericht zal niet worden verzonden met de betaling over het Marscoinnetwerk.</translation>
     </message>
     <message>
         <source>An optional label to associate with the new receiving address.</source>
-        <translation>Een optioneel label om te associëren met het nieuwe ontvangende adres</translation>
+        <translation>Een optioneel label om te associëren met het nieuwe ontvangstadres</translation>
     </message>
     <message>
         <source>Use this form to request payments. All fields are &lt;b&gt;optional&lt;/b&gt;.</source>
@@ -1670,6 +1920,14 @@ Adres: %4
     <message>
         <source>Clear</source>
         <translation>Wissen</translation>
+    </message>
+    <message>
+        <source>Native segwit addresses (aka Bech32 or BIP-173) reduce your transaction fees later on and offer better protection against typos, but old wallets don't support them. When unchecked, an address compatible with older wallets will be created instead.</source>
+        <translation>Native segwit-adressen (Bech32 of BIP-173) reduceren later je transactiekosten en bieden een betere bescherming tegen typefouten, maar oude portemonnees ondersteunen deze niet. Een adres dat is compatibel met oudere portemonnees zal worden gecreëerd indien dit niet is aangevinkt.</translation>
+    </message>
+    <message>
+        <source>Generate native segwit (Bech32) address</source>
+        <translation>Genereer native segwit-adres (Bech32)</translation>
     </message>
     <message>
         <source>Requested payments history</source>
@@ -1694,6 +1952,10 @@ Adres: %4
     <message>
         <source>Remove</source>
         <translation>Verwijder</translation>
+    </message>
+    <message>
+        <source>Copy URI</source>
+        <translation>Kopieer URI</translation>
     </message>
     <message>
         <source>Copy label</source>
@@ -1755,6 +2017,10 @@ Adres: %4
         <translation>Bericht</translation>
     </message>
     <message>
+        <source>Wallet</source>
+        <translation>Portemonnee</translation>
+    </message>
+    <message>
         <source>Resulting URI too long, try to reduce the text for label / message.</source>
         <translation>Resulterende URI te lang, probeer de tekst korter te maken voor het label/bericht.</translation>
     </message>
@@ -1778,10 +2044,6 @@ Adres: %4
         <translation>Bericht</translation>
     </message>
     <message>
-        <source>Amount</source>
-        <translation>Bedrag</translation>
-    </message>
-    <message>
         <source>(no label)</source>
         <translation>(geen label)</translation>
     </message>
@@ -1790,15 +2052,19 @@ Adres: %4
         <translation>(geen bericht)</translation>
     </message>
     <message>
-        <source>(no amount)</source>
-        <translation>(geen bedrag)</translation>
+        <source>(no amount requested)</source>
+        <translation>(geen bedrag aangevraagd)</translation>
+    </message>
+    <message>
+        <source>Requested</source>
+        <translation>Verzoek ingediend</translation>
     </message>
 </context>
 <context>
     <name>SendCoinsDialog</name>
     <message>
         <source>Send Coins</source>
-        <translation>Verstuur munten</translation>
+        <translation>Verstuurde munten</translation>
     </message>
     <message>
         <source>Coin Control Features</source>
@@ -1829,16 +2095,12 @@ Adres: %4
         <translation>Bedrag:</translation>
     </message>
     <message>
-        <source>Priority:</source>
-        <translation>Prioriteit:</translation>
-    </message>
-    <message>
         <source>Fee:</source>
         <translation>Vergoeding:</translation>
     </message>
     <message>
         <source>After Fee:</source>
-        <translation>Na vergoeding:</translation>
+        <translation>Naheffing:</translation>
     </message>
     <message>
         <source>Change:</source>
@@ -1846,7 +2108,7 @@ Adres: %4
     </message>
     <message>
         <source>If this is activated, but the change address is empty or invalid, change will be sent to a newly generated address.</source>
-        <translation>Als dit is geactiveerd, maar het wisselgeldadres is leeg of ongeldig, dan wordt het wisselgeld verzonden naar een nieuw gegenereerd adres.</translation>
+        <translation>Als dit is geactiveerd, maar het wisselgeldadres is leeg of ongeldig, dan wordt het wisselgeld verstuurd naar een nieuw gegenereerd adres.</translation>
     </message>
     <message>
         <source>Custom change address</source>
@@ -1854,35 +2116,39 @@ Adres: %4
     </message>
     <message>
         <source>Transaction Fee:</source>
-        <translation>Transactiekosten:</translation>
+        <translation>Transactievergoeding:</translation>
     </message>
     <message>
         <source>Choose...</source>
         <translation>Kies...</translation>
     </message>
     <message>
+        <source>Using the fallbackfee can result in sending a transaction that will take several hours or days (or never) to confirm. Consider choosing your fee manually or wait until you have validated the complete chain.</source>
+        <translation>Gebruik van de terugvalkosten kan resulteren in het verzenden van een transactie die meerdere uren of dagen (of nooit) zal duren om bevestigd te worden. Overweeg om handmatig de vergoeding in te geven of wacht totdat je de volledige keten hebt gevalideerd.</translation>
+    </message>
+    <message>
+        <source>Warning: Fee estimation is currently not possible.</source>
+        <translation>Waarschuwing: Schatting van de vergoeding is momenteel niet mogelijk.</translation>
+    </message>
+    <message>
         <source>collapse fee-settings</source>
-        <translation>Transactiekosteninstellingen verbergen</translation>
+        <translation>verberg vergoeding-instellingen</translation>
     </message>
     <message>
-        <source>Minimize</source>
-        <translation>Minimaliseer</translation>
-    </message>
-    <message>
-        <source>If the custom fee is set to 1000 satoshis and the transaction is only 250 bytes, then "per kilobyte" only pays 250 satoshis in fee, while "at least" pays 1000 satoshis. For transactions bigger than a kilobyte both pay by kilobyte.</source>
-        <translation>Als de aangepaste toeslag is ingesteld op 1000 satoshis en de transactie is maar 250 bytes, dan wordt bij "per kilobyte" 250 satoshis aan toeslag berekend, terwijl er bij "tenminste" 1000 satoshis worden berekend. Voor transacties die groter zijn dan een kilobyte, wordt in beide gevallen per kilobyte de toeslag berekend.</translation>
+        <source>Specify a custom fee per kB (1,000 bytes) of the transaction's virtual size.
+
+Note:  Since the fee is calculated on a per-byte basis, a fee of "100 satoshis per kB" for a transaction size of 500 bytes (half of 1 kB) would ultimately yield a fee of only 50 satoshis.</source>
+        <translation>Specificeer handmatig een vergoeding per kB (1,000 bytes) voor de virtuele grootte van de transactie.
+
+Notitie: Omdat de vergoeding per byte wordt gerekend, zal een vergoeding van "100 satoshis per kB" voor een transactie ten grootte van 500 bytes (de helft van 1 kB) uiteindelijk een vergoeding van maar liefst 50 satoshis betekenen.</translation>
     </message>
     <message>
         <source>per kilobyte</source>
         <translation>per kilobyte</translation>
     </message>
     <message>
-        <source>If the custom fee is set to 1000 satoshis and the transaction is only 250 bytes, then "per kilobyte" only pays 250 satoshis in fee, while "total at least" pays 1000 satoshis. For transactions bigger than a kilobyte both pay by kilobyte.</source>
-        <translation>Als de aangepaste toeslag is ingesteld op 1000 satoshis en de transactie is maar 250 bytes, dan wordt bij "per kilobyte" 250 satoshis aan toeslag berekend, terwijl er bij "totaal tenminste" 1000 satoshis worden berekend. Voor transacties die groter zijn dan een kilobyte, wordt in beide gevallen per kilobyte de toeslag berekend.</translation>
-    </message>
-    <message>
-        <source>total at least</source>
-        <translation>totaal ten minste</translation>
+        <source>Hide</source>
+        <translation>Verbergen</translation>
     </message>
     <message>
         <source>Paying only the minimum fee is just fine as long as there is less transaction volume than space in the blocks. But be aware that this can end up in a never confirming transaction once there is more demand for marscoin transactions than the network can process.</source>
@@ -1898,39 +2164,19 @@ Adres: %4
     </message>
     <message>
         <source>Custom:</source>
-        <translation>Handmatig:</translation>
+        <translation>Aangepast:</translation>
     </message>
     <message>
         <source>(Smart fee not initialized yet. This usually takes a few blocks...)</source>
-        <translation>(Slimme vergoeding is nog niet geïnitialiseerd. Dit duurt meestal een paar blokken...)</translation>
-    </message>
-    <message>
-        <source>Confirmation time:</source>
-        <translation>Bevestigings tijd:</translation>
-    </message>
-    <message>
-        <source>normal</source>
-        <translation>normaal</translation>
-    </message>
-    <message>
-        <source>fast</source>
-        <translation>snel</translation>
-    </message>
-    <message>
-        <source>Send as zero-fee transaction if possible</source>
-        <translation>Verstuur als transactie zonder verzendkosten indien mogelijk</translation>
-    </message>
-    <message>
-        <source>(confirmation may take longer)</source>
-        <translation>(bevestiging kan langer duren)</translation>
+        <translation>(Slimme transactiekosten is nog niet geïnitialiseerd. Dit duurt meestal een paar blokken...)</translation>
     </message>
     <message>
         <source>Send to multiple recipients at once</source>
-        <translation>Verstuur aan verschillende ontvangers ineens</translation>
+        <translation>Verstuur in een keer aan verschillende ontvangers</translation>
     </message>
     <message>
         <source>Add &amp;Recipient</source>
-        <translation>Voeg &amp;Ontvanger Toe</translation>
+        <translation>Voeg &amp;ontvanger toe</translation>
     </message>
     <message>
         <source>Clear all fields of the form.</source>
@@ -1941,8 +2187,20 @@ Adres: %4
         <translation>Stof:</translation>
     </message>
     <message>
+        <source>Confirmation time target:</source>
+        <translation>Bevestigingstijddoel:</translation>
+    </message>
+    <message>
+        <source>Enable Replace-By-Fee</source>
+        <translation>Activeer Replace-By-Fee</translation>
+    </message>
+    <message>
+        <source>With Replace-By-Fee (BIP-125) you can increase a transaction's fee after it is sent. Without this, a higher fee may be recommended to compensate for increased transaction delay risk.</source>
+        <translation>Met Replace-By-Fee (BIP-125) kun je de vergoeding voor een transactie verhogen na dat deze verstuurd is. Zonder dit kan een hogere vergoeding aangeraden worden om te compenseren voor de hogere kans op transactie vertragingen.</translation>
+    </message>
+    <message>
         <source>Clear &amp;All</source>
-        <translation>Verwijder &amp;Alles</translation>
+        <translation>Verwijder &amp;alles</translation>
     </message>
     <message>
         <source>Balance:</source>
@@ -1954,15 +2212,7 @@ Adres: %4
     </message>
     <message>
         <source>S&amp;end</source>
-        <translation>&amp;Verstuur</translation>
-    </message>
-    <message>
-        <source>Confirm send coins</source>
-        <translation>Bevestig versturen munten</translation>
-    </message>
-    <message>
-        <source>%1 to %2</source>
-        <translation>%1 tot %2</translation>
+        <translation>V&amp;erstuur</translation>
     </message>
     <message>
         <source>Copy quantity</source>
@@ -1985,20 +2235,60 @@ Adres: %4
         <translation>Kopieer bytes</translation>
     </message>
     <message>
-        <source>Copy priority</source>
-        <translation>Kopieer prioriteit</translation>
+        <source>Copy dust</source>
+        <translation>Kopieër stof</translation>
     </message>
     <message>
         <source>Copy change</source>
         <translation>Kopieer wijziging</translation>
     </message>
     <message>
+        <source>%1 (%2 blocks)</source>
+        <translation>%1 (%2 blokken)</translation>
+    </message>
+    <message>
+        <source>%1 to %2</source>
+        <translation>%1 tot %2</translation>
+    </message>
+    <message>
+        <source>Are you sure you want to send?</source>
+        <translation>Weet u zeker dat u wilt verzenden?</translation>
+    </message>
+    <message>
         <source>or</source>
         <translation>of</translation>
     </message>
     <message>
-        <source>The recipient address is not valid, please recheck.</source>
-        <translation>Het ontvangstadres is niet geldig, controleer uw invoer.</translation>
+        <source>You can increase the fee later (signals Replace-By-Fee, BIP-125).</source>
+        <translation>Je kunt de vergoeding later verhogen (signaleert Replace-By-Fee, BIP-125).</translation>
+    </message>
+    <message>
+        <source>from wallet %1</source>
+        <translation>van portemonnee %1</translation>
+    </message>
+    <message>
+        <source>Please, review your transaction.</source>
+        <translation>Controleer uw transactie aub.</translation>
+    </message>
+    <message>
+        <source>Transaction fee</source>
+        <translation>Transactiekosten</translation>
+    </message>
+    <message>
+        <source>Not signalling Replace-By-Fee, BIP-125.</source>
+        <translation>Signaleert geen Replace-By-Fee, BIP-125.</translation>
+    </message>
+    <message>
+        <source>Total Amount</source>
+        <translation>Totaalbedrag</translation>
+    </message>
+    <message>
+        <source>Confirm send coins</source>
+        <translation>Bevestig versturen munten</translation>
+    </message>
+    <message>
+        <source>The recipient address is not valid. Please recheck.</source>
+        <translation>Het adres van de ontvanger is niet geldig. Gelieve opnieuw te controleren.</translation>
     </message>
     <message>
         <source>The amount to pay must be larger than 0.</source>
@@ -2006,74 +2296,70 @@ Adres: %4
     </message>
     <message>
         <source>The amount exceeds your balance.</source>
-        <translation>Bedrag is hoger dan uw huidige saldo</translation>
+        <translation>Het bedrag is hoger dan uw huidige saldo.</translation>
     </message>
     <message>
         <source>The total exceeds your balance when the %1 transaction fee is included.</source>
-        <translation>Totaal overschrijdt uw huidige saldo wanneer de %1 transactiekosten worden meegerekend</translation>
+        <translation>Het totaal overschrijdt uw huidige saldo wanneer de %1 transactie vergoeding wordt meegerekend.</translation>
     </message>
     <message>
-        <source>Duplicate address found, can only send to each address once per send operation.</source>
-        <translation>Dubbel adres gevonden, u kunt slechts eenmaal naar een bepaald adres verzenden per verstuurtransactie</translation>
+        <source>Duplicate address found: addresses should only be used once each.</source>
+        <translation>Dubbel adres gevonden: adressen mogen maar één keer worden gebruikt worden.</translation>
     </message>
     <message>
         <source>Transaction creation failed!</source>
-        <translation>Transactie creatie niet gelukt!</translation>
+        <translation>Transactiecreatie mislukt</translation>
     </message>
     <message>
-        <source>The transaction was rejected! This might happen if some of the coins in your wallet were already spent, such as if you used a copy of wallet.dat and coins were spent in the copy but not marked as spent here.</source>
-        <translation>De transactie was afgewezen. Dit kan gebeuren als u eerder uitgegeven munten opnieuw wilt versturen, zoals wanneer u een kopie van uw wallet.dat heeft gebruikt en in de kopie deze munten zijn gemarkeerd als uitgegeven, maar in de huidige nog niet.</translation>
+        <source>The transaction was rejected with the following reason: %1</source>
+        <translation>De transactie werd afgewezen om de volgende reden: %1</translation>
     </message>
     <message>
-        <source>A fee higher than %1 is considered an insanely high fee.</source>
-        <translation>Transactiekosten hoger dan %1 worden gezien als waanzinnig hoog.</translation>
+        <source>A fee higher than %1 is considered an absurdly high fee.</source>
+        <translation>Een vergoeding van meer dan %1 wordt beschouwd als een absurd hoge vergoeding.</translation>
     </message>
     <message>
-        <source>Pay only the minimum fee of %1</source>
-        <translation>Betaal alleen de minimale transactiekosten van %1</translation>
+        <source>Payment request expired.</source>
+        <translation>Betalingsverzoek verlopen.</translation>
     </message>
     <message>
-        <source>Estimated to begin confirmation within %1 block(s).</source>
-        <translation>Beginnen van bevesting geschat binnen %1 blok(ken).</translation>
+        <source>Pay only the required fee of %1</source>
+        <translation>Betaal alleen de verplichte transactie vergoeding van %1</translation>
+    </message>
+    <message numerus="yes">
+        <source>Estimated to begin confirmation within %n block(s).</source>
+        <translation><numerusform>Schatting is dat bevestiging begint over %n blok.</numerusform><numerusform>Schatting is dat bevestiging begint over %n blokken.</numerusform></translation>
     </message>
     <message>
-        <source>Warning: Invalid Litecoin address</source>
-        <translation>Waarschuwing: Ongeldig Litecoin adres</translation>
-    </message>
-    <message>
-        <source>(no label)</source>
-        <translation>(geen label)</translation>
+        <source>Warning: Invalid Marscoin address</source>
+        <translation>Waarschuwing: Ongeldig Marscoinadres</translation>
     </message>
     <message>
         <source>Warning: Unknown change address</source>
         <translation>Waarschuwing: Onbekend wisselgeldadres</translation>
     </message>
     <message>
-        <source>Copy dust</source>
-        <translation>Kopieër stof</translation>
+        <source>Confirm custom change address</source>
+        <translation>Bevestig aangepast wisselgeldadres</translation>
     </message>
     <message>
-        <source>Are you sure you want to send?</source>
-        <translation>Weet u zeker dat u wilt verzenden?</translation>
+        <source>The address you selected for change is not part of this wallet. Any or all funds in your wallet may be sent to this address. Are you sure?</source>
+        <translation>Het wisselgeldadres dat u heeft geselecteerd maakt geen deel uit van deze portemonnee. Een deel of zelfs alle geld in uw portemonnee kan mogelijk naar dit adres worden verzonden. Weet je het zeker?</translation>
     </message>
     <message>
-        <source>added as transaction fee</source>
-        <translation>toegevoegd als transactiekosten</translation>
+        <source>(no label)</source>
+        <translation>(geen label)</translation>
     </message>
 </context>
 <context>
     <name>SendCoinsEntry</name>
     <message>
         <source>A&amp;mount:</source>
-        <translation>Bedra&amp;g:</translation>
+        <translation>B&amp;edrag:</translation>
     </message>
     <message>
         <source>Pay &amp;To:</source>
-        <translation>Betaal &amp;Aan:</translation>
-    </message>
-    <message>
-        <source>Enter a label for this address to add it to your address book</source>
-        <translation>Vul een label in voor dit adres om het toe te voegen aan uw adresboek</translation>
+        <translation>Betaal &amp;aan:</translation>
     </message>
     <message>
         <source>&amp;Label:</source>
@@ -2088,8 +2374,8 @@ Adres: %4
         <translation>Dit is een normale betaling.</translation>
     </message>
     <message>
-        <source>The Litecoin address to send the payment to</source>
-        <translation>Het Litecoin adres om betaling aan te voldoen</translation>
+        <source>The Marscoin address to send the payment to</source>
+        <translation>Het Marscoinadres om betaling aan te versturen</translation>
     </message>
     <message>
         <source>Alt+A</source>
@@ -2108,11 +2394,27 @@ Adres: %4
         <translation>Verwijder deze toevoeging</translation>
     </message>
     <message>
+        <source>The fee will be deducted from the amount being sent. The recipient will receive less marscoins than you enter in the amount field. If multiple recipients are selected, the fee is split equally.</source>
+        <translation>De transactiekosten zal worden afgetrokken van het bedrag dat verstuurd wordt. De ontvangers zullen minder marscoins ontvangen dan ingevoerd is in het hoeveelheidsveld. Als er meerdere ontvangers geselecteerd zijn, dan worden de transactiekosten gelijk verdeeld.</translation>
+    </message>
+    <message>
+        <source>S&amp;ubtract fee from amount</source>
+        <translation>Trek de transactiekosten a&amp;f van het bedrag.</translation>
+    </message>
+    <message>
+        <source>Use available balance</source>
+        <translation>Gebruik beschikbaar saldo</translation>
+    </message>
+    <message>
         <source>Message:</source>
         <translation>Bericht:</translation>
     </message>
     <message>
-        <source>This is a verified payment request.</source>
+        <source>This is an unauthenticated payment request.</source>
+        <translation>Dit is een niet-geverifieerd betalingsverzoek.</translation>
+    </message>
+    <message>
+        <source>This is an authenticated payment request.</source>
         <translation>Dit is een geverifieerd betalingsverzoek.</translation>
     </message>
     <message>
@@ -2120,12 +2422,8 @@ Adres: %4
         <translation>Vul een label voor dit adres in om het aan de lijst met gebruikte adressen toe te voegen</translation>
     </message>
     <message>
-        <source>A message that was attached to the marscoin: URI which will be stored with the transaction for your reference. Note: This message will not be sent over the Litecoin network.</source>
-        <translation>Een bericht dat werd toegevoegd aan de marscoin: URI dewelke wordt opgeslagen met de transactie ter referentie. Opmerking: Dit bericht zal niet worden verzonden over het Litecoin netwerk.</translation>
-    </message>
-    <message>
-        <source>This is an unverified payment request.</source>
-        <translation>Dit is een ongeverifieerd betalingsverzoek.</translation>
+        <source>A message that was attached to the marscoin: URI which will be stored with the transaction for your reference. Note: This message will not be sent over the Marscoin network.</source>
+        <translation>Een bericht dat werd toegevoegd aan de marscoin: URI welke wordt opgeslagen met de transactie ter referentie. Opmerking: Dit bericht zal niet worden verzonden over het Marscoinnetwerk.</translation>
     </message>
     <message>
         <source>Pay To:</source>
@@ -2135,12 +2433,23 @@ Adres: %4
         <source>Memo:</source>
         <translation>Memo:</translation>
     </message>
+    <message>
+        <source>Enter a label for this address to add it to your address book</source>
+        <translation>Vul een label in voor dit adres om het toe te voegen aan uw adresboek</translation>
+    </message>
+</context>
+<context>
+    <name>SendConfirmationDialog</name>
+    <message>
+        <source>Yes</source>
+        <translation>Ja</translation>
+    </message>
 </context>
 <context>
     <name>ShutdownWindow</name>
     <message>
-        <source>Marscoin Client is shutting down...</source>
-        <translation>Marscoin Client is aan het afsluiten...</translation>
+        <source>%1 is shutting down...</source>
+        <translation>%1 is aan het afsluiten...</translation>
     </message>
     <message>
         <source>Do not shut down the computer until this window disappears.</source>
@@ -2151,19 +2460,19 @@ Adres: %4
     <name>SignVerifyMessageDialog</name>
     <message>
         <source>Signatures - Sign / Verify a Message</source>
-        <translation>Handtekeningen - Onderteken een bericht / Verifiëer een handtekening</translation>
+        <translation>Handtekeningen – Onderteken een bericht / Verifiëer een handtekening</translation>
     </message>
     <message>
         <source>&amp;Sign Message</source>
-        <translation>O&amp;nderteken Bericht</translation>
+        <translation>&amp;Onderteken bericht</translation>
     </message>
     <message>
-        <source>You can sign messages with your addresses to prove you own them. Be careful not to sign anything vague, as phishing attacks may try to trick you into signing your identity over to them. Only sign fully-detailed statements you agree to.</source>
-        <translation>U kunt berichten ondertekenen met een van uw adressen om te bewijzen dat u dit adres bezit. Pas op dat u geen onduidelijke dingen ondertekent, want phishingaanvallen zouden u kunnen misleiden om zo uw identiteit te stelen. Onderteken alleen berichten waarmee u het volledig eens bent.</translation>
+        <source>You can sign messages/agreements with your addresses to prove you can receive marscoins sent to them. Be careful not to sign anything vague or random, as phishing attacks may try to trick you into signing your identity over to them. Only sign fully-detailed statements you agree to.</source>
+        <translation>U kunt berichten/overeenkomsten ondertekenen met uw adres om te bewijzen dat u Marscoins kunt versturen. Wees voorzichtig met het ondertekenen van iets vaags of willekeurigs, omdat phishingaanvallen u kunnen proberen te misleiden tot het ondertekenen van overeenkomsten om uw identiteit aan hen toe te vertrouwen. Onderteken alleen volledig gedetailleerde verklaringen voordat u akkoord gaat.</translation>
     </message>
     <message>
-        <source>The Litecoin address to sign the message with</source>
-        <translation>Het Litecoin adres om bericht mee te ondertekenen</translation>
+        <source>The Marscoin address to sign the message with</source>
+        <translation>Het Marscoinadres om bericht mee te ondertekenen</translation>
     </message>
     <message>
         <source>Choose previously used address</source>
@@ -2194,12 +2503,12 @@ Adres: %4
         <translation>Kopieer de huidige handtekening naar het systeemklembord</translation>
     </message>
     <message>
-        <source>Sign the message to prove you own this Litecoin address</source>
-        <translation>Onderteken een bericht om te bewijzen dat u een bepaald Litecoinadres bezit</translation>
+        <source>Sign the message to prove you own this Marscoin address</source>
+        <translation>Onderteken een bericht om te bewijzen dat u een bepaald Marscoinadres bezit</translation>
     </message>
     <message>
         <source>Sign &amp;Message</source>
-        <translation>Onderteken &amp;Bericht</translation>
+        <translation>Onderteken &amp;bericht</translation>
     </message>
     <message>
         <source>Reset all sign message fields</source>
@@ -2207,27 +2516,27 @@ Adres: %4
     </message>
     <message>
         <source>Clear &amp;All</source>
-        <translation>Verwijder &amp;Alles</translation>
+        <translation>Verwijder &amp;alles</translation>
     </message>
     <message>
         <source>&amp;Verify Message</source>
-        <translation>&amp;Verifiëer Bericht</translation>
+        <translation>&amp;Verifiëer bericht</translation>
     </message>
     <message>
-        <source>Enter the signing address, message (ensure you copy line breaks, spaces, tabs, etc. exactly) and signature below to verify the message. Be careful not to read more into the signature than what is in the signed message itself, to avoid being tricked by a man-in-the-middle attack.</source>
-        <translation>Voer het ondertekenende adres, bericht en handtekening hieronder in (let erop dat u nieuwe regels, spaties en tabs juist overneemt) om de handtekening te verifiëren. Let erop dat u niet meer uit het bericht interpreteert dan er daadwerkelijk staat,  om te voorkomen dat u wordt misleid in een man-in-the-middle-aanval.</translation>
+        <source>Enter the receiver's address, message (ensure you copy line breaks, spaces, tabs, etc. exactly) and signature below to verify the message. Be careful not to read more into the signature than what is in the signed message itself, to avoid being tricked by a man-in-the-middle attack. Note that this only proves the signing party receives with the address, it cannot prove sendership of any transaction!</source>
+        <translation>Voer het adres van de ontvanger in, bericht (zorg ervoor dat de regeleinden, spaties, tabs etc. precies kloppen) en onderteken onderaan om het bericht te verifiëren. Wees voorzicht om niet meer in de ondertekening te lezen dan in het getekende bericht zelf, om te voorkomen dat je wordt aangevallen met een man-in-the-middle attack. Houd er mee rekening dat dit alleen de ondertekende partij bewijst met het ontvangen adres, er kan niet bewezen worden dat er een transactie heeft plaatsgevonden!</translation>
     </message>
     <message>
-        <source>The Litecoin address the message was signed with</source>
-        <translation>Het Litecoin adres waarmee het bericht ondertekend is</translation>
+        <source>The Marscoin address the message was signed with</source>
+        <translation>Het Marscoinadres waarmee het bericht ondertekend is</translation>
     </message>
     <message>
-        <source>Verify the message to ensure it was signed with the specified Litecoin address</source>
-        <translation>Controleer een bericht om te verifiëren dat het gespecificeerde Litecoinadres het bericht heeft ondertekend.</translation>
+        <source>Verify the message to ensure it was signed with the specified Marscoin address</source>
+        <translation>Controleer een bericht om te verifiëren dat het gespecificeerde Marscoinadres het bericht heeft ondertekend.</translation>
     </message>
     <message>
         <source>Verify &amp;Message</source>
-        <translation>Verifiëer &amp;Bericht</translation>
+        <translation>Verifiëer &amp;bericht</translation>
     </message>
     <message>
         <source>Reset all verify message fields</source>
@@ -2235,7 +2544,7 @@ Adres: %4
     </message>
     <message>
         <source>Click "Sign Message" to generate signature</source>
-        <translation>Klik "Onderteken Bericht" om de handtekening te genereren</translation>
+        <translation>Klik op "Onderteken Bericht" om de handtekening te genereren</translation>
     </message>
     <message>
         <source>The entered address is invalid.</source>
@@ -2243,7 +2552,7 @@ Adres: %4
     </message>
     <message>
         <source>Please check the address and try again.</source>
-        <translation>Controleer s.v.p. het adres en probeer het opnieuw.</translation>
+        <translation>Controleer het adres en probeer het opnieuw.</translation>
     </message>
     <message>
         <source>The entered address does not refer to a key.</source>
@@ -2251,7 +2560,7 @@ Adres: %4
     </message>
     <message>
         <source>Wallet unlock was cancelled.</source>
-        <translation>Portemonnee-ontsleuteling is geannuleerd</translation>
+        <translation>Portemonnee-ontsleuteling is geannuleerd.</translation>
     </message>
     <message>
         <source>Private key for the entered address is not available.</source>
@@ -2271,7 +2580,7 @@ Adres: %4
     </message>
     <message>
         <source>Please check the signature and try again.</source>
-        <translation>Controleer s.v.p. de handtekening en probeer het opnieuw.</translation>
+        <translation>Controleer de handtekening en probeer het opnieuw.</translation>
     </message>
     <message>
         <source>The signature did not match the message digest.</source>
@@ -2283,19 +2592,11 @@ Adres: %4
     </message>
     <message>
         <source>Message verified.</source>
-        <translation>Bericht correct geverifiëerd.</translation>
+        <translation>Bericht geverifiëerd.</translation>
     </message>
 </context>
 <context>
     <name>SplashScreen</name>
-    <message>
-        <source>Marscoin Client</source>
-        <translation>Litecoin Kern</translation>
-    </message>
-    <message>
-        <source>The Bitcoin Core developers</source>
-        <translation>De Bitcoin Core ontwikkelaars</translation>
-    </message>
     <message>
         <source>[testnet]</source>
         <translation>[testnetwerk]</translation>
@@ -2310,17 +2611,33 @@ Adres: %4
 </context>
 <context>
     <name>TransactionDesc</name>
+    <message numerus="yes">
+        <source>Open for %n more block(s)</source>
+        <translation><numerusform>Open voor nog %n blok</numerusform><numerusform>Open voor nog %n blokken</numerusform></translation>
+    </message>
     <message>
         <source>Open until %1</source>
-        <translation>Openen totdat %1</translation>
+        <translation>Open tot %1</translation>
     </message>
     <message>
-        <source>conflicted</source>
-        <translation>conflicterend</translation>
+        <source>conflicted with a transaction with %1 confirmations</source>
+        <translation>geconflicteerd met een transactie met %1 confirmaties</translation>
     </message>
     <message>
-        <source>%1/offline</source>
-        <translation>%1/offline</translation>
+        <source>0/unconfirmed, %1</source>
+        <translation>0/onbevestigd, %1</translation>
+    </message>
+    <message>
+        <source>in memory pool</source>
+        <translation>in geheugenpoel</translation>
+    </message>
+    <message>
+        <source>not in memory pool</source>
+        <translation>niet in geheugenpoel</translation>
+    </message>
+    <message>
+        <source>abandoned</source>
+        <translation>opgegeven</translation>
     </message>
     <message>
         <source>%1/unconfirmed</source>
@@ -2333,10 +2650,6 @@ Adres: %4
     <message>
         <source>Status</source>
         <translation>Status</translation>
-    </message>
-    <message numerus="yes">
-        <source>, broadcast through %n node(s)</source>
-        <translation><numerusform>, uitgezonden naar %n node</numerusform><numerusform>, uitgezonden naar %n nodes</numerusform></translation>
     </message>
     <message>
         <source>Date</source>
@@ -2353,6 +2666,10 @@ Adres: %4
     <message>
         <source>From</source>
         <translation>Van</translation>
+    </message>
+    <message>
+        <source>unknown</source>
+        <translation>onbekend</translation>
     </message>
     <message>
         <source>To</source>
@@ -2376,7 +2693,7 @@ Adres: %4
     </message>
     <message numerus="yes">
         <source>matures in %n more block(s)</source>
-        <translation><numerusform>komt tot wasdom na %n nieuw blok</numerusform><numerusform>komt tot wasdom na %n nieuwe blokken</numerusform></translation>
+        <translation><numerusform>komt beschikbaar na %n nieuwe blok</numerusform><numerusform>komt beschikbaar na %n nieuwe blokken</numerusform></translation>
     </message>
     <message>
         <source>not accepted</source>
@@ -2412,7 +2729,19 @@ Adres: %4
     </message>
     <message>
         <source>Transaction ID</source>
-        <translation>Transactie-ID:</translation>
+        <translation>Transactie-ID</translation>
+    </message>
+    <message>
+        <source>Transaction total size</source>
+        <translation>Transactie totale grootte</translation>
+    </message>
+    <message>
+        <source>Transaction virtual size</source>
+        <translation>Transactie virtuele grootte</translation>
+    </message>
+    <message>
+        <source>Output index</source>
+        <translation>Output index</translation>
     </message>
     <message>
         <source>Merchant</source>
@@ -2420,7 +2749,7 @@ Adres: %4
     </message>
     <message>
         <source>Generated coins must mature %1 blocks before they can be spent. When you generated this block, it was broadcast to the network to be added to the block chain. If it fails to get into the chain, its state will change to "not accepted" and it won't be spendable. This may occasionally happen if another node generates a block within a few seconds of yours.</source>
-        <translation>Gegenereerde munten moeten %1 blokken rijpen voordat ze kunnen worden besteed. Toen dit blok gegenereerd werd, werd het uitgezonden naar het netwerk om aan de blokketen toegevoegd te worden. Als het niet lukt om in de keten toegevoegd te worden, zal de status te veranderen naar "niet geaccepteerd" en het zal deze niet besteedbaar zijn. Dit kan soms gebeuren als een ander knooppunt een blok genereert binnen een paar seconden na die van u.</translation>
+        <translation>Gegenereerde munten moeten %1 blokken rijpen voordat ze kunnen worden besteed. Toen dit blok gegenereerd werd, werd het uitgezonden naar het netwerk om aan de blokketen toegevoegd te worden. Als het niet lukt om in de keten toegevoegd te worden, zal de status te veranderen naar "niet geaccepteerd" en zal het niet besteedbaar zijn. Dit kan soms gebeuren als een ander node een blok genereert binnen een paar seconden na die van u.</translation>
     </message>
     <message>
         <source>Debug information</source>
@@ -2446,28 +2775,16 @@ Adres: %4
         <source>false</source>
         <translation>onwaar</translation>
     </message>
-    <message>
-        <source>, has not been successfully broadcast yet</source>
-        <translation>, is nog niet met succes uitgezonden</translation>
-    </message>
-    <message numerus="yes">
-        <source>Open for %n more block(s)</source>
-        <translation><numerusform>Open voor nog %n blok</numerusform><numerusform>Open voor nog %n blokken</numerusform></translation>
-    </message>
-    <message>
-        <source>unknown</source>
-        <translation>onbekend</translation>
-    </message>
 </context>
 <context>
     <name>TransactionDescDialog</name>
     <message>
-        <source>Transaction details</source>
-        <translation>Transactiedetails</translation>
-    </message>
-    <message>
         <source>This pane shows a detailed description of the transaction</source>
         <translation>Dit venster laat een uitgebreide beschrijving van de transactie zien</translation>
+    </message>
+    <message>
+        <source>Details for %1</source>
+        <translation>Details voor %1</translation>
     </message>
 </context>
 <context>
@@ -2481,12 +2798,8 @@ Adres: %4
         <translation>Type</translation>
     </message>
     <message>
-        <source>Address</source>
-        <translation>Adres</translation>
-    </message>
-    <message>
-        <source>Immature (%1 confirmations, will be available after %2)</source>
-        <translation>immatuur (%1 bevestigingen, zal beschikbaar zijn na %2)</translation>
+        <source>Label</source>
+        <translation>Label</translation>
     </message>
     <message numerus="yes">
         <source>Open for %n more block(s)</source>
@@ -2497,32 +2810,32 @@ Adres: %4
         <translation>Open tot %1</translation>
     </message>
     <message>
-        <source>Confirmed (%1 confirmations)</source>
-        <translation>Bevestigd (%1 bevestigingen)</translation>
-    </message>
-    <message>
-        <source>This block was not received by any other nodes and will probably not be accepted!</source>
-        <translation>Dit blok is niet ontvangen bij andere nodes en zal waarschijnlijk niet worden geaccepteerd!</translation>
-    </message>
-    <message>
-        <source>Generated but not accepted</source>
-        <translation>Gegenereerd maar niet geaccepteerd</translation>
-    </message>
-    <message>
-        <source>Offline</source>
-        <translation>Niet verbonden</translation>
-    </message>
-    <message>
         <source>Unconfirmed</source>
         <translation>Onbevestigd</translation>
+    </message>
+    <message>
+        <source>Abandoned</source>
+        <translation>Opgegeven</translation>
     </message>
     <message>
         <source>Confirming (%1 of %2 recommended confirmations)</source>
         <translation>Bevestigen (%1 van %2 aanbevolen bevestigingen)</translation>
     </message>
     <message>
+        <source>Confirmed (%1 confirmations)</source>
+        <translation>Bevestigd (%1 bevestigingen)</translation>
+    </message>
+    <message>
         <source>Conflicted</source>
         <translation>Conflicterend</translation>
+    </message>
+    <message>
+        <source>Immature (%1 confirmations, will be available after %2)</source>
+        <translation>Niet beschikbaar (%1 bevestigingen, zal beschikbaar zijn na %2)</translation>
+    </message>
+    <message>
+        <source>Generated but not accepted</source>
+        <translation>Gegenereerd maar niet geaccepteerd</translation>
     </message>
     <message>
         <source>Received with</source>
@@ -2553,8 +2866,12 @@ Adres: %4
         <translation>(nvt)</translation>
     </message>
     <message>
+        <source>(no label)</source>
+        <translation>(geen label)</translation>
+    </message>
+    <message>
         <source>Transaction status. Hover over this field to show number of confirmations.</source>
-        <translation>Transactiestatus. Houd de muiscursor boven dit veld om het aantal bevestigingen te laten zien.</translation>
+        <translation>Transactiestatus. Houd de cursor boven dit veld om het aantal bevestigingen te laten zien.</translation>
     </message>
     <message>
         <source>Date and time that the transaction was received.</source>
@@ -2566,15 +2883,15 @@ Adres: %4
     </message>
     <message>
         <source>Whether or not a watch-only address is involved in this transaction.</source>
-        <translation>Of er een alleen-bekijken adres is betrokken bij deze transactie.</translation>
+        <translation>Of er een alleen-bekijken-adres is betrokken bij deze transactie.</translation>
     </message>
     <message>
-        <source>Destination address of transaction.</source>
-        <translation>Ontvangend adres van transactie.</translation>
+        <source>User-defined intent/purpose of the transaction.</source>
+        <translation>Door gebruiker gedefinieerde intentie/doel van de transactie.</translation>
     </message>
     <message>
         <source>Amount removed from or added to balance.</source>
-        <translation>Bedrag verwijderd van of toegevoegd aan saldo</translation>
+        <translation>Bedrag verwijderd van of toegevoegd aan saldo.</translation>
     </message>
 </context>
 <context>
@@ -2628,12 +2945,20 @@ Adres: %4
         <translation>Anders</translation>
     </message>
     <message>
-        <source>Enter address or label to search</source>
-        <translation>Vul adres of label in om te zoeken</translation>
+        <source>Enter address, transaction id, or label to search</source>
+        <translation>Voer adres, transactie-ID of etiket in om te zoeken</translation>
     </message>
     <message>
         <source>Min amount</source>
         <translation>Min. bedrag</translation>
+    </message>
+    <message>
+        <source>Abandon transaction</source>
+        <translation>Doe afstand van transactie</translation>
+    </message>
+    <message>
+        <source>Increase transaction fee</source>
+        <translation>Toename transactiekosten</translation>
     </message>
     <message>
         <source>Copy address</source>
@@ -2652,6 +2977,14 @@ Adres: %4
         <translation>Kopieer transactie-ID</translation>
     </message>
     <message>
+        <source>Copy raw transaction</source>
+        <translation>Kopieer ruwe transactie</translation>
+    </message>
+    <message>
+        <source>Copy full transaction details</source>
+        <translation>Kopieer volledige transactiedetials</translation>
+    </message>
+    <message>
         <source>Edit label</source>
         <translation>Bewerk label</translation>
     </message>
@@ -2661,27 +2994,7 @@ Adres: %4
     </message>
     <message>
         <source>Export Transaction History</source>
-        <translation>Exporteer Transactieverleden</translation>
-    </message>
-    <message>
-        <source>Watch-only</source>
-        <translation>Alleen-bekijkbaar</translation>
-    </message>
-    <message>
-        <source>Exporting Failed</source>
-        <translation>Export Mislukt</translation>
-    </message>
-    <message>
-        <source>There was an error trying to save the transaction history to %1.</source>
-        <translation>Er is een fout opgetreden bij het opslaan van het transactieverleden naar %1.</translation>
-    </message>
-    <message>
-        <source>Exporting Successful</source>
-        <translation>Export Succesvol</translation>
-    </message>
-    <message>
-        <source>The transaction history was successfully saved to %1.</source>
-        <translation>Het transactieverleden was succesvol bewaard in %1.</translation>
+        <translation>Exporteer transactiegeschiedenis</translation>
     </message>
     <message>
         <source>Comma separated file (*.csv)</source>
@@ -2690,6 +3003,10 @@ Adres: %4
     <message>
         <source>Confirmed</source>
         <translation>Bevestigd</translation>
+    </message>
+    <message>
+        <source>Watch-only</source>
+        <translation>Alleen-bekijkbaar</translation>
     </message>
     <message>
         <source>Date</source>
@@ -2712,6 +3029,22 @@ Adres: %4
         <translation>ID</translation>
     </message>
     <message>
+        <source>Exporting Failed</source>
+        <translation>Export mislukt</translation>
+    </message>
+    <message>
+        <source>There was an error trying to save the transaction history to %1.</source>
+        <translation>Er is een fout opgetreden bij het opslaan van de transactiegeschiedenis naar %1.</translation>
+    </message>
+    <message>
+        <source>Exporting Successful</source>
+        <translation>Export succesvol</translation>
+    </message>
+    <message>
+        <source>The transaction history was successfully saved to %1.</source>
+        <translation>De transactiegeschiedenis was succesvol bewaard in %1.</translation>
+    </message>
+    <message>
         <source>Range:</source>
         <translation>Bereik:</translation>
     </message>
@@ -2731,7 +3064,7 @@ Adres: %4
     <name>WalletFrame</name>
     <message>
         <source>No wallet has been loaded.</source>
-        <translation>Portemonnee werd niet geladen.</translation>
+        <translation>Er is geen portemonnee geladen.</translation>
     </message>
 </context>
 <context>
@@ -2739,6 +3072,42 @@ Adres: %4
     <message>
         <source>Send Coins</source>
         <translation>Verstuur munten</translation>
+    </message>
+    <message>
+        <source>Fee bump error</source>
+        <translation>Vergoedingsverhoging fout</translation>
+    </message>
+    <message>
+        <source>Increasing transaction fee failed</source>
+        <translation>Verhogen transactie vergoeding is mislukt</translation>
+    </message>
+    <message>
+        <source>Do you want to increase the fee?</source>
+        <translation>Wil je de vergoeding verhogen?</translation>
+    </message>
+    <message>
+        <source>Current fee:</source>
+        <translation>Huidige vergoeding:</translation>
+    </message>
+    <message>
+        <source>Increase:</source>
+        <translation>Toename:</translation>
+    </message>
+    <message>
+        <source>New fee:</source>
+        <translation>Nieuwe vergoeding:</translation>
+    </message>
+    <message>
+        <source>Confirm fee bump</source>
+        <translation>Bevestig vergoedingsaanpassing</translation>
+    </message>
+    <message>
+        <source>Can't sign transaction.</source>
+        <translation>Kan transactie niet ondertekenen.</translation>
+    </message>
+    <message>
+        <source>Could not commit transaction</source>
+        <translation>Kon de transactie niet voltooien</translation>
     </message>
 </context>
 <context>
@@ -2757,98 +3126,106 @@ Adres: %4
     </message>
     <message>
         <source>Wallet Data (*.dat)</source>
-        <translation>Portemonnee-data (*.dat)</translation>
+        <translation>Portemonneedata (*.dat)</translation>
     </message>
     <message>
         <source>Backup Failed</source>
-        <translation>Backup Mislukt</translation>
+        <translation>Backup mislukt</translation>
     </message>
     <message>
         <source>There was an error trying to save the wallet data to %1.</source>
-        <translation>Er is een fout opgetreden bij het wegschrijven van de portemonnee-data naar %1.</translation>
+        <translation>Er is een fout opgetreden bij het wegschrijven van de portemonneedata naar %1.</translation>
+    </message>
+    <message>
+        <source>Backup Successful</source>
+        <translation>Backup succesvol</translation>
     </message>
     <message>
         <source>The wallet data was successfully saved to %1.</source>
         <translation>De portemonneedata is succesvol opgeslagen in %1.</translation>
     </message>
     <message>
-        <source>Backup Successful</source>
-        <translation>Backup Succesvol</translation>
+        <source>Cancel</source>
+        <translation>Annuleren</translation>
     </message>
 </context>
 <context>
     <name>bitcoin-core</name>
     <message>
-        <source>Options:</source>
-        <translation>Opties:</translation>
+        <source>Distributed under the MIT software license, see the accompanying file %s or %s</source>
+        <translation>Uitgegeven onder de MIT software licentie, zie het bijgevoegde bestand %s of %s</translation>
     </message>
     <message>
-        <source>Specify data directory</source>
-        <translation>Stel datamap in</translation>
+        <source>Prune configured below the minimum of %d MiB.  Please use a higher number.</source>
+        <translation>Prune is ingesteld op minder dan het minimum van %d MiB. Gebruik a.u.b. een hoger aantal.</translation>
     </message>
     <message>
-        <source>Connect to a node to retrieve peer addresses, and disconnect</source>
-        <translation>Verbind naar een node om adressen van anderen op te halen, en verbreek vervolgens de verbinding</translation>
+        <source>Prune: last wallet synchronisation goes beyond pruned data. You need to -reindex (download the whole blockchain again in case of pruned node)</source>
+        <translation>Prune: laatste wallet synchronisatie gaat verder terug dan de middels -prune beperkte data. U moet -reindex gebruiken (downloadt opnieuw de gehele blokketen voor een pruned node)</translation>
     </message>
     <message>
-        <source>Specify your own public address</source>
-        <translation>Specificeer uw eigen publieke adres</translation>
+        <source>Rescans are not possible in pruned mode. You will need to use -reindex which will download the whole blockchain again.</source>
+        <translation>Herscannen is niet mogelijk i.c.m. -prune. U moet -reindex gebruiken dat de hele blokketen opnieuw zal downloaden.</translation>
     </message>
     <message>
-        <source>Accept command line and JSON-RPC commands</source>
-        <translation>Aanvaard commandoregel- en JSON-RPC-commando's</translation>
+        <source>Error: A fatal internal error occurred, see debug.log for details</source>
+        <translation>Fout: er is een fout opgetreden,  zie debug.log voor details</translation>
     </message>
     <message>
-        <source>Run in the background as a daemon and accept commands</source>
-        <translation>Draai in de achtergrond als daemon en aanvaard commando's</translation>
+        <source>Pruning blockstore...</source>
+        <translation>Blokopslag prunen...</translation>
     </message>
     <message>
-        <source>Use the test network</source>
-        <translation>Gebruik het testnetwerk</translation>
+        <source>Unable to start HTTP server. See debug log for details.</source>
+        <translation>Niet mogelijk ok HTTP-server te starten. Zie debuglogboek voor details.</translation>
     </message>
     <message>
-        <source>Accept connections from outside (default: 1 if no -proxy or -connect)</source>
-        <translation>Accepteer verbindingen van buitenaf (standaard: 1 als geen -proxy of -connect is opgegeven)</translation>
+        <source>Marscoin Core</source>
+        <translation>Marscoin Core</translation>
     </message>
     <message>
-        <source>Bind to given address and always listen on it. Use [host]:port notation for IPv6</source>
-        <translation>Bind aan opgegeven adres en luister er altijd op. Gebruik [host]:port notatie voor IPv6</translation>
+        <source>The %s developers</source>
+        <translation>De %s ontwikkelaars</translation>
     </message>
     <message>
-        <source>Delete all wallet transactions and only recover those parts of the blockchain through -rescan on startup</source>
-        <translation>Verwijder alle transacties van de portemonnee en herstel alleen de delen van de blockchain door -rescan tijdens het opstarten</translation>
+        <source>Cannot obtain a lock on data directory %s. %s is probably already running.</source>
+        <translation>Kan geen lock verkrijgen op gegevensmap %s. %s draait waarschijnlijk al.</translation>
     </message>
     <message>
-        <source>Distributed under the MIT software license, see the accompanying file COPYING or &lt;http://www.opensource.org/licenses/mit-license.php&gt;.</source>
-        <translation>Uitgegeven onder de MIT software licentie, zie het bijgevoegde bestand COPYING of &lt;http://www.opensource.org/licenses/mit-license.php&gt;.</translation>
+        <source>Cannot provide specific connections and have addrman find outgoing connections at the same.</source>
+        <translation>Kan niet specifieke verbindingen voorzien en tegelijk addrman uitgaande verbindingen laten vinden.</translation>
     </message>
     <message>
-        <source>Enter regression test mode, which uses a special chain in which blocks can be solved instantly.</source>
-        <translation>Schakel regressietest-modus in, die een speciale blokketen gebruikt waarin blokken onmiddellijk opgelost kunnen worden.</translation>
+        <source>Error reading %s! All keys read correctly, but transaction data or address book entries might be missing or incorrect.</source>
+        <translation>Waarschuwing: Fout bij het lezen van %s! Alle sleutels zijn in goede orde uitgelezen, maar transactiedata of adresboeklemma's zouden kunnen ontbreken of fouten bevatten.</translation>
     </message>
     <message>
-        <source>Execute command when a wallet transaction changes (%s in cmd is replaced by TxID)</source>
-        <translation>Voer opdracht uit zodra een portemonneetransactie verandert (%s in cmd wordt vervangen door TxID)</translation>
+        <source>Please check that your computer's date and time are correct! If your clock is wrong, %s will not work properly.</source>
+        <translation>Waarschuwing: Controleer dat de datum en tijd van uw computer correct zijn ingesteld! Bij een onjuist ingestelde klok zal %s niet goed werken.</translation>
     </message>
     <message>
-        <source>In this mode -genproclimit controls how many blocks are generated immediately.</source>
-        <translation>In deze modus, -genproclimit controleert hoeveel blokken er onmiddellijk worden gegenereerd.</translation>
+        <source>Please contribute if you find %s useful. Visit %s for further information about the software.</source>
+        <translation>Gelieve bij te dragen als je %s nuttig vindt. Bezoek %s voor meer informatie over de software.</translation>
     </message>
     <message>
-        <source>Set the number of script verification threads (%u to %d, 0 = auto, &lt;0 = leave that many cores free, default: %d)</source>
-        <translation>Kies het aantal script verificatie processen (%u tot %d, 0 = auto, &lt;0 = laat dit aantal kernen vrij, standaard: %d)</translation>
+        <source>The block database contains a block which appears to be from the future. This may be due to your computer's date and time being set incorrectly. Only rebuild the block database if you are sure that your computer's date and time are correct</source>
+        <translation>De blokdatabase bevat een blok dat lijkt uit de toekomst te komen. Dit kan gebeuren omdat de datum en tijd van uw computer niet goed staat. Herbouw de blokdatabase pas nadat u de datum en tijd van uw computer correct heeft ingesteld.</translation>
     </message>
     <message>
         <source>This is a pre-release test build - use at your own risk - do not use for mining or merchant applications</source>
         <translation>Dit is een pre-release testversie - gebruik op eigen risico! Gebruik deze niet voor het delven van munten of handelsdoeleinden</translation>
     </message>
     <message>
-        <source>Unable to bind to %s on this computer. Marscoin Client is probably already running.</source>
-        <translation>Niet in staat om %s te verbinden op deze computer. Marscoin Client draait waarschijnlijk al.</translation>
+        <source>This is the transaction fee you may discard if change is smaller than dust at this level</source>
+        <translation>Dit is de transactievergoeding die u mag afleggen als het wisselgeld kleiner is dan stof op dit niveau</translation>
     </message>
     <message>
-        <source>Warning: -paytxfee is set very high! This is the transaction fee you will pay if you send a transaction.</source>
-        <translation>Waarschuwing: -paytxfee is zeer hoog ingesteld.  Dit zijn de transactiekosten die u betaalt bij het versturen van een transactie.</translation>
+        <source>Unable to replay blocks. You will need to rebuild the database using -reindex-chainstate.</source>
+        <translation>Onmogelijk om blokken opnieuw af te spelen. U dient de database opnieuw op te bouwen met behulp van -reindex-chainstate.</translation>
+    </message>
+    <message>
+        <source>Unable to rewind the database to a pre-fork state. You will need to redownload the blockchain</source>
+        <translation>Niet mogelijk om de databank terug te draaien naar een staat voor de vork. Je zal je blokketen opnieuw moeten downloaden</translation>
     </message>
     <message>
         <source>Warning: The network does not appear to fully agree! Some miners appear to be experiencing issues.</source>
@@ -2859,60 +3236,40 @@ Adres: %4
         <translation>Waarschuwing: Het lijkt erop dat we geen consensus kunnen vinden met onze peers! Mogelijk dient u te upgraden, of andere nodes moeten wellicht upgraden.</translation>
     </message>
     <message>
-        <source>Warning: error reading wallet.dat! All keys read correctly, but transaction data or address book entries might be missing or incorrect.</source>
-        <translation>Waarschuwing: Fout bij het lezen van wallet.dat! Alle sleutels zijn in goede orde uitgelezen, maar transactiedata of adresboeklemma's zouden kunnen ontbreken of fouten bevatten.</translation>
+        <source>%d of last 100 blocks have unexpected version</source>
+        <translation>%d van de laatste 100 blokken hebben een onverwachte versie</translation>
     </message>
     <message>
-        <source>Warning: wallet.dat corrupt, data salvaged! Original wallet.dat saved as wallet.{timestamp}.bak in %s; if your balance or transactions are incorrect you should restore from a backup.</source>
-        <translation>Waarschuwing: wallet.dat is corrupt, data is veiliggesteld! Originele wallet.dat is opgeslagen als wallet.{tijdstip}.bak in %s; als uw balans of transacties incorrect zijn dient u een backup terug te zetten.</translation>
+        <source>%s corrupt, salvage failed</source>
+        <translation>%s corrupt, veiligstellen mislukt</translation>
     </message>
     <message>
-        <source>Whitelist peers connecting from the given netmask or IP address. Can be specified multiple times.</source>
-        <translation>Goedgekeurde peers die verbinden van het ingegeven netmask of IP adres. Kan meerdere keren gespecificeerd worden.</translation>
+        <source>-maxmempool must be at least %d MB</source>
+        <translation>-maxmempool moet minstens %d MB zijn</translation>
     </message>
     <message>
-        <source>(default: 1)</source>
-        <translation>(standaard: 1)</translation>
+        <source>Cannot resolve -%s address: '%s'</source>
+        <translation>Kan -%s adres niet herleiden: '%s'</translation>
     </message>
     <message>
-        <source>&lt;category&gt; can be:</source>
-        <translation>&lt;category&gt; kan zijn:</translation>
+        <source>Change index out of range</source>
+        <translation>Wijzigingsindex buiten bereik</translation>
     </message>
     <message>
-        <source>Attempt to recover private keys from a corrupt wallet.dat</source>
-        <translation>Poog de geheime sleutels uit een corrupt wallet.dat bestand terug te halen</translation>
-    </message>
-    <message>
-        <source>Block creation options:</source>
-        <translation>Blokcreatie-opties:</translation>
-    </message>
-    <message>
-        <source>Connect only to the specified node(s)</source>
-        <translation>Verbind alleen naar de gespecificeerde node(s)</translation>
-    </message>
-    <message>
-        <source>Connection options:</source>
-        <translation>Verbindingsopties:</translation>
+        <source>Copyright (C) %i-%i</source>
+        <translation>Auteursrecht (C) %i-%i</translation>
     </message>
     <message>
         <source>Corrupted block database detected</source>
         <translation>Corrupte blokkendatabase gedetecteerd</translation>
     </message>
     <message>
-        <source>Debugging/Testing options:</source>
-        <translation>Foutopsporing/Testopties:</translation>
-    </message>
-    <message>
-        <source>Discover own IP address (default: 1 when listening and no -externalip)</source>
-        <translation>Ontdek eigen IP-adres (standaard: 1 als er wordt geluisterd en geen -externalip is opgegeven)</translation>
-    </message>
-    <message>
-        <source>Do not load the wallet and disable wallet RPC calls</source>
-        <translation>Laad de wallet niet en schakel wallet RPC oproepen uit</translation>
-    </message>
-    <message>
         <source>Do you want to rebuild the block database now?</source>
         <translation>Wilt u de blokkendatabase nu herbouwen?</translation>
+    </message>
+    <message>
+        <source>Error creating %s: You can't create non-HD wallets with this version.</source>
+        <translation>Fout bij het maken van %s: Je kunt geen niet-HD portemonnees maken met deze versie.</translation>
     </message>
     <message>
         <source>Error initializing block database</source>
@@ -2921,6 +3278,22 @@ Adres: %4
     <message>
         <source>Error initializing wallet database environment %s!</source>
         <translation>Probleem met initializeren van de database-omgeving %s!</translation>
+    </message>
+    <message>
+        <source>Error loading %s</source>
+        <translation>Fout bij het laden van %s</translation>
+    </message>
+    <message>
+        <source>Error loading %s: Private keys can only be disabled during creation</source>
+        <translation>Fout bij het laden van %s: Geheime sleutels kunnen alleen worden uitgeschakeld tijdens het aanmaken</translation>
+    </message>
+    <message>
+        <source>Error loading %s: Wallet corrupted</source>
+        <translation>Fout bij het laden van %s: Portomonnee corrupt</translation>
+    </message>
+    <message>
+        <source>Error loading %s: Wallet requires newer version of %s</source>
+        <translation>Fout bij laden %s: Portemonnee vereist een nieuwere versie van %s</translation>
     </message>
     <message>
         <source>Error loading block database</source>
@@ -2939,8 +3312,8 @@ Adres: %4
         <translation>Mislukt om op welke poort dan ook te luisteren. Gebruik -listen=0 as u dit wilt.</translation>
     </message>
     <message>
-        <source>If &lt;category&gt; is not supplied, output all debugging information.</source>
-        <translation>Als er geen &lt;category&gt; is opgegeven, laat dan alle debugging informatie zien.</translation>
+        <source>Failed to rescan the wallet during initialization</source>
+        <translation>Portemonnee herscannen tijdens initialisatie mislukt</translation>
     </message>
     <message>
         <source>Importing...</source>
@@ -2948,244 +3321,143 @@ Adres: %4
     </message>
     <message>
         <source>Incorrect or no genesis block found. Wrong datadir for network?</source>
-        <translation>Incorrect of geen genesis-blok gevonden. Verkeerde datamap voor het netwerk?</translation>
+        <translation>Incorrect of geen genesisblok gevonden. Verkeerde gegevensmap voor het netwerk?</translation>
     </message>
     <message>
-        <source>Invalid -onion address: '%s'</source>
-        <translation>Ongeldig -onion adres '%s'</translation>
+        <source>Initialization sanity check failed. %s is shutting down.</source>
+        <translation>Initialisatie sanity check mislukt. %s is aan het afsluiten.</translation>
+    </message>
+    <message>
+        <source>Invalid amount for -%s=&lt;amount&gt;: '%s'</source>
+        <translation>Ongeldig bedrag voor -%s=&lt;bedrag&gt;: '%s'</translation>
+    </message>
+    <message>
+        <source>Invalid amount for -discardfee=&lt;amount&gt;: '%s'</source>
+        <translation>Ongeldig bedrag for -discardfee=&lt;amount&gt;: '%s'</translation>
+    </message>
+    <message>
+        <source>Invalid amount for -fallbackfee=&lt;amount&gt;: '%s'</source>
+        <translation>Ongeldig bedrag voor -fallbackfee=&lt;bedrag&gt;: '%s'</translation>
+    </message>
+    <message>
+        <source>Upgrading txindex database</source>
+        <translation>Upgraden txindex database</translation>
+    </message>
+    <message>
+        <source>Loading P2P addresses...</source>
+        <translation>P2P-adressen aan het laden...</translation>
+    </message>
+    <message>
+        <source>Loading banlist...</source>
+        <translation>Verbanningslijst aan het laden...</translation>
     </message>
     <message>
         <source>Not enough file descriptors available.</source>
         <translation>Niet genoeg file descriptors beschikbaar.</translation>
     </message>
     <message>
-        <source>Only connect to nodes in network &lt;net&gt; (ipv4, ipv6 or onion)</source>
-        <translation>Verbind alleen met nodes in netwerk &lt;net&gt; (ipv4, ipv6 of onion)</translation>
+        <source>Prune cannot be configured with a negative value.</source>
+        <translation>Prune kan niet worden geconfigureerd met een negatieve waarde.</translation>
     </message>
     <message>
-        <source>Rebuild block chain index from current blk000??.dat files</source>
-        <translation>Blokketen opnieuw opbouwen met behulp van huidige blk000??.dat-bestanden</translation>
+        <source>Prune mode is incompatible with -txindex.</source>
+        <translation>Prune-modus is niet compatible met -txindex</translation>
     </message>
     <message>
-        <source>Set database cache size in megabytes (%d to %d, default: %d)</source>
-        <translation>Zet database cache grootte in megabytes (%d tot %d, standaard: %d)</translation>
+        <source>Replaying blocks...</source>
+        <translation>Blokken opnieuw aan het afspelen...</translation>
     </message>
     <message>
-        <source>Set maximum block size in bytes (default: %d)</source>
-        <translation>Stel maximum blokgrootte in in bytes (standaard: %d)</translation>
+        <source>Rewinding blocks...</source>
+        <translation>Blokken aan het terugdraaien...</translation>
     </message>
     <message>
-        <source>Specify wallet file (within data directory)</source>
-        <translation>Specificeer het portemonnee bestand (vanuit de gegevensmap)</translation>
+        <source>The source code is available from %s.</source>
+        <translation>De broncode is beschikbaar van %s.</translation>
     </message>
     <message>
-        <source>This is intended for regression testing tools and app development.</source>
-        <translation>Dit is bedoeld voor regressie test toepassingen en applicatie onwikkeling.</translation>
+        <source>Transaction fee and change calculation failed</source>
+        <translation>Transactievergoeding en wisselgeldberekening mislukt</translation>
     </message>
     <message>
-        <source>Use UPnP to map the listening port (default: %u)</source>
-        <translation>Gebruik UPnP om de luisterende poort te mappen (standaard: %u)</translation>
+        <source>Unable to bind to %s on this computer. %s is probably already running.</source>
+        <translation>Niet in staat om %s te verbinden op deze computer. %s draait waarschijnlijk al.</translation>
+    </message>
+    <message>
+        <source>Unable to generate keys</source>
+        <translation>Niet mogelijk sleutels te genereren</translation>
+    </message>
+    <message>
+        <source>Unsupported argument -benchmark ignored, use -debug=bench.</source>
+        <translation>Niet-ondersteund argument -benchmark genegeerd, gebruik -debug=bench.</translation>
+    </message>
+    <message>
+        <source>Unsupported argument -debugnet ignored, use -debug=net.</source>
+        <translation>Niet-ondersteund argument -debugnet genegeerd, gebruik -debug=net</translation>
+    </message>
+    <message>
+        <source>Unsupported argument -tor found, use -onion.</source>
+        <translation>Niet-ondersteund argument -tor gevonden, gebruik -onion.</translation>
+    </message>
+    <message>
+        <source>Unsupported logging category %s=%s.</source>
+        <translation>Niet-ondersteunde logcategorie %s=%s.</translation>
+    </message>
+    <message>
+        <source>Upgrading UTXO database</source>
+        <translation>Upgraden UTXO-database</translation>
+    </message>
+    <message>
+        <source>User Agent comment (%s) contains unsafe characters.</source>
+        <translation>User Agentcommentaar (%s) bevat onveilige karakters.</translation>
     </message>
     <message>
         <source>Verifying blocks...</source>
         <translation>Blokken aan het controleren...</translation>
     </message>
     <message>
-        <source>Verifying wallet...</source>
-        <translation>Portemonnee aan het controleren...</translation>
-    </message>
-    <message>
-        <source>Wallet %s resides outside data directory %s</source>
-        <translation>Portemonnee %s bevindt zich buiten de gegevensmap %s</translation>
-    </message>
-    <message>
-        <source>Wallet options:</source>
-        <translation>Portemonnee instellingen:</translation>
-    </message>
-    <message>
-        <source>You need to rebuild the database using -reindex to change -txindex</source>
-        <translation>Om -txindex te kunnen veranderen dient u de database opnieuw te bouwen met gebruik van -reindex.</translation>
-    </message>
-    <message>
-        <source>Imports blocks from external blk000??.dat file</source>
-        <translation>Importeert blokken van extern blk000??.dat bestand</translation>
-    </message>
-    <message>
-        <source>Allow JSON-RPC connections from specified source. Valid for &lt;ip&gt; are a single IP (e.g. 1.2.3.4), a network/netmask (e.g. 1.2.3.4/255.255.255.0) or a network/CIDR (e.g. 1.2.3.4/24). This option can be specified multiple times</source>
-        <translation>Sta JSON-RPC verbindingen toe vanuit een gespecificeerde bron. Geldig voor &lt;ip&gt; zijn een enkel IP (bijv. 1.2.3.4), een netwerk/netmask (bijv. 1.2.3.4/255.255.255.0) of een netwerk/CIDR (bijv. 1.2.3.4/24). Deze optie kan meerdere keren gespecificeerd worden.</translation>
-    </message>
-    <message>
-        <source>An error occurred while setting up the RPC address %s port %u for listening: %s</source>
-        <translation>Er is een fout opgetreden tijdens het opzetten van het RPC adres %s poort %u voor luisteren: %s</translation>
-    </message>
-    <message>
-        <source>Bind to given address and whitelist peers connecting to it. Use [host]:port notation for IPv6</source>
-        <translation>Bind aan opgegeven adres en keur peers die ermee verbinden goed. Gebruik [host]:poort notatie voor IPv6</translation>
-    </message>
-    <message>
-        <source>Bind to given address to listen for JSON-RPC connections. Use [host]:port notation for IPv6. This option can be specified multiple times (default: bind to all interfaces)</source>
-        <translation>Bind aan gegeven adres om te luisteren voor JSON-RPC verbindingen. Gebruik [host]:poort notatie voor IPv6. Deze optie kan meerdere keren gespecificeerd worden (standaard: bind aan alle interfaces.</translation>
-    </message>
-    <message>
-        <source>Cannot obtain a lock on data directory %s. Marscoin Client is probably already running.</source>
-        <translation>Kan geen lock verkrijgen op gegevensmap %s. Marscoin Client draait waarschijnlijk al.</translation>
-    </message>
-    <message>
-        <source>Continuously rate-limit free transactions to &lt;n&gt;*1000 bytes per minute (default:%u)</source>
-        <translation>Doorlopend tarief-limiet op gratis transacties toepassen tot &lt;n&gt;*1000 bytes per minuut (standaard: %u)</translation>
-    </message>
-    <message>
-        <source>Create new files with system default permissions, instead of umask 077 (only effective with disabled wallet functionality)</source>
-        <translation>Creër nieuwe bestanden met standaard systeem bestandsrechten in plaats van umask 077 (alleen effectief met uitgeschakelde portemonnee functionaliteit)</translation>
+        <source>Wallet needed to be rewritten: restart %s to complete</source>
+        <translation>Portemonnee moest herschreven worden: Herstart %s om te voltooien</translation>
     </message>
     <message>
         <source>Error: Listening for incoming connections failed (listen returned error %s)</source>
         <translation>Fout: luisteren naar binnenkomende verbindingen mislukt (luisteren gaf foutmelding %s)</translation>
     </message>
     <message>
-        <source>Error: Unsupported argument -socks found. Setting SOCKS version isn't possible anymore, only SOCKS5 proxies are supported.</source>
-        <translation>Fout: er is een niet-ondersteund argument -socks aangetroffen. Het instellen van de SOCKS-versie is niet langer mogelijk. Alleen SOCKS5-proxy's worden ondersteund.</translation>
-    </message>
-    <message>
-        <source>Execute command when a relevant alert is received or we see a really long fork (%s in cmd is replaced by message)</source>
-        <translation>Voer commando uit zodra een waarschuwing is ontvangen of wanneer we een erg lange fork detecteren (%s in commando wordt vervangen door bericht)</translation>
-    </message>
-    <message>
-        <source>Fees (in LTC/Kb) smaller than this are considered zero fee for relaying (default: %s)</source>
-        <translation>Toeslagen (in LTC/Kb) kleiner dan dit worden beschouwd als geen vergoeding (voor doorgeven) (standaard: %s)</translation>
-    </message>
-    <message>
-        <source>Fees (in LTC/Kb) smaller than this are considered zero fee for transaction creation (default: %s)</source>
-        <translation>Toeslagen (in LTC/Kb) kleiner dan dit worden beschouwd als geen vergoeding transactieaanmaak (standaard: %s)</translation>
-    </message>
-    <message>
-        <source>If paytxfee is not set, include enough fee so transactions begin confirmation on average within n blocks (default: %u)</source>
-        <translation>Als paytxfee niet is ingesteld, het pakket voldoende vergoeding zodat transacties beginnen bevestiging gemiddeld binnen in blokken (default: %u)</translation>
-    </message>
-    <message>
         <source>Invalid amount for -maxtxfee=&lt;amount&gt;: '%s' (must be at least the minrelay fee of %s to prevent stuck transactions)</source>
-        <translation>ongeldig bedrag voor -maxtxfee=&lt;amount&gt;: '%s' (moet ten minste de minrelay vergoeding van %s het voorkomen geplakt transacties voorkomen)</translation>
+        <translation>ongeldig bedrag voor -maxtxfee=&lt;bedrag&gt;: '%s' (moet ten minste de minimale doorgeefvergoeding van %s zijn om vastgelopen transacties te voorkomen)</translation>
     </message>
     <message>
-        <source>Maximum size of data in data carrier transactions we relay and mine (default: %u)</source>
-        <translation>Maximale grootte va  n de gegevens in gegevensdrager transacties we relais en de mijnen
-(default: %u)</translation>
+        <source>The transaction amount is too small to send after the fee has been deducted</source>
+        <translation>Het transactiebedrag is te klein om te versturen nadat de transactievergoeding in mindering is gebracht</translation>
     </message>
     <message>
-        <source>Maximum total fees to use in a single wallet transaction, setting too low may abort large transactions (default: %s)</source>
-        <translation>Maximale totale kosten om te gebruiken in een enkele portemonnee transactie , vaststellen van een te laag kan grote transacties af te breken (default: %s)</translation>
+        <source>You need to rebuild the database using -reindex to go back to unpruned mode.  This will redownload the entire blockchain</source>
+        <translation>U moet de database herbouwen met -reindex om terug te gaan naar de niet-prune modus. Dit zal de gehele blokketen opnieuw downloaden.</translation>
     </message>
     <message>
-        <source>Query for peer addresses via DNS lookup, if low on addresses (default: 1 unless -connect)</source>
-        <translation>Query voor peer- adressen via DNS- lookup , als laag op adressen  (default: 1 unless -connect)</translation>
-    </message>
-    <message>
-        <source>Require high priority for relaying free or low-fee transactions (default:%u)</source>
-        <translation>Vereisen een hoge prioriteit voor het doorgeven van gratis of tegen lage vergoeding transacties  (default:%u)</translation>
-    </message>
-    <message>
-        <source>Set maximum size of high-priority/low-fee transactions in bytes (default: %d)</source>
-        <translation>Stel maximumgrootte in bytes in voor hoge-prioriteits-/lage-transactiekosten-transacties (standaard: %d)</translation>
-    </message>
-    <message>
-        <source>Set the number of threads for coin generation if enabled (-1 = all cores, default: %d)</source>
-        <translation>Stel het aantal threads in voor het genereren van coins indien ingesteld (-1 = alle kernen, standaard: %d)</translation>
-    </message>
-    <message>
-        <source>This product includes software developed by the OpenSSL Project for use in the OpenSSL Toolkit &lt;https://www.openssl.org/&gt; and cryptographic software written by Eric Young and UPnP software written by Thomas Bernard.</source>
-        <translation>Dit product bevat software dat ontwikkeld is door het OpenSSL Project voor gebruik in de OpenSSL Toolkit &lt;https://www.openssl.org/&gt; en cryptografische software geschreven door Eric Young en UPnP software geschreven door Thomas Bernard.</translation>
-    </message>
-    <message>
-        <source>To use marscoind, or the -server option to marscoin-qt, you must set an rpcpassword in the configuration file:
-%s
-It is recommended you use the following random password:
-rpcuser=marscoinrpc
-rpcpassword=%s
-(you do not need to remember this password)
-The username and password MUST NOT be the same.
-If the file does not exist, create it with owner-readable-only file permissions.
-It is also recommended to set alertnotify so you are notified of problems;
-for example: alertnotify=echo %%s | mail -s "Litecoin Alert" admin@foo.com
-</source>
-        <translation>Om marscoind of de -server optie naar marscoin-gt te gebruiken, dient u een rpcwachtwoord in te stellen in het configuratiebestand:
- %s
-Wij raden u aan om het volgende wachtwoord willekeurig te gebruiken: 
-rpcuser=marscoinrpc 
-rpcpassword=%s 
-(u hoeft dit wachtwoord niet te onthouden)
-De gebruikersnaam en het wachtwoorden moeten NIET hetzelfde zijn. 
-Indien het bestand niet bestaat, maak het bestand aan met bestandsrechten: alleen lezen voor eigenaar.
-Het is ook aan te raden om een alarmnotificatie in te stellen, zodat u op de hoogte bent van de problemen;
-Voorbeeld: alertnotify=echo %%s | mail -s "Litecoin Alert" admin@foo.com
-</translation>
-    </message>
-    <message>
-        <source>Warning: -maxtxfee is set very high! Fees this large could be paid on a single transaction.</source>
-        <translation>Let op: -maxtxfee is erg hoog ingesteld! Transactiekosten van dergelijke groottes kunnen in een enkele transactie worden betaald.</translation>
-    </message>
-    <message>
-        <source>Warning: Please check that your computer's date and time are correct! If your clock is wrong Marscoin Client will not work properly.</source>
-        <translation>Waarschuwing: Controleer dat de datum en tijd van uw computer correct zijn ingesteld! Bij een onjuist ingestelde klok zal Marscoin Client niet goed werken.</translation>
-    </message>
-    <message>
-        <source>Whitelisted peers cannot be DoS banned and their transactions are always relayed, even if they are already in the mempool, useful e.g. for a gateway</source>
-        <translation>Goedgekeurde peers kunnen niet ge-DoS-banned worden en hun transacties worden altijd doorgestuurd, zelfs als ze reeds in de mempool aanwezig zijn, nuttig voor bijv. een gateway</translation>
-    </message>
-    <message>
-        <source>Accept public REST requests (default: %u)</source>
-        <translation>Accepteer publieke REST-requests (standaard: %u)</translation>
-    </message>
-    <message>
-        <source>Cannot resolve -whitebind address: '%s'</source>
-        <translation>Kan -whitebind adres niet herleiden: '%s'</translation>
-    </message>
-    <message>
-        <source>Connect through SOCKS5 proxy</source>
-        <translation>Verbind door SOCKS5 proxy</translation>
-    </message>
-    <message>
-        <source>Copyright (C) 2009-%i The Bitcoin Core Developers</source>
-        <translation>Auteursrecht (C) 2009-%i De Bitcoin Core Ontwikkelaars</translation>
-    </message>
-    <message>
-        <source>Could not parse -rpcbind value %s as network address</source>
-        <translation>Niet mogelijk om -rpcbind waarde %s te verwerken als netwerk adres</translation>
-    </message>
-    <message>
-        <source>Error loading wallet.dat: Wallet requires newer version of Marscoin Client</source>
-        <translation>Fout bij laden wallet.dat: Portemonnee vereist een nieuwere versie van Marscoin Client</translation>
+        <source>Error loading %s: You can't disable HD on an already existing HD wallet</source>
+        <translation>Fout bij het laden van %s: Je kan HD niet deactiveren voor een reeds bestaande niet-HD-portemonnee</translation>
     </message>
     <message>
         <source>Error reading from database, shutting down.</source>
         <translation>Fout bij het lezen van de database, afsluiten. </translation>
     </message>
     <message>
-        <source>Error: Unsupported argument -tor found, use -onion.</source>
-        <translation>Fout: Niet ondersteund argument -tor gevonden, gebruik -onion.</translation>
-    </message>
-    <message>
-        <source>Fee (in LTC/kB) to add to transactions you send (default: %s)</source>
-        <translation>Transactiekosten (in LTC/kB) om toe te voegen aan transacties die u verstuurd (standaard: %s)</translation>
+        <source>Error upgrading chainstate database</source>
+        <translation>Fout bij het upgraden van de ketenstaat database</translation>
     </message>
     <message>
         <source>Information</source>
         <translation>Informatie</translation>
     </message>
     <message>
-        <source>Initialization sanity check failed. Marscoin Client is shutting down.</source>
-        <translation>Initialisatie sanity check mislukt. Marscoin Client is aan het afsluiten.</translation>
+        <source>Invalid -onion address or hostname: '%s'</source>
+        <translation>Ongeldig -onion adress of hostnaam: '%s'</translation>
     </message>
     <message>
-        <source>Invalid amount for -maxtxfee=&lt;amount&gt;: '%s'</source>
-        <translation>Ongeldig bedrag voor -maxtxfee=&lt;amount&gt;: '%s'</translation>
-    </message>
-    <message>
-        <source>Invalid amount for -minrelaytxfee=&lt;amount&gt;: '%s'</source>
-        <translation>Ongeldig bedrag voor -minrelaytxfee=&lt;bedrag&gt;: '%s'</translation>
-    </message>
-    <message>
-        <source>Invalid amount for -mintxfee=&lt;amount&gt;: '%s'</source>
-        <translation>Ongeldig bedrag voor -mintxfee=&lt;bedrag&gt;: '%s'</translation>
+        <source>Invalid -proxy address or hostname: '%s'</source>
+        <translation>Ongeldig -proxy adress of hostnaam: '%s'</translation>
     </message>
     <message>
         <source>Invalid amount for -paytxfee=&lt;amount&gt;: '%s' (must be at least %s)</source>
@@ -3196,56 +3468,32 @@ Voorbeeld: alertnotify=echo %%s | mail -s "Litecoin Alert" admin@foo.com
         <translation>Ongeldig netmask gespecificeerd in -whitelist: '%s'</translation>
     </message>
     <message>
-        <source>Keep at most &lt;n&gt; unconnectable transactions in memory (default: %u)</source>
-        <translation>Houd maximaal &lt;n&gt; onverbonden transacties in geheugen (standaard: %u)</translation>
-    </message>
-    <message>
         <source>Need to specify a port with -whitebind: '%s'</source>
         <translation>Verplicht een poort met -whitebind op te geven: '%s'</translation>
     </message>
     <message>
-        <source>Node relay options:</source>
-        <translation>Node relay opties:</translation>
-    </message>
-    <message>
-        <source>RPC SSL options: (see the Litecoin Wiki for SSL setup instructions)</source>
-        <translation>RPC SSL opties: (zie de Litecoin Wiki voor SSL installatie-instructies)</translation>
-    </message>
-    <message>
-        <source>RPC server options:</source>
-        <translation>RPC server opties:</translation>
-    </message>
-    <message>
-        <source>RPC support for HTTP persistent connections (default: %d)</source>
-        <translation>RPC ondersteuning voor HTTP persisten verbindingen (default: %d)</translation>
-    </message>
-    <message>
-        <source>Randomly drop 1 of every &lt;n&gt; network messages</source>
-        <translation>Laat willekeurig 1 elke &lt;n&gt; netwerkberichten vallen</translation>
-    </message>
-    <message>
-        <source>Randomly fuzz 1 of every &lt;n&gt; network messages</source>
-        <translation>Fuzz willekeurig 1 van elke &lt;n&gt; netwerkberichten</translation>
-    </message>
-    <message>
-        <source>Send trace/debug info to console instead of debug.log file</source>
-        <translation>Stuur trace/debug-info naar de console in plaats van het debug.log bestand</translation>
-    </message>
-    <message>
-        <source>Send transactions as zero-fee transactions if possible (default: %u)</source>
-        <translation>Verstuur transacties zonder verzendkosten indien mogelijk (standaard: %u)</translation>
-    </message>
-    <message>
-        <source>Show all debugging options (usage: --help -help-debug)</source>
-        <translation>Toon alle foutopsporingsopties (gebruik: --help -help-debug)</translation>
-    </message>
-    <message>
-        <source>Shrink debug.log file on client startup (default: 1 when no -debug)</source>
-        <translation>Verklein debug.log-bestand bij het opstarten van de client (standaard: 1 als geen -debug)</translation>
+        <source>Reducing -maxconnections from %d to %d, because of system limitations.</source>
+        <translation>Verminder -maxconnections van %d naar %d, vanwege systeembeperkingen.</translation>
     </message>
     <message>
         <source>Signing transaction failed</source>
         <translation>Ondertekenen van transactie mislukt</translation>
+    </message>
+    <message>
+        <source>Specified -walletdir "%s" does not exist</source>
+        <translation>Opgegeven -walletdir "%s" bestaat niet</translation>
+    </message>
+    <message>
+        <source>Specified -walletdir "%s" is a relative path</source>
+        <translation>Opgegeven -walletdir "%s" is een relatief pad</translation>
+    </message>
+    <message>
+        <source>Specified -walletdir "%s" is not a directory</source>
+        <translation>Opgegeven -walletdir "%s" is geen map</translation>
+    </message>
+    <message>
+        <source>The transaction amount is too small to pay the fee</source>
+        <translation>Het transactiebedrag is te klein om transactiekosten in rekening te brengen</translation>
     </message>
     <message>
         <source>This is experimental software.</source>
@@ -3256,12 +3504,8 @@ Voorbeeld: alertnotify=echo %%s | mail -s "Litecoin Alert" admin@foo.com
         <translation>Transactiebedrag te klein</translation>
     </message>
     <message>
-        <source>Transaction amounts must be positive</source>
-        <translation>Transactiebedragen moeten positief zijn</translation>
-    </message>
-    <message>
         <source>Transaction too large for fee policy</source>
-        <translation>De transactie is te groot voor het toeslagenbeleid</translation>
+        <translation>De transactie is te groot voor het transactiekostenbeleid</translation>
     </message>
     <message>
         <source>Transaction too large</source>
@@ -3272,268 +3516,136 @@ Voorbeeld: alertnotify=echo %%s | mail -s "Litecoin Alert" admin@foo.com
         <translation>Niet in staat om aan %s te binden op deze computer (bind gaf error %s)</translation>
     </message>
     <message>
-        <source>Use UPnP to map the listening port (default: 1 when listening)</source>
-        <translation>Gebruik UPnP om de luisterende poort te mappen (standaard: 1 als er wordt geluisterd)</translation>
+        <source>Unable to generate initial keys</source>
+        <translation>Niet mogelijk initiële sleutels te genereren</translation>
     </message>
     <message>
-        <source>Username for JSON-RPC connections</source>
-        <translation>Gebruikersnaam voor JSON-RPC-verbindingen</translation>
+        <source>Verifying wallet(s)...</source>
+        <translation>Portomenee(n) aan het verifiëren...</translation>
     </message>
     <message>
-        <source>Wallet needed to be rewritten: restart Marscoin Client to complete</source>
-        <translation>Portemonnee moest herschreven worden: Herstart Marscoin Client om te voltooien</translation>
+        <source>Wallet %s resides outside wallet directory %s</source>
+        <translation>Portemonnee %s begeeft zich buiten portemoneemap %s</translation>
     </message>
     <message>
         <source>Warning</source>
         <translation>Waarschuwing</translation>
     </message>
     <message>
-        <source>Warning: This version is obsolete, upgrade required!</source>
-        <translation>Waarschuwing: Deze versie is verouderd, een upgrade is vereist!</translation>
-    </message>
-    <message>
-        <source>Warning: Unsupported argument -benchmark ignored, use -debug=bench.</source>
-        <translation>Waarschuwing: Niet ondersteund argument -benchmark genegeerd, gebruik -debug=bench.</translation>
-    </message>
-    <message>
-        <source>Warning: Unsupported argument -debugnet ignored, use -debug=net.</source>
-        <translation>Waarschuwing: Niet ondersteund argument -debugnet genegeerd, gebruik -debug=net.</translation>
+        <source>Warning: unknown new rules activated (versionbit %i)</source>
+        <translation>Waarschuwing: onbekende nieuwe regels geactiveerd (versionbit %i)</translation>
     </message>
     <message>
         <source>Zapping all transactions from wallet...</source>
         <translation>Bezig met het zappen van alle transacties van de portemonnee...</translation>
     </message>
     <message>
-        <source>on startup</source>
-        <translation>bij opstarten</translation>
+        <source>-maxtxfee is set very high! Fees this large could be paid on a single transaction.</source>
+        <translation>-maxtxfee staat zeer hoog! Transactiekosten van deze grootte kunnen worden gebruikt in een enkele transactie.</translation>
     </message>
     <message>
-        <source>wallet.dat corrupt, salvage failed</source>
-        <translation>wallet.dat corrupt, veiligstellen mislukt</translation>
+        <source>Error loading %s: You can't enable HD on an already existing non-HD wallet</source>
+        <translation>Fout bij het laden van %s: Je kan HD niet activeren voor een reeds bestaande niet-HD-portemonnee</translation>
     </message>
     <message>
-        <source>Password for JSON-RPC connections</source>
-        <translation>Wachtwoord voor JSON-RPC-verbindingen</translation>
+        <source>This is the transaction fee you may pay when fee estimates are not available.</source>
+        <translation>Dit is de transactievergoeding die je mogelijk betaalt indien geschatte tarief niet beschikbaar is</translation>
     </message>
     <message>
-        <source>Execute command when the best block changes (%s in cmd is replaced by block hash)</source>
-        <translation>Voer commando uit zodra het beste blok verandert (%s in cmd wordt vervangen door blockhash)</translation>
+        <source>This product includes software developed by the OpenSSL Project for use in the OpenSSL Toolkit %s and cryptographic software written by Eric Young and UPnP software written by Thomas Bernard.</source>
+        <translation>Dit product bevat software dat ontwikkeld is door het OpenSSL Project voor gebruik in de OpenSSL Toolkit %s en cryptografische software geschreven door Eric Young en UPnP software geschreven door Thomas Bernard.</translation>
     </message>
     <message>
-        <source>Upgrade wallet to latest format</source>
-        <translation>Vernieuw portemonnee naar nieuwste versie</translation>
+        <source>Total length of network version string (%i) exceeds maximum length (%i). Reduce the number or size of uacomments.</source>
+        <translation>Totale lengte van netwerkversiestring (%i) overschrijdt maximale lengte (%i). Verminder het aantal of grootte van uacomments.</translation>
     </message>
     <message>
-        <source>Rescan the block chain for missing wallet transactions</source>
-        <translation>Doorzoek de blokketen op ontbrekende portemonnee-transacties</translation>
+        <source>Unsupported argument -socks found. Setting SOCKS version isn't possible anymore, only SOCKS5 proxies are supported.</source>
+        <translation>Niet-ondersteund argument -socks gevonden. Instellen van SOCKS-versie is niet meer mogelijk, alleen SOCKS5-proxies worden ondersteund.</translation>
     </message>
     <message>
-        <source>Use OpenSSL (https) for JSON-RPC connections</source>
-        <translation>Gebruik OpenSSL (https) voor JSON-RPC-verbindingen</translation>
+        <source>Unsupported argument -whitelistalwaysrelay ignored, use -whitelistrelay and/or -whitelistforcerelay.</source>
+        <translation>Niet ondersteund argument -whitelistalwaysrelay genegeerd, gebruik -whitelistrelay en/of -whitelistforcerelay.</translation>
     </message>
     <message>
-        <source>This help message</source>
-        <translation>Dit helpbericht</translation>
+        <source>Warning: Unknown block versions being mined! It's possible unknown rules are in effect</source>
+        <translation>Waarschuwing: Onbekende blok versies worden gemined! Er zijn mogelijk onbekende regels in werking getreden</translation>
     </message>
     <message>
-        <source>Allow DNS lookups for -addnode, -seednode and -connect</source>
-        <translation>Sta DNS-naslag toe voor -addnode, -seednode en -connect</translation>
+        <source>Warning: Wallet file corrupt, data salvaged! Original %s saved as %s in %s; if your balance or transactions are incorrect you should restore from a backup.</source>
+        <translation>Waarschuwing: portemonnee bestand is corrupt, data is veiliggesteld! Originele %s is opgeslagen als %s in %s; als uw balans of transacties incorrect zijn dient u een backup terug te zetten.</translation>
     </message>
     <message>
-        <source>Loading addresses...</source>
-        <translation>Adressen aan het laden...</translation>
+        <source>%s is set very high!</source>
+        <translation>%s is zeer hoog ingesteld!</translation>
     </message>
     <message>
-        <source>Error loading wallet.dat: Wallet corrupted</source>
-        <translation>Fout bij laden wallet.dat: Portemonnee corrupt</translation>
+        <source>Error loading wallet %s. Duplicate -wallet filename specified.</source>
+        <translation>Fout bij laden van portemonnee %s. Duplicaat -wallet bestandsnaam opgegeven.</translation>
     </message>
     <message>
-        <source>(1 = keep tx meta data e.g. account owner and payment request information, 2 = drop tx meta data)</source>
-        <translation>(1 = behoudt tx meta data bijv. account eigenaar en betalingsverzoek informatie, 2. sla tx meta data niet op)</translation>
+        <source>Keypool ran out, please call keypoolrefill first</source>
+        <translation>Keypool op geraakt, roep alsjeblieft eerst keypoolrefill functie aan</translation>
     </message>
     <message>
-        <source>Flush database activity from memory pool to disk log every &lt;n&gt; megabytes (default: %u)</source>
-        <translation>Leeg database-activiteit uit de geheugen pool naar schijf log elke &lt;n&gt; megabytes (standaard: %u) </translation>
+        <source>Starting network threads...</source>
+        <translation>Netwerkthread starten...</translation>
     </message>
     <message>
-        <source>How thorough the block verification of -checkblocks is (0-4, default: %u)</source>
-        <translation>Hoe grondig de blokverificatie van -checkblocks is (0-4, standaard: %u)</translation>
+        <source>The wallet will avoid paying less than the minimum relay fee.</source>
+        <translation>De portemonnee vermijdt minder te betalen dan de minimale doorgeef vergoeding.</translation>
     </message>
     <message>
-        <source>Log transaction priority and fee per kB when mining blocks (default: %u)</source>
-        <translation>Log transactieprioriteit en -kosten per kB bij het mijnen van blokken (standaard: %u)</translation>
+        <source>This is the minimum transaction fee you pay on every transaction.</source>
+        <translation>Dit is de minimum transactievergoeding dat je betaalt op elke transactie.</translation>
     </message>
     <message>
-        <source>Maintain a full transaction index, used by the getrawtransaction rpc call (default: %u)</source>
-        <translation>Onderhoud een volledige transactieindex, gebruikt door de getrawtransaction rpc call (standaard: %u)</translation>
+        <source>This is the transaction fee you will pay if you send a transaction.</source>
+        <translation>Dit is de transactievergoeding dat je betaalt wanneer je een transactie verstuurt.</translation>
     </message>
     <message>
-        <source>Number of seconds to keep misbehaving peers from reconnecting (default: %u)</source>
-        <translation>Aantal seconden dat zich misdragende peers niet opnieuw kunnen verbinden (standaard: %u)</translation>
+        <source>Transaction amounts must not be negative</source>
+        <translation>Transactiebedragen moeten positief zijn</translation>
     </message>
     <message>
-        <source>Output debugging information (default: %u, supplying &lt;category&gt; is optional)</source>
-        <translation>Output extra debugginginformatie (standaard: %u, het leveren van &lt;category&gt; is optioneel)</translation>
+        <source>Transaction has too long of a mempool chain</source>
+        <translation>Transactie heeft een te lange mempoolketen</translation>
     </message>
     <message>
-        <source>Use separate SOCKS5 proxy to reach peers via Tor hidden services (default: %s)</source>
-        <translation>Gebruik een aparte SOCKS5 proxy om 'Tor hidden services' te bereiken (standaard: %s)</translation>
-    </message>
-    <message>
-        <source>Acceptable ciphers (default: %s)</source>
-        <translation>Geaccepteerde versleutelingen (standaard: %s)</translation>
-    </message>
-    <message>
-        <source>Always query for peer addresses via DNS lookup (default: %u)</source>
-        <translation>Vind anderen door middel van een DNS-naslag (standaard: %u)</translation>
-    </message>
-    <message>
-        <source>Disable safemode, override a real safe mode event (default: %u)</source>
-        <translation>Veilige modus uitschakelen, hef een echte veilige modus gebeurtenis uit (default: %u)</translation>
-    </message>
-    <message>
-        <source>Error loading wallet.dat</source>
-        <translation>Fout bij laden wallet.dat</translation>
-    </message>
-    <message>
-        <source>Force safe mode (default: %u)</source>
-        <translation>Forceer veilige modus (default: %u)</translation>
-    </message>
-    <message>
-        <source>Generate coins (default: %u)</source>
-        <translation>Genereer munten (standaard: %u)</translation>
-    </message>
-    <message>
-        <source>How many blocks to check at startup (default: %u, 0 = all)</source>
-        <translation>Aantal te checken blokken bij het opstarten (standaard: %u, 0 = allemaal)</translation>
-    </message>
-    <message>
-        <source>Include IP addresses in debug output (default: %u)</source>
-        <translation>IP-adressen toevoegen in de debuguitvoer (standaard: %u)</translation>
-    </message>
-    <message>
-        <source>Invalid -proxy address: '%s'</source>
-        <translation>Ongeldig -proxy adres: '%s'</translation>
-    </message>
-    <message>
-        <source>Limit size of signature cache to &lt;n&gt; entries (default: %u)</source>
-        <translation>Limiteer grootte van de handtekening cache tot &lt;n&gt; entries (default: %u)</translation>
-    </message>
-    <message>
-        <source>Listen for JSON-RPC connections on &lt;port&gt; (default: %u or testnet: %u)</source>
-        <translation>Luister naar JSON-RPC-verbindingen op poort &lt;port&gt; (standaard: %u of testnet: %u)</translation>
-    </message>
-    <message>
-        <source>Listen for connections on &lt;port&gt; (default: %u or testnet: %u)</source>
-        <translation>Luister naar verbindingen op &lt;poort&gt; (standaard: %u of testnet: %u)</translation>
-    </message>
-    <message>
-        <source>Maintain at most &lt;n&gt; connections to peers (default: %u)</source>
-        <translation>Onderhoud maximaal &lt;n&gt; verbindingen naar peers (standaard: %u)</translation>
-    </message>
-    <message>
-        <source>Maximum per-connection receive buffer, &lt;n&gt;*1000 bytes (default: %u)</source>
-        <translation>Maximum per-connectie ontvangstbuffer, &lt;n&gt;*1000 bytes (standaard: %u)</translation>
-    </message>
-    <message>
-        <source>Maximum per-connection send buffer, &lt;n&gt;*1000 bytes (default: %u)</source>
-        <translation>Maximum per-connectie zendbuffer, &lt;n&gt;*1000 bytes (standaard: %u)</translation>
-    </message>
-    <message>
-        <source>Only accept block chain matching built-in checkpoints (default: %u)</source>
-        <translation>Accepteer alleen blokkenketen die overeenkomt met de ingebouwde checkpoints (standaard: %u)</translation>
-    </message>
-    <message>
-        <source>Prepend debug output with timestamp (default: %u)</source>
-        <translation>Prepend debug output met tijdstempel (standaard: %u)</translation>
-    </message>
-    <message>
-        <source>Relay and mine data carrier transactions (default: %u)</source>
-        <translation>Gegevensdrager transacties relay en de mijnen (default: %u)</translation>
-    </message>
-    <message>
-        <source>Relay non-P2SH multisig (default: %u)</source>
-        <translation>Relay non-P2SH multisig (default: %u)</translation>
-    </message>
-    <message>
-        <source>Run a thread to flush wallet periodically (default: %u)</source>
-        <translation>Draai een proces om de wallet periodiek te flushen (default: %u)</translation>
-    </message>
-    <message>
-        <source>Server certificate file (default: %s)</source>
-        <translation>Certificaat-bestand voor server (standaard: %s)</translation>
-    </message>
-    <message>
-        <source>Server private key (default: %s)</source>
-        <translation>Geheime sleutel voor server (standaard: %s)</translation>
-    </message>
-    <message>
-        <source>Set key pool size to &lt;n&gt; (default: %u)</source>
-        <translation>Stel sleutelpoelgrootte in op &lt;&amp;&gt; (standaard: %u)</translation>
-    </message>
-    <message>
-        <source>Set minimum block size in bytes (default: %u)</source>
-        <translation>Stel minimum blokgrootte in in bytes (standaard: %u)</translation>
-    </message>
-    <message>
-        <source>Set the number of threads to service RPC calls (default: %d)</source>
-        <translation>Stel het aantal threads in om RPC-aanvragen mee te bedienen (standaard: %d)</translation>
-    </message>
-    <message>
-        <source>Sets the DB_PRIVATE flag in the wallet db environment (default: %u)</source>
-        <translation>Plaatst de DB_PRIVATE vlag in de wallet db omgeving (default: %u)</translation>
-    </message>
-    <message>
-        <source>Specify configuration file (default: %s)</source>
-        <translation>Specificeer configuratie bestand (standaard: %s)</translation>
-    </message>
-    <message>
-        <source>Specify connection timeout in milliseconds (minimum: 1, default: %d)</source>
-        <translation>Specificeer de time-out tijd in milliseconden (minimum: 1, standaard: %d)</translation>
-    </message>
-    <message>
-        <source>Specify pid file (default: %s)</source>
-        <translation>Specificeer pid-bestand (standaard: %s)</translation>
-    </message>
-    <message>
-        <source>Spend unconfirmed change when sending transactions (default: %u)</source>
-        <translation>Besteed onbevestigd wisselgeld bij het versturen van transacties (standaard: %u)</translation>
-    </message>
-    <message>
-        <source>Stop running after importing blocks from disk (default: %u)</source>
-        <translation>Stop uitvoeren na het importeren van blokken van de schijf (standaard: %u)</translation>
-    </message>
-    <message>
-        <source>Threshold for disconnecting misbehaving peers (default: %u)</source>
-        <translation>Drempel om verbinding te verbreken naar zich misdragende peers (standaard: %u)</translation>
+        <source>Transaction must have at least one recipient</source>
+        <translation>Transactie moet ten minste één ontvanger hebben</translation>
     </message>
     <message>
         <source>Unknown network specified in -onlynet: '%s'</source>
         <translation>Onbekend netwerk gespecificeerd in -onlynet: '%s'</translation>
     </message>
     <message>
-        <source>Cannot resolve -bind address: '%s'</source>
-        <translation>Kan -bind adres niet herleiden: '%s'</translation>
-    </message>
-    <message>
-        <source>Cannot resolve -externalip address: '%s'</source>
-        <translation>Kan -externlip adres niet herleiden: '%s'</translation>
-    </message>
-    <message>
-        <source>Invalid amount for -paytxfee=&lt;amount&gt;: '%s'</source>
-        <translation>Ongeldig bedrag voor -paytxfee=&lt;bedrag&gt;: '%s'</translation>
-    </message>
-    <message>
         <source>Insufficient funds</source>
         <translation>Ontoereikend saldo</translation>
     </message>
     <message>
-        <source>Loading block index...</source>
-        <translation>Blokindex aan het laden...</translation>
+        <source>Can't generate a change-address key. Private keys are disabled for this wallet.</source>
+        <translation>Kan geen sleutel genereren voor een wisselgeldadres. Geheime sleutels zijn uitgeschakeld voor deze portemonnee.</translation>
     </message>
     <message>
-        <source>Add a node to connect to and attempt to keep the connection open</source>
-        <translation>Voeg een node om naar te verbinden toe en probeer de verbinding open te houden</translation>
+        <source>Cannot upgrade a non HD split wallet without upgrading to support pre split keypool. Please use -upgradewallet=169900 or -upgradewallet with no version specified.</source>
+        <translation>Het is niet mogelijk een non HD split portemonnee te upgraden zonder pre split keypool te ondersteunen. Gebruik -upgradewallet=169900 of -upgradewallet zonder een specifiek versie nummer.</translation>
+    </message>
+    <message>
+        <source>Fee estimation failed. Fallbackfee is disabled. Wait a few blocks or enable -fallbackfee.</source>
+        <translation>Het inschatten van de vergoeding is gefaald. Fallbackfee is uitgeschakeld. Wacht een aantal blocks of schakel -fallbackfee in.</translation>
+    </message>
+    <message>
+        <source>Warning: Private keys detected in wallet {%s} with disabled private keys</source>
+        <translation>Waarschuwing: Geheime sleutels gedetecteerd in portemonnee {%s} met uitgeschakelde geheime sleutels</translation>
+    </message>
+    <message>
+        <source>Cannot write to data directory '%s'; check permissions.</source>
+        <translation>Mag niet schrijven naar gegevensmap '%s'; controleer bestandsrechten.</translation>
+    </message>
+    <message>
+        <source>Loading block index...</source>
+        <translation>Blokindex aan het laden...</translation>
     </message>
     <message>
         <source>Loading wallet...</source>
@@ -3544,12 +3656,8 @@ Voorbeeld: alertnotify=echo %%s | mail -s "Litecoin Alert" admin@foo.com
         <translation>Kan portemonnee niet downgraden</translation>
     </message>
     <message>
-        <source>Cannot write default address</source>
-        <translation>Kan standaardadres niet schrijven</translation>
-    </message>
-    <message>
         <source>Rescanning...</source>
-        <translation>Blokketen aan het doorzoeken...</translation>
+        <translation>Blokketen aan het herscannen...</translation>
     </message>
     <message>
         <source>Done loading</source>
