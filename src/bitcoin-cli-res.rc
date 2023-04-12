@@ -17,11 +17,11 @@ BEGIN
         BLOCK "040904E4" // U.S. English - multilingual (hex)
         BEGIN
             VALUE "CompanyName",        "Marscoin"
-            VALUE "FileDescription",    "Marscoin-cli (OSS RPC client for Marscoin)"
+            VALUE "FileDescription",    "marscoin-cli (JSON-RPC client for " PACKAGE_NAME ")"
             VALUE "FileVersion",        VER_FILEVERSION_STR
             VALUE "InternalName",       "marscoin-cli"
             VALUE "LegalCopyright",     COPYRIGHT_STR
-            VALUE "LegalTrademarks1",   "Distributed under the MIT/X11 software license, see the accompanying file COPYING or http://www.opensource.org/licenses/mit-license.php."
+            VALUE "LegalTrademarks1",   "Distributed under the MIT software license, see the accompanying file COPYING or http://www.opensource.org/licenses/mit-license.php."
             VALUE "OriginalFilename",   "marscoin-cli.exe"
             VALUE "ProductName",        "marscoin-cli"
             VALUE "ProductVersion",     VER_PRODUCTVERSION_STR

@@ -17,13 +17,13 @@ BEGIN
         BLOCK "040904E4" // U.S. English - multilingual (hex)
         BEGIN
             VALUE "CompanyName",        "Marscoin"
-            VALUE "FileDescription",    "Marscoind (OSS daemon/client for Marscoin)"
+            VALUE "FileDescription",    "marscoind (marscoin node with a JSON-RPC server)"
             VALUE "FileVersion",        VER_FILEVERSION_STR
-            VALUE "InternalName",       "litecoind"
+            VALUE "InternalName",       "marscoind"
             VALUE "LegalCopyright",     COPYRIGHT_STR
-            VALUE "LegalTrademarks1",   "Distributed under the MIT/X11 software license, see the accompanying file COPYING or http://www.opensource.org/licenses/mit-license.php."
-            VALUE "OriginalFilename",   "litecoind.exe"
-            VALUE "ProductName",        "Marscoind"
+            VALUE "LegalTrademarks1",   "Distributed under the MIT software license, see the accompanying file COPYING or http://www.opensource.org/licenses/mit-license.php."
+            VALUE "OriginalFilename",   "marscoind.exe"
+            VALUE "ProductName",        "marscoind"
             VALUE "ProductVersion",     VER_PRODUCTVERSION_STR
         END
     END
