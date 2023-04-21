@@ -15,19 +15,19 @@ unsigned int GetNextWorkRequired(const CBlockIndex* pindexLast, const CBlockHead
 {
     assert(pindexLast != nullptr);
     int DiffMode = 1;
-        if(! Params().RequireStandard() ){
-                if (pindexLast->nHeight+1 >= 15) { DiffMode = 1; }
-                else if (pindexLast->nHeight+1 >= 5) { DiffMode = 1; }
-        }
-        else {
+        // if(! params.NetworkIDString() == "main" ){
+        //         if (pindexLast->nHeight+1 >= 15) { DiffMode = 1; }
+        //         else if (pindexLast->nHeight+1 >= 5) { DiffMode = 1; }
+        // }
+        // else {
                 if (pindexLast->nHeight+1 >= 120000) { DiffMode = 4; }
                 if (pindexLast->nHeight+1 >= 126000) { DiffMode = 5; }
 
-        }
-        if (DiffMode == 1) { return GetNextWorkRequired_V1(pindexLast, pblock); }
-        else if (DiffMode == 4) { return DarkGravityWave2(pindexLast, pblock); }
-        else if (DiffMode == 5) { return DarkGravityWave3(pindexLast, pblock); }
-    return DarkGravityWave3(pindexLast, pindexFirst->GetBlockTime(), params);
+        //}
+        if (DiffMode == 1) { return GetNextWorkRequired_V1(pindexLast, pblock, params); }
+        else if (DiffMode == 4) { return DarkGravityWave2(pindexLast, pblock, params); }
+        else if (DiffMode == 5) { return DarkGravityWave3(pindexLast, pblock, params); }
+    return DarkGravityWave3(pindexLast, pblock, params);
 }
 
 unsigned int GetNextWorkRequired_V1(const CBlockIndex* pindexLast, const CBlockHeader *pblock, const Consensus::Params& params)
@@ -39,10 +39,10 @@ unsigned int GetNextWorkRequired_V1(const CBlockIndex* pindexLast, const CBlockH
     if (pindexLast == NULL)
         return nProofOfWorkLimit;
 
-
+    int nHeight = pindexLast->nHeight + 1;
     int64_t nTargetSpacing = params.nPowTargetSpacing;
     int64_t nTargetTimespan = params.nPowTargetTimespan;
-    int64_t nInterval = params.nInterval;
+    int64_t nInterval = params.DifficultyAdjustmentInterval();
 
     // Marscoin: 1 sol (every Mars sol retarget)
     int nForkOne = 14260;
@@ -110,7 +110,7 @@ unsigned int CalculateNextWorkRequired(const CBlockIndex* pindexLast, int64_t nF
     int nHeight = pindexLast->nHeight + 1;
     int64_t nTargetSpacing = params.nPowTargetSpacing;
     int64_t nTargetTimespan = params.nPowTargetTimespan;
-    int64_t nInterval = params.nInterval;
+    int64_t nInterval = params.DifficultyAdjustmentInterval();
 
     // Marscoin: 1 sol (every Mars sol retarget)
     int nForkOne = 14260;
@@ -155,10 +155,10 @@ unsigned int CalculateNextWorkRequired(const CBlockIndex* pindexLast, int64_t nF
         bnNew = bnPowLimit;
 
     /// debug print
-    LogPrintf("GetNextWorkRequired RETARGET\n");
-    LogPrintf("Params().TargetTimespan() = %d    nActualTimespan = %d\n", nTargetTimespan, nActualTimespan);
-    LogPrintf("Before: %08x  %s\n", pindexLast->nBits, bnOld.ToString());
-    LogPrintf("After:  %08x  %s\n", bnNew.GetCompact(), bnNew.ToString());
+//    LogPrintf("GetNextWorkRequired RETARGET\n");
+//    LogPrintf("Params().TargetTimespan() = %d    nActualTimespan = %d\n", nTargetTimespan, nActualTimespan);
+//    LogPrintf("Before: %08x  %s\n", pindexLast->nBits, bnOld.ToString());
+//    LogPrintf("After:  %08x  %s\n", bnNew.GetCompact(), bnNew.ToString());
 
     return bnNew.GetCompact();
 }
@@ -185,25 +185,11 @@ bool CheckProofOfWork(uint256 hash, unsigned int nBits, const Consensus::Params&
 
 
 
-uint256 GetBlockProof(const CBlockIndex& block)
-{
-    uint256 bnTarget;
-    bool fNegative;
-    bool fOverflow;
-    bnTarget.SetCompact(block.nBits, &fNegative, &fOverflow);
-    if (fNegative || fOverflow || bnTarget == 0)
-        return 0;
-    // We need to compute 2**256 / (bnTarget+1), but we can't represent 2**256
-    // as it's too large for a uint256. However, as 2**256 is at least as large
-    // as bnTarget+1, it is equal to ((2**256 - bnTarget - 1) / (bnTarget+1)) + 1,
-    // or ~bnTarget / (nTarget+1) + 1.
-    return (~bnTarget / (bnTarget + 1)) + 1;
-}
 
 //original
-unsigned int DarkGravityWave2(const CBlockIndex* pindexLast, int64_t nFirstBlockTime, const Consensus::Params& params)
+unsigned int DarkGravityWave2(const CBlockIndex* pindexLast, const CBlockHeader *pblock, const Consensus::Params& params)
 {
-    /* current difficulty formula, darkcoin - DarkGravity v2, written by Evan Duffield - evan@darkcoin.io */
+    /* current difficulty formula, darkcoin / dash - DarkGravity v2, written by Evan Duffield -  */
     const CBlockIndex *BlockLastSolved = pindexLast;
     const CBlockIndex *BlockReading = pindexLast;
     const CBlockHeader *BlockCreating = pblock;
@@ -219,12 +205,15 @@ unsigned int DarkGravityWave2(const CBlockIndex* pindexLast, int64_t nFirstBlock
     int64_t CountBlocks = 0;
     arith_uint256 PastDifficultyAverage;
     arith_uint256 PastDifficultyAveragePrev;
-    LogPrintf("GravityWave2===================================\n");
+    //LogPrintf("GravityWave2===================================\n");
     int64_t nTargetSpacing = 123; //Marscoin: 2 Mars-minutes. 1 Mars-second is 61.649486615 seconds
 
-    if (BlockLastSolved == NULL || BlockLastSolved->nHeight == 0 || BlockLastSolved->nHeight < PastBlocksMin) { return Params().ProofOfWorkLimit().GetCompact(); }
+    //LogPrintf("powLimit: %i\n", UintToArith256(params.powLimit).GetCompact());
+    if (BlockLastSolved == NULL || BlockLastSolved->nHeight == 0 || BlockLastSolved->nHeight < PastBlocksMin) { return UintToArith256(params.powLimit).GetCompact(); }
 
-    for (unsigned int i = 1; BlockReading && BlockReading->nHeight > 0; i++) {
+    //LogPrintf("GravityWave2 setup complete\n");
+    for (unsigned int i = 1; BlockReading && BlockReading->nHeight > 0; i++) 
+    {
         if (PastBlocksMax > 0 && i > PastBlocksMax) { break; }
         CountBlocks++;
 
@@ -232,65 +221,102 @@ unsigned int DarkGravityWave2(const CBlockIndex* pindexLast, int64_t nFirstBlock
         {
             if (CountBlocks == 1) { 
                 PastDifficultyAverage.SetCompact(BlockReading->nBits); 
+                //LogPrintf("Count1: PastDifficultyAvg: %i\n", arith_uint256(PastDifficultyAverage).GetCompact());
             }
             
             else 
             { 
-                PastDifficultyAverage = ( ( arith_uint256().SetCompact(BlockReading->nBits) - PastDifficultyAveragePrev) / CountBlocks) + PastDifficultyAveragePrev; 
+                //PastDifficultyAverage = ( ( arith_uint256().SetCompact(BlockReading->nBits) - PastDifficultyAveragePrev) / CountBlocks) + PastDifficultyAveragePrev; 
+                PastDifficultyAverage = ((PastDifficultyAveragePrev * CountBlocks) + (arith_uint256().SetCompact(BlockReading->nBits))) / (CountBlocks + 1);
+//                LogPrintf("Part0: %i\n", BlockReading->nBits);
+//                LogPrintf("Part1: %i\n", arith_uint256().SetCompact(BlockReading->nBits).GetCompact());
+//                LogPrintf("Part2 (minus): %i\n", PastDifficultyAveragePrev.GetCompact());
+//                LogPrintf("Part3 (minus): %i\n", CountBlocks);
+//                LogPrintf("Part4 (minus): %i\n", PastDifficultyAveragePrev.GetCompact());
+//                LogPrintf("Sum Part 1: %i\n", arith_uint256( arith_uint256().SetCompact(BlockReading->nBits) - PastDifficultyAveragePrev).GetCompact()  );
+//                LogPrintf("Sum Part 2: %i\n", PastDifficultyAveragePrev.GetCompact());
+//                LogPrintf("Else: PastDifficultyAvg: %i\n", arith_uint256(PastDifficultyAverage).GetCompact());
+//                LogPrintf("Else: PastDifficultyAvgPrev: %i\n", arith_uint256(PastDifficultyAveragePrev).GetCompact());
             }
             PastDifficultyAveragePrev = PastDifficultyAverage;
         }
+        //LogPrintf("PastDifficultyAvg: %i\n", arith_uint256(PastDifficultyAveragePrev).GetCompact());
 
         if(LastBlockTime > 0){
             int64_t Diff = (LastBlockTime - BlockReading->GetBlockTime());
             if(nBlockTimeCount <= PastBlocksMin) {
                 nBlockTimeCount++;
-
                 if (nBlockTimeCount == 1) { nBlockTimeAverage = Diff; }
                 else { nBlockTimeAverage = ((Diff - nBlockTimeAveragePrev) / nBlockTimeCount) + nBlockTimeAveragePrev; }
                 nBlockTimeAveragePrev = nBlockTimeAverage;
             }
             nBlockTimeCount2++;
             nBlockTimeSum2 += Diff;
+            //LogPrintf("PastDifficultyAvg: %i\n", arith_uint256(PastDifficultyAveragePrev).GetCompact());
         }
         LastBlockTime = BlockReading->GetBlockTime();
 
         if (BlockReading->pprev == NULL) { assert(BlockReading); break; }
         BlockReading = BlockReading->pprev;
     }
+    //LogPrintf("BlocktimeAvg: %i \n", nBlockTimeAveragePrev);
 
     arith_uint256 bnNew(PastDifficultyAverage);
-    if (nBlockTimeCount != 0 && nBlockTimeCount2 != 0) {
+    //LogPrintf("bnNew Setup: %i \n", bnNew.GetCompact());
+    if (nBlockTimeCount != 0 && nBlockTimeCount2 != 0) 
+    {
+//            LogPrintf("nBlockTimeAverage: %d \n", nBlockTimeAverage);
+//            LogPrintf("nBlockTimeSum2: %d \n", nBlockTimeSum2);
+//            LogPrintf("nBlockTimeCount2: %d \n", nBlockTimeCount2);
+            
             double SmartAverage = ((((long double)nBlockTimeAverage)*0.7)+(((long double)nBlockTimeSum2 / (long double)nBlockTimeCount2)*0.3));
+            //LogPrintf("SmartAverage: %d \n", SmartAverage);
+            
             if(SmartAverage < 1) SmartAverage = 1;
             
+            //LogPrintf("TargetSpacing1: %d \n", nTargetSpacing);
+            
             double Shift = nTargetSpacing/SmartAverage;
+            //LogPrintf("Shift: %d \n", Shift);
             
             double fActualTimespan = ((long double)CountBlocks*(double)nTargetSpacing)/Shift;
             double fTargetTimespan = ((long double)CountBlocks*(double)nTargetSpacing);
             
-            if (fActualTimespan < fTargetTimespan/3)
+            //LogPrintf("fActualTimespan: %d \n", fActualTimespan);
+            //LogPrintf("fTargetTimespan: %d \n", fTargetTimespan);
+            
+            if (fActualTimespan < fTargetTimespan/3){
                 fActualTimespan = fTargetTimespan/3;
+                //LogPrintf("I guess it's this time of the year");
+            }
             if (fActualTimespan > fTargetTimespan*3)
                 fActualTimespan = fTargetTimespan*3;
 
+            //LogPrintf("bnNew before application: %i \n", bnNew.GetCompact());
             int64_t nActualTimespan = fActualTimespan;
             int64_t nTargetTimespan = fTargetTimespan;
+            //LogPrintf("nActualTimespan: %d \n", nActualTimespan);
+            //LogPrintf("nTargetTimespan: %d \n", nTargetTimespan);
 
             // Retarget
             bnNew *= nActualTimespan;
+            //LogPrintf("Retarget1: %i using nActualTimespan %i \n", bnNew.GetCompact(), nActualTimespan);
             bnNew /= nTargetTimespan;
+            //LogPrintf("Retarget2: %i using nTargetTimespan %i \n", bnNew.GetCompact(), nTargetTimespan);
     }
+    //LogPrintf("GravityWave2 calculation complete\n");
+    //LogPrintf("bnNew: %i > %i \n", bnNew.GetCompact(), UintToArith256(params.powLimit).GetCompact());
 
     if (bnNew.GetCompact() > UintToArith256(params.powLimit).GetCompact()){
         bnNew.SetCompact(UintToArith256(params.powLimit).GetCompact());
+        //LogPrintf("PowLimit: %i\n", bnNew.GetCompact());
     }
 
     return bnNew.GetCompact();
 }
 
 
-unsigned int DarkGravityWave3(const CBlockIndex* pindexLast, int64_t nFirstBlockTime, const Consensus::Params& params)
+unsigned int DarkGravityWave3(const CBlockIndex* pindexLast, const CBlockHeader *pblock, const Consensus::Params& params)
 {
     /* current difficulty formula, darkcoin - DarkGravity v3, written by Evan Duffield - evan@darkcoin.io */
     const CBlockIndex *BlockLastSolved = pindexLast;
@@ -304,13 +330,13 @@ unsigned int DarkGravityWave3(const CBlockIndex* pindexLast, int64_t nFirstBlock
     int64_t CountBlocks = 0;
     arith_uint256 PastDifficultyAverage;
     arith_uint256 PastDifficultyAveragePrev;
-    LogPrintf("GravityWave3===================================\n");
-    int64_t nTargetSpacing = Params().TargetSpacing();
+    //LogPrintf("GravityWave3===================================\n");
+    int64_t nTargetSpacing = params.nPowTargetSpacing;
     int64_t nTargetTimespan = 88775; //Marscoin: 1 Mars-day has 88775 seconds
     nTargetSpacing = 123; //Marscoin: 2 Mars-minutes. 1 Mars-second is 61.649486615 seconds
 
     if (BlockLastSolved == NULL || BlockLastSolved->nHeight == 0 || BlockLastSolved->nHeight < PastBlocksMin) {
-        return Params().ProofOfWorkLimit().GetCompact();
+        return UintToArith256(params.powLimit).GetCompact();
     }
 
     for (unsigned int i = 1; BlockReading && BlockReading->nHeight > 0; i++) {
@@ -324,7 +350,7 @@ unsigned int DarkGravityWave3(const CBlockIndex* pindexLast, int64_t nFirstBlock
         }
 
         if(LastBlockTime > 0){
-            int64 Diff = (LastBlockTime - BlockReading->GetBlockTime());
+            int64_t Diff = (LastBlockTime - BlockReading->GetBlockTime());
             nActualTimespan += Diff;
         }
         LastBlockTime = BlockReading->GetBlockTime();

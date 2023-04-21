@@ -17,13 +17,13 @@
   <string>APPL</string>
 
   <key>CFBundleGetInfoString</key>
-  <string>1.7.1, Copyright © 2014-2023 The Marscoin developers</string>
+  <string>1.7.0, Copyright © 2009-2023 _COPYRIGHT_HOLDERS</string>
 
   <key>CFBundleShortVersionString</key>
-  <string>1.7.1</string>
+  <string>1.7.0</string>
 
   <key>CFBundleVersion</key>
-  <string>0.17.1</string>
+  <string>1.7.0</string>
 
   <key>CFBundleSignature</key>
   <string>????</string>
@@ -49,7 +49,7 @@
       <string>org.marscoin.MarscoinPayment</string>
       <key>CFBundleURLSchemes</key>
       <array>
-        <string>marscoind</string>
+        <string>marscoin</string>
       </array>
     </dict>
   </array>
