@@ -1,24 +1,30 @@
-// Copyright (c) 2011-2013 The Bitcoin developers
-// Distributed under the MIT/X11 software license, see the accompanying
+// Copyright (c) 2011-2018 The Bitcoin Core developers
+// Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #ifndef BITCOIN_QT_GUIUTIL_H
 #define BITCOIN_QT_GUIUTIL_H
 
-#include "amount.h"
+#include <amount.h>
+#include <fs.h>
 
 #include <QEvent>
 #include <QHeaderView>
+#include <QItemDelegate>
 #include <QMessageBox>
 #include <QObject>
 #include <QProgressBar>
 #include <QString>
 #include <QTableView>
-
-#include <boost/filesystem.hpp>
+#include <QLabel>
 
 class QValidatedLineEdit;
 class SendCoinsRecipient;
+
+namespace interfaces
+{
+    class Node;
+}
 
 QT_BEGIN_NAMESPACE
 class QAbstractItemView;
@@ -37,20 +43,19 @@ namespace GUIUtil
     QString dateTimeStr(const QDateTime &datetime);
     QString dateTimeStr(qint64 nTime);
 
-    // Render Bitcoin addresses in monospace font
-    QFont bitcoinAddressFont();
+    // Return a monospace font
+    QFont fixedPitchFont();
 
-    // Set up widgets for address and amounts
+    // Set up widget for address
     void setupAddressWidget(QValidatedLineEdit *widget, QWidget *parent);
-    void setupAmountWidget(QLineEdit *widget, QWidget *parent);
 
     // Parse "bitcoin:" URI into recipient object, return true on successful parsing
-    bool parseMarscoinURI(const QUrl &uri, SendCoinsRecipient *out);
-    bool parseMarscoinURI(QString uri, SendCoinsRecipient *out);
+    bool parseBitcoinURI(const QUrl &uri, SendCoinsRecipient *out);
+    bool parseBitcoinURI(QString uri, SendCoinsRecipient *out);
     QString formatBitcoinURI(const SendCoinsRecipient &info);
 
     // Returns true if given address+amount meets "dust" definition
-    bool isDust(const QString& address, const CAmount& amount);
+    bool isDust(interfaces::Node& node, const QString& address, const CAmount& amount);
 
     // HTML escaping for rich text controls
     QString HtmlEscape(const QString& str, bool fMultiLine=false);
@@ -63,6 +68,13 @@ namespace GUIUtil
        @see  TransactionView::copyLabel, TransactionView::copyAmount, TransactionView::copyAddress
      */
     void copyEntryData(QAbstractItemView *view, int column, int role=Qt::EditRole);
+
+    /** Return a field of the currently selected entry as a QString. Does nothing if nothing
+        is selected.
+       @param[in] column  Data column to extract from the model
+       @see  TransactionView::copyLabel, TransactionView::copyAmount, TransactionView::copyAddress
+     */
+    QList<QModelIndex> getEntryData(QAbstractItemView *view, int column);
 
     void setClipboard(const QString& str);
 
@@ -106,8 +118,8 @@ namespace GUIUtil
     // Open debug.log
     void openDebugLogfile();
 
-    // Replace invalid default fonts with known good ones
-    void SubstituteFonts(const QString& language);
+    // Open the config file
+    bool openBitcoinConf();
 
     /** Qt event filter that intercepts ToolTipChange events, and replaces the tooltip with a rich text
       representation if needed. This assures that Qt can word-wrap long tooltip messages.
@@ -131,8 +143,8 @@ namespace GUIUtil
      * Makes a QTableView last column feel as if it was being resized from its left border.
      * Also makes sure the column widths are never larger than the table's viewport.
      * In Qt, all columns are resizable from the right, but it's not intuitive resizing the last column from the right.
-     * Usually our second to last columns behave as if stretched, and when on strech mode, columns aren't resizable
-     * interactively or programatically.
+     * Usually our second to last columns behave as if stretched, and when on stretch mode, columns aren't resizable
+     * interactively or programmatically.
      *
      * This helper object takes care of this issue.
      *
@@ -142,7 +154,7 @@ namespace GUIUtil
         Q_OBJECT
 
         public:
-            TableViewLastColumnResizingFixer(QTableView* table, int lastColMinimumWidth, int allColsMinimumWidth);
+            TableViewLastColumnResizingFixer(QTableView* table, int lastColMinimumWidth, int allColsMinimumWidth, QObject *parent);
             void stretchColumnWidth(int column);
 
         private:
@@ -161,7 +173,7 @@ namespace GUIUtil
             void setViewHeaderResizeMode(int logicalIndex, QHeaderView::ResizeMode resizeMode);
             void resizeColumn(int nColumnIndex, int width);
 
-        private slots:
+        private Q_SLOTS:
             void on_sectionResized(int logicalIndex, int oldSize, int newSize);
             void on_geometriesChanged();
     };
@@ -169,16 +181,11 @@ namespace GUIUtil
     bool GetStartOnSystemStartup();
     bool SetStartOnSystemStartup(bool fAutoStart);
 
-    /** Save window size and position */
-    void saveWindowGeometry(const QString& strSetting, QWidget *parent);
-    /** Restore window size and position */
-    void restoreWindowGeometry(const QString& strSetting, const QSize &defaultSizeIn, QWidget *parent);
-
     /* Convert QString to OS specific boost path through UTF-8 */
-    boost::filesystem::path qstringToBoostPath(const QString &path);
+    fs::path qstringToBoostPath(const QString &path);
 
     /* Convert OS specific boost path to QString through UTF-8 */
-    QString boostPathToQString(const boost::filesystem::path &path);
+    QString boostPathToQString(const fs::path &path);
 
     /* Convert seconds into a QString with days, hours, mins, secs */
     QString formatDurationStr(int secs);
@@ -188,21 +195,56 @@ namespace GUIUtil
 
     /* Format a CNodeCombinedStats.dPingTime into a user-readable string or display N/A, if 0*/
     QString formatPingTime(double dPingTime);
-    
-#if defined(Q_OS_MAC) && QT_VERSION >= 0x050000
-    // workaround for Qt OSX Bug:
-    // https://bugreports.qt-project.org/browse/QTBUG-15631
-    // QProgressBar uses around 10% CPU even when app is in background
-    class ProgressBar : public QProgressBar
+
+    /* Format a CNodeCombinedStats.nTimeOffset into a user-readable string. */
+    QString formatTimeOffset(int64_t nTimeOffset);
+
+    QString formatNiceTimeOffset(qint64 secs);
+
+    QString formatBytes(uint64_t bytes);
+
+    qreal calculateIdealFontSize(int width, const QString& text, QFont font, qreal minPointSize = 4, qreal startPointSize = 14);
+
+    class ClickableLabel : public QLabel
     {
-        bool event(QEvent *e) {
-            return (e->type() != QEvent::StyleAnimationUpdate) ? QProgressBar::event(e) : false;
-        }
+        Q_OBJECT
+
+    Q_SIGNALS:
+        /** Emitted when the label is clicked. The relative mouse coordinates of the click are
+         * passed to the signal.
+         */
+        void clicked(const QPoint& point);
+    protected:
+        void mouseReleaseEvent(QMouseEvent *event);
     };
-#else
-    typedef QProgressBar ProgressBar;
-#endif
-    
+
+    class ClickableProgressBar : public QProgressBar
+    {
+        Q_OBJECT
+
+    Q_SIGNALS:
+        /** Emitted when the progressbar is clicked. The relative mouse coordinates of the click are
+         * passed to the signal.
+         */
+        void clicked(const QPoint& point);
+    protected:
+        void mouseReleaseEvent(QMouseEvent *event);
+    };
+
+    typedef ClickableProgressBar ProgressBar;
+
+    class ItemDelegate : public QItemDelegate
+    {
+        Q_OBJECT
+    public:
+        ItemDelegate(QObject* parent) : QItemDelegate(parent) {}
+
+    Q_SIGNALS:
+        void keyEscapePressed();
+
+    private:
+        bool eventFilter(QObject *object, QEvent *event);
+    };
 } // namespace GUIUtil
 
 #endif // BITCOIN_QT_GUIUTIL_H

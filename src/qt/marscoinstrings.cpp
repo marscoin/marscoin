@@ -49,7 +49,7 @@ QT_TRANSLATE_NOOP("marscoin-core", ""
 "Execute command when the best block changes (%s in cmd is replaced by block "
 "hash)"),
 QT_TRANSLATE_NOOP("marscoin-core", ""
-"Listen for JSON-RPC connections on <port> (default: 9332 or testnet: 19332)"),
+"Listen for JSON-RPC connections on <port> (default: 8339 or testnet: 18339)"),
 QT_TRANSLATE_NOOP("marscoin-core", ""
 "Number of seconds to keep misbehaving peers from reconnecting (default: "
 "86400)"),

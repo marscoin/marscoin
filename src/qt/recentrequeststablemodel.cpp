@@ -1,27 +1,26 @@
-// Copyright (c) 2011-2014 The Bitcoin developers
-// Distributed under the MIT/X11 software license, see the accompanying
+// Copyright (c) 2011-2018 The Bitcoin Core developers
+// Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#include "recentrequeststablemodel.h"
+#include <qt/recentrequeststablemodel.h>
 
-#include "bitcoinunits.h"
-#include "clientversion.h"
-#include "guiutil.h"
-#include "optionsmodel.h"
-#include "streams.h"
+#include <qt/bitcoinunits.h>
+#include <qt/guiutil.h>
+#include <qt/optionsmodel.h>
 
-#include <boost/foreach.hpp>
+#include <clientversion.h>
+#include <streams.h>
 
-RecentRequestsTableModel::RecentRequestsTableModel(CWallet *wallet, WalletModel *parent) :
-    walletModel(parent)
+
+RecentRequestsTableModel::RecentRequestsTableModel(WalletModel *parent) :
+    QAbstractTableModel(parent), walletModel(parent)
 {
-    Q_UNUSED(wallet);
     nReceiveRequestsMaxId = 0;
 
     // Load entries from wallet
     std::vector<std::string> vReceiveRequests;
     parent->loadReceiveRequests(vReceiveRequests);
-    BOOST_FOREACH(const std::string& request, vReceiveRequests)
+    for (const std::string& request : vReceiveRequests)
         addNewRequest(request);
 
     /* These columns must match the indices in the ColumnIndex enumeration */
@@ -54,10 +53,9 @@ QVariant RecentRequestsTableModel::data(const QModelIndex &index, int role) cons
     if(!index.isValid() || index.row() >= list.length())
         return QVariant();
 
-    const RecentRequestEntry *rec = &list[index.row()];
-
     if(role == Qt::DisplayRole || role == Qt::EditRole)
     {
+        const RecentRequestEntry *rec = &list[index.row()];
         switch(index.column())
         {
         case Date:
@@ -82,7 +80,7 @@ QVariant RecentRequestsTableModel::data(const QModelIndex &index, int role) cons
             }
         case Amount:
             if (rec->recipient.amount == 0 && role == Qt::DisplayRole)
-                return tr("(no amount)");
+                return tr("(no amount requested)");
             else if (role == Qt::EditRole)
                 return BitcoinUnits::format(walletModel->getOptionsModel()->getDisplayUnit(), rec->recipient.amount, false, BitcoinUnits::separatorNever);
             else
@@ -118,18 +116,13 @@ QVariant RecentRequestsTableModel::headerData(int section, Qt::Orientation orien
 void RecentRequestsTableModel::updateAmountColumnTitle()
 {
     columns[Amount] = getAmountTitle();
-    emit headerDataChanged(Qt::Horizontal,Amount,Amount);
+    Q_EMIT headerDataChanged(Qt::Horizontal,Amount,Amount);
 }
 
 /** Gets title for amount column including current display unit if optionsModel reference available. */
 QString RecentRequestsTableModel::getAmountTitle()
 {
-    QString amountTitle = tr("Amount");
-    if (this->walletModel->getOptionsModel() != NULL)
-    {
-        amountTitle += " ("+BitcoinUnits::name(this->walletModel->getOptionsModel()->getDisplayUnit()) + ")";
-    }
-    return amountTitle;
+    return (this->walletModel->getOptionsModel() != nullptr) ? tr("Requested") + " ("+BitcoinUnits::shortName(this->walletModel->getOptionsModel()->getDisplayUnit()) + ")" : "";
 }
 
 QModelIndex RecentRequestsTableModel::index(int row, int column, const QModelIndex &parent) const
@@ -145,10 +138,9 @@ bool RecentRequestsTableModel::removeRows(int row, int count, const QModelIndex 
 
     if(count > 0 && row >= 0 && (row+count) <= list.size())
     {
-        const RecentRequestEntry *rec;
         for (int i = 0; i < count; ++i)
         {
-            rec = &list[row+i];
+            const RecentRequestEntry* rec = &list[row+i];
             if (!walletModel->saveReceiveRequest(rec->recipient.address.toStdString(), rec->id, ""))
                 return false;
         }
@@ -213,7 +205,7 @@ void RecentRequestsTableModel::addNewRequest(RecentRequestEntry &recipient)
 void RecentRequestsTableModel::sort(int column, Qt::SortOrder order)
 {
     qSort(list.begin(), list.end(), RecentRequestEntryLessThan(column, order));
-    emit dataChanged(index(0, 0, QModelIndex()), index(list.size() - 1, NUMBER_OF_COLUMNS - 1, QModelIndex()));
+    Q_EMIT dataChanged(index(0, 0, QModelIndex()), index(list.size() - 1, NUMBER_OF_COLUMNS - 1, QModelIndex()));
 }
 
 void RecentRequestsTableModel::updateDisplayUnit()
