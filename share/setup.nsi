@@ -5,9 +5,9 @@ SetCompressor /SOLID lzma
 
 # General Symbol Definitions
 !define REGKEY "SOFTWARE\$(^Name)"
-!define VERSION 0.17.1
+!define VERSION 1.7.0
 !define COMPANY "Marscoin project"
-!define URL https://marscoin.org/
+!define URL 
 
 # MUI Symbol Definitions
 !define MUI_ICON "/home/llopin/OSS/marscoin17/share/pixmaps/bitcoin.ico"
@@ -75,8 +75,8 @@ Section -Main SEC0000
     SetOutPath $INSTDIR
     SetOverwrite on
     File /home/llopin/OSS/marscoin17/release/marscoin-qt
-    File /oname=COPYING.txt /home/llopin/OSS/marscoin/COPYING
-    File /oname=readme.txt /home/llopin/OSS/marscoin/doc/README_windows.txt
+    File /oname=COPYING.txt /home/llopin/OSS/marscoin17/COPYING
+    File /oname=readme.txt /home/llopin/OSS/marscoin17/doc/README_windows.txt
     SetOutPath $INSTDIR\daemon
     File /home/llopin/OSS/marscoin17/release/marscoind
     File /home/llopin/OSS/marscoin17/release/marscoin-cli
