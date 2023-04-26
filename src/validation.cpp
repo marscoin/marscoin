@@ -3247,11 +3247,11 @@ static bool ContextualCheckBlockHeader(const CBlockHeader& block, CValidationSta
     assert(pindexPrev != nullptr);
     const int nHeight = pindexPrev->nHeight + 1;
 
-    LogPrintf("CheckBlockHeader at height:  %d \n", nHeight);
+    //LogPrintf("CheckBlockHeader at height:  %d \n", nHeight);
 
     // Check proof of work
     const Consensus::Params& consensusParams = params.GetConsensus();
-    LogPrintf("Expected work: %d\n", block.nBits);
+    //LogPrintf("Expected work: %d\n", block.nBits);
     // Check proof of work (Here for the architecture issues with DGW v1 and v2)
     if(nHeight <= 126000){
         unsigned int nBitsNext = GetNextWorkRequired(pindexPrev, &block, consensusParams);
