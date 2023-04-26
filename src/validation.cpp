@@ -3227,10 +3227,27 @@ static bool ContextualCheckBlockHeader(const CBlockHeader& block, CValidationSta
     assert(pindexPrev != nullptr);
     const int nHeight = pindexPrev->nHeight + 1;
 
+    LogPrintf("CheckBlockHeader at height:  %d \n", nHeight);
+
     // Check proof of work
     const Consensus::Params& consensusParams = params.GetConsensus();
-    if (block.nBits != GetNextWorkRequired(pindexPrev, &block, consensusParams))
-        return state.DoS(100, false, REJECT_INVALID, "bad-diffbits", false, "incorrect proof of work");
+    LogPrintf("Expected work: %d\n", block.nBits);
+    // Check proof of work (Here for the architecture issues with DGW v1 and v2)
+    if(nHeight <= 126000){
+        unsigned int nBitsNext = GetNextWorkRequired(pindexPrev, &block);
+        //LogPrintf("BitsNext: %i \n", block.nBits);
+        //LogPrintf("BlockBits: %i \n", nBitsNext);
+        double n1 = ConvertBitsToDouble(block.nBits );
+        double n2 = ConvertBitsToDouble(nBitsNext);
+        //LogPrintf("Abs: %d\n", abs(n1-n2));
+        //LogPrintf("Diff: %f\n", n1*0.5);
+        if (abs(n1-n2) > n1*0.2)
+            return state.DoS(100, error("AcceptBlock() : incorrect proof of work (DGW pre-fork)"));
+    } else {
+	if (block.nBits != GetNextWorkRequired(pindexPrev, &block, consensusParams))
+        	return state.DoS(100, false, REJECT_INVALID, "bad-diffbits", false, "incorrect proof of work");
+    }
+
 
     // Check against checkpoints
     if (fCheckpointsEnabled) {
