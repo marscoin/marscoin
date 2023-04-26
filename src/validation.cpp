@@ -3254,7 +3254,7 @@ static bool ContextualCheckBlockHeader(const CBlockHeader& block, CValidationSta
     LogPrintf("Expected work: %d\n", block.nBits);
     // Check proof of work (Here for the architecture issues with DGW v1 and v2)
     if(nHeight <= 126000){
-        unsigned int nBitsNext = GetNextWorkRequired(pindexPrev, &block);
+        unsigned int nBitsNext = GetNextWorkRequired(pindexPrev, &block, consensusParams);
         //LogPrintf("BitsNext: %i \n", block.nBits);
         //LogPrintf("BlockBits: %i \n", nBitsNext);
         double n1 = ConvertBitsToDouble(block.nBits );
