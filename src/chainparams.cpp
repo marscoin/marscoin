@@ -76,10 +76,10 @@ public:
         strNetworkID = "main";
         consensus.nSubsidyHalvingInterval = 395699;
         // consensus.BIP16Height = 218579; // 87afb798a3ad9378fcd56123c81fb31cfd9a8df4719b9774d71730c16315a092 - October 1, 2012
-        consensus.BIP34Height = 1272755;
-        consensus.BIP34Hash = uint256S("b2e2cbc00b6a8bb55c0f32af37cb75caa8da73adb53d010ec41d625c4179d8a9");
-        consensus.BIP65Height = 1272755; // b2e2cbc00b6a8bb55c0f32af37cb75caa8da73adb53d010ec41d625c4179d8a9
-        consensus.BIP66Height = 1272755; // b2e2cbc00b6a8bb55c0f32af37cb75caa8da73adb53d010ec41d625c4179d8a9
+        consensus.BIP34Height = 1282755;
+        consensus.BIP34Hash = uint256S("418d8c3e71cd91a036911916164fe4f72ec729a12565b03dfab33211f73c21ad");
+        consensus.BIP65Height = 1282755; // 418d8c3e71cd91a036911916164fe4f72ec729a12565b03dfab33211f73c21ad
+        consensus.BIP66Height = 1282755; // 418d8c3e71cd91a036911916164fe4f72ec729a12565b03dfab33211f73c21ad
         consensus.powLimit = uint256S("00000fffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"); 
         consensus.nPowTargetTimespan = 3.5 * 24 * 60 * 60; 
         consensus.nPowTargetSpacing = 2.5 * 60; 
