@@ -91,7 +91,8 @@ endif
 # bitcoin core #
 BITCOIN_CORE_H = \
   addrdb.h \
-  addrman.h \
+  addrman.h \	
+  auxpow.h \
   base58.h \
   bech32.h \
   bloom.h \
@@ -145,6 +146,8 @@ BITCOIN_CORE_H = \
   policy/policy.h \
   policy/rbf.h \
   pow.h \
+  primitives/block.h \
+  primitives/pureheader.h \
   protocol.h \
   random.h \
   reverse_iterator.h \
@@ -376,6 +379,8 @@ libbitcoin_consensus_a_SOURCES = \
 libbitcoin_common_a_CPPFLAGS = $(AM_CPPFLAGS) $(BITCOIN_INCLUDES)
 libbitcoin_common_a_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
 libbitcoin_common_a_SOURCES = \
+  arith_uint256.cpp \
+  auxpow.cpp \
   base58.cpp \
   bech32.cpp \
   chainparams.cpp \
@@ -388,6 +393,9 @@ libbitcoin_common_a_SOURCES = \
   keystore.cpp \
   netaddress.cpp \
   netbase.cpp \
+  primitives/block.cpp \
+  primitives/pureheader.cpp \
+  primitives/transaction.cpp \
   policy/feerate.cpp \
   protocol.cpp \
   scheduler.cpp \
