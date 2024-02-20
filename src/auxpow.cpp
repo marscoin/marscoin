@@ -65,15 +65,16 @@ int CMerkleTx::GetBlocksToMaturity() const
 {
     if (!IsCoinBase())
         return 0;
-    int nCoinbaseMaturity = Params().GetConsensus(chainActive.Height()).nCoinbaseMaturity;
-    return std::max(0, (nCoinbaseMaturity + 1) - GetDepthInMainChain());
+    return std::max(0, (COINBASE_MATURITY+1) - GetDepthInMainChain());
 }
 
 
 bool CMerkleTx::AcceptToMemoryPool(const CAmount& nAbsurdFee, CValidationState& state)
 {
-    return ::AcceptToMemoryPool(mempool, state, tx, true, NULL, NULL, false, nAbsurdFee);
+    bool missingInputs = true; 
+    return ::AcceptToMemoryPool(mempool, state, tx, &missingInputs, nullptr, false, nAbsurdFee, false);
 }
+
 
 /* ************************************************************************** */
 

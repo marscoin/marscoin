@@ -464,7 +464,7 @@ static UniValue getinfo_deprecated(const JSONRPCRequest& request)
         "- getblockchaininfo: blocks, difficulty, chain\n"
         "- getnetworkinfo: version, protocolversion, timeoffset, connections, proxy, relayfee, warnings\n"
         "- getwalletinfo: balance, keypoololdest, keypoolsize, paytxfee, unlocked_until, walletversion\n"
-        "\marscoin-cli has the option -getinfo to collect and format these in the old format."
+        "- marscoin-cli has the option -getinfo to collect and format these in the old format."
     );
 }
 

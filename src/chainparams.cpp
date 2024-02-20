@@ -98,6 +98,11 @@ public:
         // By default assume that the signatures in ancestors of this block are valid.
         consensus.defaultAssumeValid = uint256S("0xb8aa2b9b6da5a782c9ca0d942ec396d18a412c75290a6305b7397700a4a19a6a"); //2000000
 
+        consensus.nAuxpowChainId = 0x0062; // 98 - Josh Wise!
+        consensus.nAuxpowStartHeight = 371337;
+        consensus.fStrictChainId = true;
+        consensus.nLegacyBlocksBefore = 371337;
+        
         /**
          * The message start string is designed to be unlikely to occur in normal data.
          * The characters are rarely used upper ASCII, not valid as UTF-8, and produce
@@ -215,7 +220,9 @@ public:
 
         // The best chain should have at least this much work.
         consensus.defaultAssumeValid = uint256S("0x00");
-
+        consensus.nAuxpowStartHeight = 158100;
+        consensus.fStrictChainId = false;
+        consensus.nLegacyBlocksBefore = -1;
         // By default assume that the signatures in ancestors of this block are valid.
         consensus.defaultAssumeValid = uint256S("0x00");
 
@@ -306,7 +313,8 @@ public:
 
         // By default assume that the signatures in ancestors of this block are valid.
         consensus.defaultAssumeValid = uint256S("0x00");
-
+        consensus.fStrictChainId = true;
+        consensus.nLegacyBlocksBefore = 0;
         pchMessageStart[0] = 0xfa;
         pchMessageStart[1] = 0xbf;
         pchMessageStart[2] = 0xb5;

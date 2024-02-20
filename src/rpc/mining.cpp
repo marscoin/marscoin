@@ -946,8 +946,7 @@ static CCriticalSection cs_auxblockCache;
 static std::map<uint256, CBlock*> mapNewBlock;
 static std::vector<std::unique_ptr<CBlockTemplate>> vNewBlockTemplate;
 
-static
-void AuxMiningCheck()
+static void AuxMiningCheck()
 {
   if(!g_connman)
     throw JSONRPCError(RPC_CLIENT_P2P_DISABLED,
@@ -956,11 +955,11 @@ void AuxMiningCheck()
   if (g_connman->GetNodeCount(CConnman::CONNECTIONS_ALL) == 0
         && !Params().MineBlocksOnDemand())
     throw JSONRPCError(RPC_CLIENT_NOT_CONNECTED,
-                       "Dogecoin is not connected!");
+                       "Marscoin is not connected!");
 
   if (IsInitialBlockDownload() && !Params().MineBlocksOnDemand())
     throw JSONRPCError(RPC_CLIENT_IN_INITIAL_DOWNLOAD,
-                       "Dogecoin is downloading blocks...");
+                       "Marscoin is downloading blocks...");
 
   /* This should never fail, since the chain is already
      past the point of merge-mining start.  Check nevertheless.  */
@@ -971,8 +970,7 @@ void AuxMiningCheck()
   }
 }
 
-static
-UniValue AuxMiningCreateBlock(const CScript& scriptPubKey)
+static UniValue AuxMiningCreateBlock(const CScript& scriptPubKey)
 {
     AuxMiningCheck();
 
@@ -1046,8 +1044,7 @@ UniValue AuxMiningCreateBlock(const CScript& scriptPubKey)
     return result;
 }
 
-static
-bool AuxMiningSubmitBlock(const std::string& hashHex,
+static bool AuxMiningSubmitBlock(const std::string& hashHex,
                           const std::string& auxpowHex)
 {
     AuxMiningCheck();
@@ -1110,8 +1107,8 @@ UniValue getauxblock(const JSONRPCRequest& request)
             + HelpExampleRpc("getauxblock", "")
             );
 
-    boost::shared_ptr<CReserveScript> coinbaseScript;
-    GetMainSignals().ScriptForMining(coinbaseScript);
+    std::shared_ptr<CReserveScript> coinbaseScript = std::make_shared<CReserveScript>();
+    //GetMainSignals().ScriptForMining(coinbaseScript);
 
     // If the keypool is exhausted, no script is returned at all.  Catch this.
     if (!coinbaseScript)
@@ -1159,15 +1156,32 @@ UniValue createauxblock(const JSONRPCRequest& request)
             + HelpExampleRpc("createauxblock", "\"address\"")
             );
 
-    // Check coinbase payout address
-    CBitcoinAddress coinbaseAddress(request.params[0].get_str());
-    if (!coinbaseAddress.IsValid())
-        throw JSONRPCError(RPC_INVALID_PARAMETER,
-                           "Invalid coinbase payout address");
-    const CScript scriptPubKey
-        = GetScriptForDestination(coinbaseAddress.Get());
+    // Get the coinbase payout address as a string
+    std::string addressStr = request.params[0].get_str();
 
+    // Decode the address to a CTxDestination
+    CTxDestination dest = DecodeDestination(addressStr);
+
+    if (!IsValidDestination(dest)) {
+        throw JSONRPCError(RPC_INVALID_PARAMETER, "Invalid coinbase payout address");
+    }
+
+    // Get the scriptPubKey for the destination
+    CScript scriptPubKey = GetScriptForDestination(dest);
+
+    // Proceed with block creation
     return AuxMiningCreateBlock(scriptPubKey);
+    
+    // Check coinbase payout address
+//    CBitcoinAddress coinbaseAddress(request.params[0].get_str());
+//    
+//    if (!coinbaseAddress.IsValid())
+//        throw JSONRPCError(RPC_INVALID_PARAMETER,
+//                           "Invalid coinbase payout address");
+//    const CScript scriptPubKey
+//        = GetScriptForDestination(coinbaseAddress.Get());
+//
+//    return AuxMiningCreateBlock(scriptPubKey);
 }
 
 UniValue submitauxblock(const JSONRPCRequest& request)
@@ -1199,9 +1213,9 @@ static const CRPCCommand commands[] =
     { "mining",             "prioritisetransaction",  &prioritisetransaction,  {"txid","dummy","fee_delta"} },
     { "mining",             "getblocktemplate",       &getblocktemplate,       {"template_request"} },
     { "mining",             "submitblock",            &submitblock,            {"hexdata","dummy"} },
-    { "mining",             "getauxblock",            &getauxblock,            true,  {"hash", "auxpow"} },
-    { "mining",             "createauxblock",         &createauxblock,         true,  {"address"} },
-    { "mining",             "submitauxblock",         &submitauxblock,         true,  {"hash", "auxpow"} },
+    { "mining",             "getauxblock",            &getauxblock,            {"hash", "auxpow"} },
+    { "mining",             "createauxblock",         &createauxblock,         {"address"} },
+    { "mining",             "submitauxblock",         &submitauxblock,         {"hash", "auxpow"} },
 
     { "generating",         "generatetoaddress",      &generatetoaddress,      {"nblocks","address","maxtries"} },
 

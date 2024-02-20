@@ -80,6 +80,7 @@ double GetDifficulty(const CBlockIndex* blockindex)
 
     return dDiff;
 }
+extern void TxToJSON(const CTransaction& tx, const uint256 hashBlock, UniValue& entry);
 
 UniValue AuxpowToJSON(const CAuxPow& auxpow)
 {
@@ -87,35 +88,39 @@ UniValue AuxpowToJSON(const CAuxPow& auxpow)
 
     {
         UniValue tx(UniValue::VOBJ);
-        tx.push_back(Pair("hex", EncodeHexTx(auxpow)));
+        tx.pushKV("hex", EncodeHexTx(auxpow));
         TxToJSON(auxpow, auxpow.parentBlock.GetHash(), tx);
-        result.push_back(Pair("tx", tx));
+        result.pushKV("tx", tx);
     }
 
-    result.push_back(Pair("index", auxpow.nIndex));
-    result.push_back(Pair("chainindex", auxpow.nChainIndex));
+    result.pushKV("index", auxpow.nIndex);
+    result.pushKV("chainindex", auxpow.nChainIndex);
 
     {
         UniValue branch(UniValue::VARR);
-        BOOST_FOREACH(const uint256& node, auxpow.vMerkleBranch)
+        for (const uint256& node : auxpow.vMerkleBranch) { 
             branch.push_back(node.GetHex());
-        result.push_back(Pair("merklebranch", branch));
+        }
+        result.pushKV("merklebranch", branch);
     }
 
     {
         UniValue branch(UniValue::VARR);
-        BOOST_FOREACH(const uint256& node, auxpow.vChainMerkleBranch)
+        
+        for (const uint256& node : auxpow.vChainMerkleBranch) { // Replacing BOOST_FOREACH
             branch.push_back(node.GetHex());
-        result.push_back(Pair("chainmerklebranch", branch));
+        }
+        result.pushKV("chainmerklebranch", branch);
     }
 
     CDataStream ssParent(SER_NETWORK, PROTOCOL_VERSION);
     ssParent << auxpow.parentBlock;
     const std::string strHex = HexStr(ssParent.begin(), ssParent.end());
-    result.push_back(Pair("parentblock", strHex));
+    result.pushKV("parentblock", strHex);
 
     return result;
 }
+
 
 UniValue blockheaderToJSON(const CBlockIndex* blockindex)
 {
@@ -138,9 +143,6 @@ UniValue blockheaderToJSON(const CBlockIndex* blockindex)
     result.pushKV("difficulty", GetDifficulty(blockindex));
     result.pushKV("chainwork", blockindex->nChainWork.GetHex());
     result.pushKV("nTx", (uint64_t)blockindex->nTx);
-    
-    if (block.auxpow)
-        result.pushKV("auxpow", AuxpowToJSON(*block.auxpow));
 
     if (blockindex->pprev)
         result.pushKV("previousblockhash", blockindex->pprev->GetBlockHash().GetHex());
