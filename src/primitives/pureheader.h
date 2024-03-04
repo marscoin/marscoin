@@ -150,7 +150,7 @@ public:
     inline bool IsLegacy() const
     {
         //return nVersion == 1;
-        return nVersion <= 4;
+        return ((nVersion & 0xff) < 4) || (GetChainId() != 0x002A);
     }
 };
 

@@ -3254,7 +3254,7 @@ double ConvertBitsToDouble(unsigned int nBits){
  *  in ConnectBlock().
  *  Note that -reindex-chainstate skips the validation that happens here!
  */
-static bool ContextualCheckBlockHeader(const CBlockHeader& block, CValidationState& state, const CChainParams& params, const CBlockIndex* pindexPrev, int64_t nAdjustedTime)
+    static bool ContextualCheckBlockHeader(const CBlockHeader& block, CValidationState& state, const CChainParams& params, const CBlockIndex* pindexPrev, int64_t nAdjustedTime)
 {
     assert(pindexPrev != nullptr);
     const int nHeight = pindexPrev->nHeight + 1;
@@ -3265,6 +3265,12 @@ static bool ContextualCheckBlockHeader(const CBlockHeader& block, CValidationSta
         return state.DoS(100, error("%s : legacy block after auxpow start",
                                     __func__),
                          REJECT_INVALID, "late-legacy-block");
+    // consensusParams.nHeightEffective
+    if (Params().GetConsensus().AllowLegacyBlocks(nHeight)
+        && block.IsAuxpow())
+        return state.DoS(100, error("%s : auxpow blocks are not allowed at height %d, parameters effective from %d",
+                                    __func__, pindexPrev->nHeight + 1, Params().GetConsensus().nAuxpowStartHeight),
+                         REJECT_INVALID, "early-auxpow-block");
     
     //LogPrintf("CheckBlockHeader at height:  %d \n", nHeight);
 
