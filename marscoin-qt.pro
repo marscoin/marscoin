@@ -1,7 +1,7 @@
 TEMPLATE = app
 TARGET = marscoin-qt
-macx:TARGET = "Marscoin-Qt-1.6.0"
-VERSION = 1.6.0
+macx:TARGET = "Marscoin-Qt-2.0.0"
+VERSION = 2.0.0
 INCLUDEPATH += src src/json src/qt
 QT += core gui network webkit
 win32:QT += core gui network
