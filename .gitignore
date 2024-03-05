@@ -13,6 +13,9 @@ src/marscoin-cli
 src/marscoin-tx
 src/test/test_marscoin
 src/qt/test/test_marscoin-qt
+src/test/test_bitcoin
+src/test/test_bitcoin_fuzzy
+src/qt/test/test_bitcoin-qt
 
 # autoreconf
 Makefile.in
