@@ -9,13 +9,13 @@
  * network protocol versioning
  */
 
-static const int PROTOCOL_VERSION = 70050;
+static const int PROTOCOL_VERSION = 70060;
 
 //! initial proto version, to be increased after version/verack negotiation
 static const int INIT_PROTO_VERSION = 209;
 
 //! disconnect from peers older than this proto version
-static const int MIN_PEER_PROTO_VERSION = PROTOCOL_VERSION;
+static const int MIN_PEER_PROTO_VERSION = 70050;
 
 //! Version when we switched to a size-based "headers" limit.
 static const int SIZE_HEADERS_LIMIT_VERSION = PROTOCOL_VERSION;

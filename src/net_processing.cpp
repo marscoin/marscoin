@@ -3799,6 +3799,15 @@ void PeerManagerImpl::ProcessMessage(CNode& pfrom, const std::string& msg_type, 
             SeenLocal(addrMe);
         }
 
+        // implement segwit fork
+        if (m_chainman.ActiveChain().Height() >= Params().GetConsensus().SegwitHeight) {
+            if (nVersion < PROTOCOL_VERSION) {
+                LogPrint(BCLog::NET, "peer=%d using obsolete version %i (after segwit fork); disconnecting\n", pfrom.GetId(), nVersion);
+                pfrom.fDisconnect = true;
+                return;
+            }
+        }
+
         // Inbound peers send us their version message when they connect.
         // We send our version message in response.
         if (pfrom.IsInboundConn()) {
