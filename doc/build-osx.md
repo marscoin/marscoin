@@ -48,7 +48,17 @@ See [dependencies.md](dependencies.md) for a complete overview.
 To install, run the following from your terminal:
 
 ``` bash
-brew install automake libtool boost pkg-config libevent
+brew install automake libtool boost pkg-config libevent openssl@3
+```
+
+On Apple Silicon systems (M-series), OpenSSL headers and libraries are usually
+installed under Homebrew's prefix and may need to be passed explicitly to
+`configure`:
+
+``` bash
+CPPFLAGS="-I$(brew --prefix openssl@3)/include" \
+LDFLAGS="-L$(brew --prefix openssl@3)/lib" \
+./configure --with-gui=no
 ```
 
 For macOS 11 (Big Sur) and 12 (Monterey) you need to install a more recent version of llvm.
@@ -196,6 +206,9 @@ Additionally, this explicitly disables the GUI.
 ./autogen.sh
 ./configure --with-gui=no
 ```
+
+If you encounter `libcrypto headers missing` on macOS, use the OpenSSL flags
+shown in the dependency section above.
 
 ##### Wallet (only SQlite) and GUI Support:
 
