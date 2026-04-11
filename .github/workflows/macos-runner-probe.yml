@@ -1,6 +1,9 @@
 name: macOS Runner Probe
 
 on:
+  push:
+    branches:
+      - chore/macos-runner-probe
   workflow_dispatch:
 
 jobs:
