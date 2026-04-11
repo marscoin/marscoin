@@ -1,0 +1,56 @@
+name: macOS Runner Probe
+
+on:
+  workflow_dispatch:
+
+jobs:
+  probe:
+    name: Probe ${{ matrix.label }}
+    strategy:
+      fail-fast: false
+      matrix:
+        label:
+          - macos-14
+          - macos-13
+          - macos-15
+          - macos-15-intel
+    runs-on: ${{ matrix.label }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Print runner details
+        run: |
+          uname -a
+          uname -m
+          sw_vers
+
+  intel_gui_smoke:
+    name: Intel GUI Smoke (macos-13)
+    runs-on: macos-13
+    needs: probe
+    if: ${{ always() }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          brew install automake libtool boost pkg-config libevent openssl@3 qt@5 miniupnpc
+
+      - name: Configure and build GUI
+        run: |
+          PATH="$(brew --prefix qt@5)/bin:$PATH" \
+          CPPFLAGS="-I$(brew --prefix openssl@3)/include" \
+          LDFLAGS="-L$(brew --prefix openssl@3)/lib" \
+          ./autogen.sh
+          PATH="$(brew --prefix qt@5)/bin:$PATH" \
+          CPPFLAGS="-I$(brew --prefix openssl@3)/include" \
+          LDFLAGS="-L$(brew --prefix openssl@3)/lib" \
+          ./configure --with-gui=yes --disable-tests --disable-bench
+          make -j"$(sysctl -n hw.ncpu)" src/qt/marscoin-qt
+
+      - name: Smoke check
+        run: ./src/qt/marscoin-qt -version
