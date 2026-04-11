@@ -21,6 +21,9 @@ jobs:
           - os: ubuntu-24.04
             target: linux-x86_64
             gui: "no"
+          - os: macos-15-intel
+            target: macos-x86_64
+            gui: "yes"
           - os: macos-14
             target: macos-arm64
             gui: "yes"
@@ -124,16 +127,20 @@ jobs:
             mingw-w64-x86_64-openssl
             mingw-w64-x86_64-miniupnpc
             mingw-w64-x86_64-python
+            mingw-w64-x86_64-qt5-base
+            mingw-w64-x86_64-qt5-tools
+            mingw-w64-x86_64-qrencode
 
       - name: Configure and build
         shell: msys2 {0}
         run: |
           ./autogen.sh
-          LIBS="-lcrypt32" ./configure --without-gui --disable-tests --disable-bench
+          LIBS="-lcrypt32" ./configure --with-gui=yes --disable-tests --disable-bench
           LIBS="-lcrypt32" make -j"$(nproc)" src/marscoind.exe
           LIBS="-lcrypt32" make -j"$(nproc)" src/marscoin-cli.exe
           LIBS="-lcrypt32" make -j"$(nproc)" src/marscoin-tx.exe
           LIBS="-lcrypt32" make -j"$(nproc)" src/marscoin-util.exe
+          LIBS="-lcrypt32" make -j"$(nproc)" src/qt/marscoin-qt.exe
 
       - name: Package artifacts
         shell: msys2 {0}
@@ -143,6 +150,7 @@ jobs:
           cp src/marscoin-cli.exe dist/bin/
           cp src/marscoin-tx.exe dist/bin/
           cp src/marscoin-util.exe dist/bin/
+          cp src/qt/marscoin-qt.exe dist/bin/
           tar -czf "marscoin-${{ github.ref_name }}-windows-x86_64.tar.gz" -C dist bin
 
       - name: Upload build artifact
