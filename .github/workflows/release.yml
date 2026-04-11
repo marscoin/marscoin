@@ -1,0 +1,114 @@
+name: Release Binaries
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: Build ${{ matrix.target }}
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 90
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-24.04
+            target: linux-x86_64
+            gui: "no"
+          - os: macos-13
+            target: macos-x86_64
+            gui: "yes"
+          - os: macos-14
+            target: macos-arm64
+            gui: "yes"
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Linux dependencies
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            build-essential \
+            automake \
+            libtool \
+            autotools-dev \
+            pkg-config \
+            python3 \
+            libevent-dev \
+            libboost-dev \
+            libsqlite3-dev \
+            libssl-dev \
+            libminiupnpc-dev \
+            libnatpmp-dev
+
+      - name: Install macOS dependencies
+        if: runner.os == 'macOS'
+        run: |
+          brew install automake libtool boost pkg-config libevent openssl@3 qt@5 miniupnpc
+
+      - name: Configure
+        run: |
+          if [ "${{ runner.os }}" = "macOS" ]; then
+            PATH="$(brew --prefix qt@5)/bin:$PATH" \
+            CPPFLAGS="-I$(brew --prefix openssl@3)/include" \
+            LDFLAGS="-L$(brew --prefix openssl@3)/lib" \
+            ./autogen.sh
+            PATH="$(brew --prefix qt@5)/bin:$PATH" \
+            CPPFLAGS="-I$(brew --prefix openssl@3)/include" \
+            LDFLAGS="-L$(brew --prefix openssl@3)/lib" \
+            ./configure --with-gui=${{ matrix.gui }} --disable-tests --disable-bench
+          else
+            ./autogen.sh
+            ./configure --with-gui=${{ matrix.gui }} --disable-tests --disable-bench
+          fi
+
+      - name: Build
+        run: |
+          if [ "${{ runner.os }}" = "macOS" ]; then
+            make -j"$(sysctl -n hw.ncpu)" src/marscoind src/marscoin-cli src/marscoin-tx src/marscoin-util
+            make -j"$(sysctl -n hw.ncpu)" src/qt/marscoin-qt
+          else
+            make -j"$(nproc)" src/marscoind src/marscoin-cli src/marscoin-tx src/marscoin-util
+          fi
+
+      - name: Package artifacts
+        run: |
+          mkdir -p dist/bin
+          cp src/marscoind dist/bin/
+          cp src/marscoin-cli dist/bin/
+          cp src/marscoin-tx dist/bin/
+          cp src/marscoin-util dist/bin/
+          if [ "${{ matrix.gui }}" = "yes" ]; then
+            cp src/qt/marscoin-qt dist/bin/
+          fi
+          tar -czf "marscoin-${{ github.ref_name }}-${{ matrix.target }}.tar.gz" -C dist bin
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: marscoin-${{ github.ref_name }}-${{ matrix.target }}
+          path: marscoin-${{ github.ref_name }}-${{ matrix.target }}.tar.gz
+
+  publish:
+    name: Publish GitHub Release Assets
+    runs-on: ubuntu-24.04
+    needs: build
+
+    steps:
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: release-assets
+
+      - name: Attach assets to release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: release-assets/**/*.tar.gz
