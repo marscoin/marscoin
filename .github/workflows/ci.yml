@@ -77,7 +77,10 @@ jobs:
           ./configure --with-gui=yes --disable-tests --disable-bench
 
       - name: Build
-        run: make -j"$(sysctl -n hw.ncpu)" src/qt/marscoin-qt src/marscoind src/marscoin-cli
+        run: |
+          make -j"$(sysctl -n hw.ncpu)" src/marscoind
+          make -j"$(sysctl -n hw.ncpu)" src/marscoin-cli
+          make -j"$(sysctl -n hw.ncpu)" src/qt/marscoin-qt
 
       - name: Smoke check
         run: |
