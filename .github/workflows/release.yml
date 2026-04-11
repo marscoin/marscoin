@@ -21,6 +21,9 @@ jobs:
           - os: ubuntu-24.04
             target: linux-x86_64
             gui: "no"
+          - os: macos-15-intel
+            target: macos-x86_64
+            gui: "yes"
           - os: macos-14
             target: macos-arm64
             gui: "yes"
@@ -85,6 +88,7 @@ jobs:
 
       - name: Package artifacts
         run: |
+          SAFE_REF_NAME="${GITHUB_REF_NAME//\//-}"
           mkdir -p dist/bin
           cp src/marscoind dist/bin/
           cp src/marscoin-cli dist/bin/
@@ -93,13 +97,13 @@ jobs:
           if [ "${{ matrix.gui }}" = "yes" ]; then
             cp src/qt/marscoin-qt dist/bin/
           fi
-          tar -czf "marscoin-${{ github.ref_name }}-${{ matrix.target }}.tar.gz" -C dist bin
+          tar -czf "marscoin-${SAFE_REF_NAME}-${{ matrix.target }}.tar.gz" -C dist bin
 
       - name: Upload build artifact
         uses: actions/upload-artifact@v4
         with:
           name: marscoin-${{ github.ref_name }}-${{ matrix.target }}
-          path: marscoin-${{ github.ref_name }}-${{ matrix.target }}.tar.gz
+          path: marscoin-*-${{ matrix.target }}.tar.gz
 
   build-windows:
     name: Build windows-x86_64
@@ -124,32 +128,67 @@ jobs:
             mingw-w64-x86_64-openssl
             mingw-w64-x86_64-miniupnpc
             mingw-w64-x86_64-python
+            mingw-w64-x86_64-qt5-base
+            mingw-w64-x86_64-qt5-tools
+            mingw-w64-x86_64-qrencode
 
       - name: Configure and build
         shell: msys2 {0}
         run: |
+          export PATH="/mingw64/qt5/bin:/mingw64/lib/qt5/bin:/mingw64/bin:$PATH"
+          MOC_BIN="$(command -v moc-qt5 || command -v moc || true)"
+          if [ -z "$MOC_BIN" ] && [ -x /mingw64/qt5/bin/moc.exe ]; then
+            MOC_BIN="/mingw64/qt5/bin/moc.exe"
+          fi
+          if [ -z "$MOC_BIN" ] && [ -x /mingw64/lib/qt5/bin/moc.exe ]; then
+            MOC_BIN="/mingw64/lib/qt5/bin/moc.exe"
+          fi
+          UIC_BIN="$(command -v uic-qt5 || command -v uic5 || command -v uic || true)"
+          if [ -z "$UIC_BIN" ] && [ -x /mingw64/qt5/bin/uic.exe ]; then
+            UIC_BIN="/mingw64/qt5/bin/uic.exe"
+          fi
+          if [ -z "$UIC_BIN" ] && [ -x /mingw64/lib/qt5/bin/uic.exe ]; then
+            UIC_BIN="/mingw64/lib/qt5/bin/uic.exe"
+          fi
+          RCC_BIN="$(command -v rcc-qt5 || command -v rcc5 || command -v rcc || true)"
+          if [ -z "$RCC_BIN" ] && [ -x /mingw64/qt5/bin/rcc.exe ]; then
+            RCC_BIN="/mingw64/qt5/bin/rcc.exe"
+          fi
+          if [ -z "$RCC_BIN" ] && [ -x /mingw64/lib/qt5/bin/rcc.exe ]; then
+            RCC_BIN="/mingw64/lib/qt5/bin/rcc.exe"
+          fi
+          if [ -z "$RCC_BIN" ] && [ -x /mingw64/bin/rcc.exe ]; then
+            RCC_BIN="/mingw64/bin/rcc.exe"
+          fi
+          LRELEASE_BIN="$(command -v lrelease-qt5 || command -v lrelease || true)"
+          if [ -z "$LRELEASE_BIN" ] && [ -x /mingw64/bin/lrelease.exe ]; then
+            LRELEASE_BIN="/mingw64/bin/lrelease.exe"
+          fi
           ./autogen.sh
-          LIBS="-lcrypt32" ./configure --without-gui --disable-tests --disable-bench
+          LIBS="-lcrypt32" MOC="$MOC_BIN" UIC="$UIC_BIN" RCC="$RCC_BIN" LRELEASE="$LRELEASE_BIN" ./configure --with-gui=yes --disable-tests --disable-bench
           LIBS="-lcrypt32" make -j"$(nproc)" src/marscoind.exe
           LIBS="-lcrypt32" make -j"$(nproc)" src/marscoin-cli.exe
           LIBS="-lcrypt32" make -j"$(nproc)" src/marscoin-tx.exe
           LIBS="-lcrypt32" make -j"$(nproc)" src/marscoin-util.exe
+          LIBS="-lcrypt32" make -j"$(nproc)" src/qt/marscoin-qt.exe
 
       - name: Package artifacts
         shell: msys2 {0}
         run: |
+          SAFE_REF_NAME="${GITHUB_REF_NAME//\//-}"
           mkdir -p dist/bin
           cp src/marscoind.exe dist/bin/
           cp src/marscoin-cli.exe dist/bin/
           cp src/marscoin-tx.exe dist/bin/
           cp src/marscoin-util.exe dist/bin/
-          tar -czf "marscoin-${{ github.ref_name }}-windows-x86_64.tar.gz" -C dist bin
+          cp src/qt/marscoin-qt.exe dist/bin/
+          tar -czf "marscoin-${SAFE_REF_NAME}-windows-x86_64.tar.gz" -C dist bin
 
       - name: Upload build artifact
         uses: actions/upload-artifact@v4
         with:
           name: marscoin-${{ github.ref_name }}-windows-x86_64
-          path: marscoin-${{ github.ref_name }}-windows-x86_64.tar.gz
+          path: marscoin-*-windows-x86_64.tar.gz
 
   checksums:
     name: Generate checksums
