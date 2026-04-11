@@ -1,0 +1,89 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches:
+      - "**"
+    tags-ignore:
+      - "**"
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  linux-cli-build:
+    name: Linux CLI Build
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            build-essential \
+            automake \
+            libtool \
+            autotools-dev \
+            pkg-config \
+            python3 \
+            libevent-dev \
+            libboost-dev \
+            libsqlite3-dev \
+            libssl-dev \
+            libminiupnpc-dev \
+            libnatpmp-dev
+
+      - name: Configure
+        run: |
+          ./autogen.sh
+          ./configure --without-gui --disable-tests --disable-bench
+
+      - name: Build
+        run: make -j"$(nproc)"
+
+      - name: Smoke check
+        run: |
+          ./src/marscoind --version
+          ./src/marscoin-cli --version
+
+  macos-arm64-gui-build:
+    name: macOS ARM64 GUI Build
+    runs-on: macos-14
+    timeout-minutes: 75
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          brew install automake libtool boost pkg-config libevent openssl@3 qt@5 miniupnpc
+
+      - name: Configure
+        run: |
+          PATH="$(brew --prefix qt@5)/bin:$PATH" \
+          CPPFLAGS="-I$(brew --prefix openssl@3)/include" \
+          LDFLAGS="-L$(brew --prefix openssl@3)/lib" \
+          ./autogen.sh
+          PATH="$(brew --prefix qt@5)/bin:$PATH" \
+          CPPFLAGS="-I$(brew --prefix openssl@3)/include" \
+          LDFLAGS="-L$(brew --prefix openssl@3)/lib" \
+          ./configure --with-gui=yes --disable-tests --disable-bench
+
+      - name: Build
+        run: |
+          make -j"$(sysctl -n hw.ncpu)" src/marscoind
+          make -j"$(sysctl -n hw.ncpu)" src/marscoin-cli
+          make -j"$(sysctl -n hw.ncpu)" src/qt/marscoin-qt
+
+      - name: Smoke check
+        run: |
+          ./src/qt/marscoin-qt -version
+          ./src/marscoind --version
+          ./src/marscoin-cli --version
