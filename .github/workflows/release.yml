@@ -173,7 +173,7 @@ jobs:
           make -j"$(nproc)" src/marscoin-cli.exe
           make -j"$(nproc)" src/marscoin-tx.exe
           make -j"$(nproc)" src/marscoin-util.exe
-          make -j"$(nproc)" src/qt/marscoin-qt.exe
+          make V=1 -j"$(nproc)" src/qt/marscoin-qt.exe
 
       - name: Package artifacts
         shell: msys2 {0}
