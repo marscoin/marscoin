@@ -136,6 +136,9 @@ jobs:
         shell: msys2 {0}
         run: |
           export PATH="/mingw64/qt5/bin:/mingw64/lib/qt5/bin:/mingw64/bin:$PATH"
+          export PKG_CONFIG_PATH="/mingw64/lib/pkgconfig:/mingw64/share/pkgconfig"
+          export CPPFLAGS="-I/mingw64/include"
+          export LDFLAGS="-L/mingw64/lib -L/mingw64/qt5/lib -L/mingw64/lib/qt5/lib"
           MOC_BIN="$(command -v moc-qt5 || command -v moc || true)"
           if [ -z "$MOC_BIN" ] && [ -x /mingw64/qt5/bin/moc.exe ]; then
             MOC_BIN="/mingw64/qt5/bin/moc.exe"
@@ -166,11 +169,11 @@ jobs:
           fi
           ./autogen.sh
           LIBS="-lcrypt32" MOC="$MOC_BIN" UIC="$UIC_BIN" RCC="$RCC_BIN" LRELEASE="$LRELEASE_BIN" ./configure --with-gui=yes --disable-tests --disable-bench
-          LIBS="-lcrypt32" make -j"$(nproc)" src/marscoind.exe
-          LIBS="-lcrypt32" make -j"$(nproc)" src/marscoin-cli.exe
-          LIBS="-lcrypt32" make -j"$(nproc)" src/marscoin-tx.exe
-          LIBS="-lcrypt32" make -j"$(nproc)" src/marscoin-util.exe
-          LIBS="-lcrypt32" make -j"$(nproc)" src/qt/marscoin-qt.exe
+          make -j"$(nproc)" src/marscoind.exe
+          make -j"$(nproc)" src/marscoin-cli.exe
+          make -j"$(nproc)" src/marscoin-tx.exe
+          make -j"$(nproc)" src/marscoin-util.exe
+          make -j"$(nproc)" src/qt/marscoin-qt.exe
 
       - name: Package artifacts
         shell: msys2 {0}
