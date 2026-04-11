@@ -102,7 +102,7 @@ jobs:
       - name: Upload build artifact
         uses: actions/upload-artifact@v4
         with:
-          name: marscoin-${{ github.ref_name }}-${{ matrix.target }}
+          name: marscoin-${{ matrix.target }}-${{ github.run_id }}
           path: marscoin-*-${{ matrix.target }}.tar.gz
 
   build-windows:
@@ -168,7 +168,7 @@ jobs:
             LRELEASE_BIN="/mingw64/bin/lrelease.exe"
           fi
           ./autogen.sh
-          LIBS="-lcrypt32" MOC="$MOC_BIN" UIC="$UIC_BIN" RCC="$RCC_BIN" LRELEASE="$LRELEASE_BIN" ./configure --with-gui=yes --disable-tests --disable-bench
+          LIBS="-lcrypt32" MOC="$MOC_BIN" UIC="$UIC_BIN" RCC="$RCC_BIN" LRELEASE="$LRELEASE_BIN" ./configure --with-gui=yes --disable-tests --disable-bench --disable-static
           make -j"$(nproc)" src/marscoind.exe
           make -j"$(nproc)" src/marscoin-cli.exe
           make -j"$(nproc)" src/marscoin-tx.exe
@@ -190,7 +190,7 @@ jobs:
       - name: Upload build artifact
         uses: actions/upload-artifact@v4
         with:
-          name: marscoin-${{ github.ref_name }}-windows-x86_64
+          name: marscoin-windows-x86_64-${{ github.run_id }}
           path: marscoin-*-windows-x86_64.tar.gz
 
   checksums:
@@ -213,7 +213,7 @@ jobs:
       - name: Upload checksums artifact
         uses: actions/upload-artifact@v4
         with:
-          name: marscoin-${{ github.ref_name }}-checksums
+          name: marscoin-checksums-${{ github.run_id }}
           path: SHA256SUMS
 
   publish:
