@@ -134,13 +134,23 @@ jobs:
       - name: Configure and build
         shell: msys2 {0}
         run: |
-          export PATH="/mingw64/qt5/bin:/mingw64/bin:$PATH"
+          export PATH="/mingw64/qt5/bin:/mingw64/lib/qt5/bin:/mingw64/bin:$PATH"
           MOC_BIN="$(command -v moc-qt5 || command -v moc || true)"
           if [ -z "$MOC_BIN" ] && [ -x /mingw64/qt5/bin/moc.exe ]; then
             MOC_BIN="/mingw64/qt5/bin/moc.exe"
           fi
+          if [ -z "$MOC_BIN" ] && [ -x /mingw64/lib/qt5/bin/moc.exe ]; then
+            MOC_BIN="/mingw64/lib/qt5/bin/moc.exe"
+          fi
+          UIC_BIN="$(command -v uic-qt5 || command -v uic5 || command -v uic || true)"
+          if [ -z "$UIC_BIN" ] && [ -x /mingw64/qt5/bin/uic.exe ]; then
+            UIC_BIN="/mingw64/qt5/bin/uic.exe"
+          fi
+          if [ -z "$UIC_BIN" ] && [ -x /mingw64/lib/qt5/bin/uic.exe ]; then
+            UIC_BIN="/mingw64/lib/qt5/bin/uic.exe"
+          fi
           ./autogen.sh
-          LIBS="-lcrypt32" MOC="$MOC_BIN" ./configure --with-gui=yes --disable-tests --disable-bench
+          LIBS="-lcrypt32" MOC="$MOC_BIN" UIC="$UIC_BIN" ./configure --with-gui=yes --disable-tests --disable-bench
           LIBS="-lcrypt32" make -j"$(nproc)" src/marscoind.exe
           LIBS="-lcrypt32" make -j"$(nproc)" src/marscoin-cli.exe
           LIBS="-lcrypt32" make -j"$(nproc)" src/marscoin-tx.exe
