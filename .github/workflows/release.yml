@@ -21,9 +21,6 @@ jobs:
           - os: ubuntu-24.04
             target: linux-x86_64
             gui: "no"
-          - os: macos-13
-            target: macos-x86_64
-            gui: "yes"
           - os: macos-14
             target: macos-arm64
             gui: "yes"
@@ -74,10 +71,16 @@ jobs:
       - name: Build
         run: |
           if [ "${{ runner.os }}" = "macOS" ]; then
-            make -j"$(sysctl -n hw.ncpu)" src/marscoind src/marscoin-cli src/marscoin-tx src/marscoin-util
+            make -j"$(sysctl -n hw.ncpu)" src/marscoind
+            make -j"$(sysctl -n hw.ncpu)" src/marscoin-cli
+            make -j"$(sysctl -n hw.ncpu)" src/marscoin-tx
+            make -j"$(sysctl -n hw.ncpu)" src/marscoin-util
             make -j"$(sysctl -n hw.ncpu)" src/qt/marscoin-qt
           else
-            make -j"$(nproc)" src/marscoind src/marscoin-cli src/marscoin-tx src/marscoin-util
+            make -j"$(nproc)" src/marscoind
+            make -j"$(nproc)" src/marscoin-cli
+            make -j"$(nproc)" src/marscoin-tx
+            make -j"$(nproc)" src/marscoin-util
           fi
 
       - name: Package artifacts
@@ -126,8 +129,11 @@ jobs:
         shell: msys2 {0}
         run: |
           ./autogen.sh
-          ./configure --without-gui --disable-tests --disable-bench
-          make -j"$(nproc)" src/marscoind.exe src/marscoin-cli.exe src/marscoin-tx.exe src/marscoin-util.exe
+          LIBS="-lcrypt32" ./configure --without-gui --disable-tests --disable-bench
+          LIBS="-lcrypt32" make -j"$(nproc)" src/marscoind.exe
+          LIBS="-lcrypt32" make -j"$(nproc)" src/marscoin-cli.exe
+          LIBS="-lcrypt32" make -j"$(nproc)" src/marscoin-tx.exe
+          LIBS="-lcrypt32" make -j"$(nproc)" src/marscoin-util.exe
 
       - name: Package artifacts
         shell: msys2 {0}
