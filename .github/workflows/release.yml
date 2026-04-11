@@ -149,8 +149,22 @@ jobs:
           if [ -z "$UIC_BIN" ] && [ -x /mingw64/lib/qt5/bin/uic.exe ]; then
             UIC_BIN="/mingw64/lib/qt5/bin/uic.exe"
           fi
+          RCC_BIN="$(command -v rcc-qt5 || command -v rcc5 || command -v rcc || true)"
+          if [ -z "$RCC_BIN" ] && [ -x /mingw64/qt5/bin/rcc.exe ]; then
+            RCC_BIN="/mingw64/qt5/bin/rcc.exe"
+          fi
+          if [ -z "$RCC_BIN" ] && [ -x /mingw64/lib/qt5/bin/rcc.exe ]; then
+            RCC_BIN="/mingw64/lib/qt5/bin/rcc.exe"
+          fi
+          if [ -z "$RCC_BIN" ] && [ -x /mingw64/bin/rcc.exe ]; then
+            RCC_BIN="/mingw64/bin/rcc.exe"
+          fi
+          LRELEASE_BIN="$(command -v lrelease-qt5 || command -v lrelease || true)"
+          if [ -z "$LRELEASE_BIN" ] && [ -x /mingw64/bin/lrelease.exe ]; then
+            LRELEASE_BIN="/mingw64/bin/lrelease.exe"
+          fi
           ./autogen.sh
-          LIBS="-lcrypt32" MOC="$MOC_BIN" UIC="$UIC_BIN" ./configure --with-gui=yes --disable-tests --disable-bench
+          LIBS="-lcrypt32" MOC="$MOC_BIN" UIC="$UIC_BIN" RCC="$RCC_BIN" LRELEASE="$LRELEASE_BIN" ./configure --with-gui=yes --disable-tests --disable-bench
           LIBS="-lcrypt32" make -j"$(nproc)" src/marscoind.exe
           LIBS="-lcrypt32" make -j"$(nproc)" src/marscoin-cli.exe
           LIBS="-lcrypt32" make -j"$(nproc)" src/marscoin-tx.exe
