@@ -34,14 +34,6 @@
 #include <stdint.h>
 #include <string.h>
 
-#ifdef _MSC_VER
-// MSVC 64bit is unable to use inline asm
-#include <intrin.h>
-#else
-// GCC Linux or i686-w64-mingw32
-#include <cpuid.h>
-#endif
-
 #ifndef __FreeBSD__
 static inline uint32_t be32dec(const void *pp)
 {
