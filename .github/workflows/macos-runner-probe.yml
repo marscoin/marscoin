@@ -14,7 +14,6 @@ jobs:
       matrix:
         label:
           - macos-14
-          - macos-13
           - macos-15
           - macos-15-intel
     runs-on: ${{ matrix.label }}
@@ -30,8 +29,8 @@ jobs:
           sw_vers
 
   intel_gui_smoke:
-    name: Intel GUI Smoke (macos-13)
-    runs-on: macos-13
+    name: Intel GUI Smoke (macos-15-intel)
+    runs-on: macos-15-intel
     needs: probe
     if: ${{ always() }}
 
