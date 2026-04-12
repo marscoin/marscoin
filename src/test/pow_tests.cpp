@@ -227,6 +227,15 @@ BOOST_AUTO_TEST_CASE(RandomX_consensus_profile_scaffold)
         "RandomX v2 flag is required by consensus profile");
 }
 
+BOOST_AUTO_TEST_CASE(ChainParams_QDEVNET_regtest_randomx_toggle)
+{
+    ArgsManager args;
+    args.ForceSetArg("-chain", "qdevnet");
+    const auto params = CreateChainParams(args, ChainType::REGTEST);
+    BOOST_CHECK(params->GetConsensus().fPowUseRandomX);
+    BOOST_CHECK_EQUAL(params->GetDefaultPort(), 19444);
+}
+
 #ifdef ENABLE_RANDOMX_VENDOR
 BOOST_AUTO_TEST_CASE(RandomX_wrapper_deterministic_vectors)
 {
@@ -234,31 +243,31 @@ BOOST_AUTO_TEST_CASE(RandomX_wrapper_deterministic_vectors)
     std::string error;
 
     const std::vector<unsigned char> key_1{'m','a','r','s','-','s','e','e','d','-','e','p','o','c','h','-','0','0','0','1'};
-    BOOST_CHECK(randomx::InitCache(cache, key_1, error));
+    BOOST_CHECK(randomx::InitCache(cache, Span<const unsigned char>(key_1.data(), key_1.size()), error));
     BOOST_CHECK(error.empty());
 
     std::array<unsigned char, 32> hash_1a;
     std::array<unsigned char, 32> hash_1b;
     const std::vector<unsigned char> input_1{'b','l','o','c','k','-','h','e','a','d','e','r','-','s','a','m','p','l','e','-','0','0','0','1'};
-    BOOST_CHECK(randomx::HashOnce(cache, input_1, hash_1a, error));
+    BOOST_CHECK(randomx::HashOnce(cache, Span<const unsigned char>(input_1.data(), input_1.size()), hash_1a, error));
     BOOST_CHECK(error.empty());
-    BOOST_CHECK(randomx::HashOnce(cache, input_1, hash_1b, error));
+    BOOST_CHECK(randomx::HashOnce(cache, Span<const unsigned char>(input_1.data(), input_1.size()), hash_1b, error));
     BOOST_CHECK(error.empty());
     BOOST_CHECK_EQUAL(HexStr(hash_1a), HexStr(hash_1b));
 
     const std::vector<unsigned char> key_2{'m','a','r','s','-','s','e','e','d','-','e','p','o','c','h','-','0','0','0','2'};
-    BOOST_CHECK(randomx::InitCache(cache, key_2, error));
+    BOOST_CHECK(randomx::InitCache(cache, Span<const unsigned char>(key_2.data(), key_2.size()), error));
     BOOST_CHECK(error.empty());
 
     std::array<unsigned char, 32> hash_2;
     const std::vector<unsigned char> input_2{'b','l','o','c','k','-','h','e','a','d','e','r','-','s','a','m','p','l','e','-','0','0','0','2'};
-    BOOST_CHECK(randomx::HashOnce(cache, input_2, hash_2, error));
+    BOOST_CHECK(randomx::HashOnce(cache, Span<const unsigned char>(input_2.data(), input_2.size()), hash_2, error));
     BOOST_CHECK(error.empty());
     BOOST_CHECK_NE(HexStr(hash_1a), HexStr(hash_2));
 
     randomx::CacheHandle empty_cache;
     std::array<unsigned char, 32> hash_fail;
-    BOOST_CHECK(!randomx::HashOnce(empty_cache, input_1, hash_fail, error));
+    BOOST_CHECK(!randomx::HashOnce(empty_cache, Span<const unsigned char>(input_1.data(), input_1.size()), hash_fail, error));
     BOOST_CHECK_EQUAL(error, "RandomX cache is not initialized");
 
     randomx::ReleaseCache(cache);

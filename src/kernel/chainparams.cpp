@@ -579,6 +579,7 @@ public:
         consensus.fPowAllowMinDifficultyBlocks = true;
         consensus.enforce_BIP94 = true;
         consensus.fPowNoRetargeting = true;
+        consensus.fPowUseRandomX = opts.randomx_devnet;
         consensus.nRuleChangeActivationThreshold = 108; // 75% for testchains
         consensus.nMinerConfirmationWindow = 144; // Faster than normal for regtest (144 instead of 2016)
 
@@ -596,15 +597,15 @@ public:
         consensus.defaultAssumeValid = uint256{};
 
         consensus.nAuxpowStartHeight = 0;
-        consensus.nAuxpowChainId = 0x0001;
-        consensus.fStrictChainId = true;
+        consensus.nAuxpowChainId = opts.randomx_devnet ? 0x0715 : 0x0001;
+        consensus.fStrictChainId = opts.randomx_devnet ? false : true;
         consensus.nLegacyBlocksBefore = 0;
 
-        pchMessageStart[0] = 0xfa;
-        pchMessageStart[1] = 0xbf;
-        pchMessageStart[2] = 0xb5;
-        pchMessageStart[3] = 0xda;
-        nDefaultPort = 18444;
+        pchMessageStart[0] = opts.randomx_devnet ? 0xce : 0xfa;
+        pchMessageStart[1] = opts.randomx_devnet ? 0xfa : 0xbf;
+        pchMessageStart[2] = opts.randomx_devnet ? 0x71 : 0xb5;
+        pchMessageStart[3] = opts.randomx_devnet ? 0x5a : 0xda;
+        nDefaultPort = opts.randomx_devnet ? 19444 : 18444;
         nPruneAfterHeight = opts.fastprune ? 100 : 1000;
         m_assumed_blockchain_size = 0;
         m_assumed_chain_state_size = 0;
@@ -688,7 +689,7 @@ public:
         base58Prefixes[EXT_PUBLIC_KEY] = {0x04, 0x35, 0x87, 0xCF};
         base58Prefixes[EXT_SECRET_KEY] = {0x04, 0x35, 0x83, 0x94};
 
-        bech32_hrp = "bcrt";
+        bech32_hrp = opts.randomx_devnet ? "mq" : "bcrt";
     }
 };
 

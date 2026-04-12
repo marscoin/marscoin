@@ -115,6 +115,7 @@ struct Params {
       */
     bool enforce_BIP94;
     bool fPowNoRetargeting;
+    bool fPowUseRandomX{false};
     int64_t nPowTargetSpacing;
     int64_t nPowTargetTimespan;
     int64_t nASERTAnchor;
