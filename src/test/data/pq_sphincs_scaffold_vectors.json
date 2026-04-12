@@ -1,0 +1,28 @@
+[
+  {
+    "name": "valid_sha2_128s_minimal_zeroed",
+    "parameter_set": 0,
+    "payload_length": 7857,
+    "valid_encoding": true
+  },
+  {
+    "name": "empty_payload",
+    "payload_length": 0,
+    "valid_encoding": false,
+    "expected_error": "Empty SPHINCS+ payload"
+  },
+  {
+    "name": "unsupported_parameter_set",
+    "parameter_set": 127,
+    "payload_length": 7857,
+    "valid_encoding": false,
+    "expected_error": "Unsupported SPHINCS+ parameter set"
+  },
+  {
+    "name": "invalid_length",
+    "parameter_set": 0,
+    "payload_length": 7856,
+    "valid_encoding": false,
+    "expected_error": "Invalid SPHINCS+ payload length"
+  }
+]
