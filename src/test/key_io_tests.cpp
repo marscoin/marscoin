@@ -146,4 +146,38 @@ BOOST_AUTO_TEST_CASE(key_io_invalid)
     }
 }
 
+BOOST_AUTO_TEST_CASE(key_io_post_quantum_address_scaffold)
+{
+    struct PrefixVector {
+        ChainType chain;
+        std::string address;
+        bool is_pq;
+    };
+
+    const std::vector<PrefixVector> vectors{
+        {ChainType::MAIN, "mars1pqexampleaddress0000000000000000000000", true},
+        {ChainType::TESTNET, "tmars1pqexampleaddress000000000000000000000", true},
+        {ChainType::SIGNET, "tb1pqexampleaddress000000000000000000000000", true},
+        {ChainType::REGTEST, "bcrt1pqexampleaddress0000000000000000000000", true},
+        {ChainType::MAIN, "mars1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh", false},
+        {ChainType::MAIN, "M4f82c4d228f34c5bde0f6968dcfdbf67e", false},
+    };
+
+    for (const auto& vector : vectors) {
+        SelectParams(vector.chain);
+        BOOST_CHECK_EQUAL(IsPostQuantumAddress(vector.address), vector.is_pq);
+    }
+
+    SelectParams(ChainType::MAIN);
+    std::string error;
+    const CTxDestination dest = DecodeDestination("mars1pqexampleaddress0000000000000000000000", error);
+    BOOST_CHECK(!IsValidDestination(dest));
+    BOOST_CHECK_EQUAL(error, "Post-quantum address format is recognized but not enabled yet");
+
+    // This is the error text surfaced by RPC endpoints like getaddressinfo.
+    std::string rpc_error;
+    (void)DecodeDestination("mars1pqdeadbeefdeadbeefdeadbeefdeadbeef", rpc_error);
+    BOOST_CHECK_EQUAL(rpc_error, "Post-quantum address format is recognized but not enabled yet");
+}
+
 BOOST_AUTO_TEST_SUITE_END()

@@ -1,0 +1,42 @@
+[
+  {
+    "address": "mars1pqexampleaddress0000000000000000000000",
+    "chain": "main",
+    "is_pq_prefix": true,
+    "roundtrip_supported": false,
+    "expected_error": "Post-quantum address format is recognized but not enabled yet"
+  },
+  {
+    "address": "tmars1pqexampleaddress000000000000000000000",
+    "chain": "test",
+    "is_pq_prefix": true,
+    "roundtrip_supported": false,
+    "expected_error": "Post-quantum address format is recognized but not enabled yet"
+  },
+  {
+    "address": "tb1pqexampleaddress000000000000000000000000",
+    "chain": "signet",
+    "is_pq_prefix": true,
+    "roundtrip_supported": false,
+    "expected_error": "Post-quantum address format is recognized but not enabled yet"
+  },
+  {
+    "address": "bcrt1pqexampleaddress0000000000000000000000",
+    "chain": "regtest",
+    "is_pq_prefix": true,
+    "roundtrip_supported": false,
+    "expected_error": "Post-quantum address format is recognized but not enabled yet"
+  },
+  {
+    "address": "mars1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh",
+    "chain": "main",
+    "is_pq_prefix": false,
+    "roundtrip_supported": true
+  },
+  {
+    "address": "M4f82c4d228f34c5bde0f6968dcfdbf67e",
+    "chain": "main",
+    "is_pq_prefix": false,
+    "roundtrip_supported": true
+  }
+]
