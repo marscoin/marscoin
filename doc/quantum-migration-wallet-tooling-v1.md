@@ -21,6 +21,17 @@ Current scaffold behavior:
 This RPC is intended as a stable contract for monitoring integrations and
 operator playbooks before migration transactions are implemented.
 
+## RPC: estimatequantummigration
+
+Current scaffold behavior:
+
+- Inspects wallet UTXOs in read-only mode.
+- Classifies outputs into `eligible`, `pending_or_unsafe`, and `locked` groups.
+- Produces rough transaction/vsize and fee estimates (`low`, `medium`, `high`).
+- Returns warnings for operator attention (for example no eligible UTXOs).
+
+This endpoint is a dry-run planner and does not create migration transactions.
+
 ## Non-goals (v1)
 
 - No creation of migration transactions

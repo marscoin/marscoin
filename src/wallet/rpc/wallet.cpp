@@ -14,6 +14,7 @@
 #include <wallet/receive.h>
 #include <wallet/rpc/wallet.h>
 #include <wallet/rpc/util.h>
+#include <wallet/spend.h>
 #include <wallet/wallet.h>
 #include <wallet/walletutil.h>
 
@@ -204,6 +205,128 @@ static RPCHelpMan getquantummigrationstatus()
     result.pushKV("migrated_balance", ValueFromAmount(0));
     result.pushKV("remaining_legacy_balance", ValueFromAmount(remaining_legacy));
     result.pushKV("recommended_next_action", "Review quantum-upgrade docs and wait for migration activation release");
+    return result;
+},
+    };
+}
+
+static RPCHelpMan estimatequantummigration()
+{
+    return RPCHelpMan{"estimatequantummigration",
+                "Returns a read-only dry-run estimate for wallet quantum migration planning.\n"
+                "This RPC does not create or broadcast transactions.\n",
+                {},
+                RPCResult{
+                    RPCResult::Type::OBJ, "", "",
+                    {
+                        {RPCResult::Type::STR, "walletname", "the wallet name"},
+                        {RPCResult::Type::STR, "phase", "current migration implementation phase"},
+                        {RPCResult::Type::OBJ, "utxo_summary", "legacy UTXO planning summary", {
+                            {RPCResult::Type::NUM, "eligible_count", "confirmed spendable UTXOs eligible for migration planning"},
+                            {RPCResult::Type::NUM, "pending_or_unsafe_count", "UTXOs currently unconfirmed or unsafe for planning"},
+                            {RPCResult::Type::NUM, "locked_count", "wallet-locked UTXOs"},
+                            {RPCResult::Type::STR_AMOUNT, "eligible_amount", "sum of eligible UTXO values"},
+                            {RPCResult::Type::STR_AMOUNT, "pending_or_unsafe_amount", "sum of unconfirmed/unsafe UTXO values"},
+                            {RPCResult::Type::STR_AMOUNT, "locked_amount", "sum of locked UTXO values"},
+                        }},
+                        {RPCResult::Type::OBJ, "estimated_plan", "high-level migration batching and fee estimate", {
+                            {RPCResult::Type::NUM, "estimated_transactions", "estimated number of migration transactions"},
+                            {RPCResult::Type::NUM, "estimated_total_vbytes", "rough total virtual size for all estimated transactions"},
+                            {RPCResult::Type::STR_AMOUNT, "fee_low", "estimated total fee at 1 sat/vB"},
+                            {RPCResult::Type::STR_AMOUNT, "fee_medium", "estimated total fee at 3 sat/vB"},
+                            {RPCResult::Type::STR_AMOUNT, "fee_high", "estimated total fee at 10 sat/vB"},
+                        }},
+                        {RPCResult::Type::ARR, "warnings", "planning caveats", {
+                            {RPCResult::Type::STR, "", "warning text"},
+                        }},
+                    }
+                },
+                RPCExamples{
+                    HelpExampleCli("estimatequantummigration", "")
+            + HelpExampleRpc("estimatequantummigration", "")
+                },
+        [&](const RPCHelpMan& self, const JSONRPCRequest& request) -> UniValue
+{
+    const std::shared_ptr<const CWallet> pwallet = GetWalletForJSONRPCRequest(request);
+    if (!pwallet) return UniValue::VNULL;
+
+    pwallet->BlockUntilSyncedToCurrentChain();
+    LOCK(pwallet->cs_wallet);
+
+    CoinFilterParams params;
+    params.only_spendable = true;
+    params.skip_locked = false;
+    params.include_immature_coinbase = true;
+
+    const auto coins = AvailableCoinsListUnspent(*pwallet, nullptr, params).All();
+
+    int eligible_count{0};
+    int pending_or_unsafe_count{0};
+    int locked_count{0};
+    CAmount eligible_amount{0};
+    CAmount pending_or_unsafe_amount{0};
+    CAmount locked_amount{0};
+
+    for (const auto& coin : coins) {
+        const bool locked = pwallet->IsLockedCoin(coin.outpoint);
+        if (locked) {
+            ++locked_count;
+            locked_amount += coin.txout.nValue;
+            continue;
+        }
+
+        if (coin.depth > 0 && coin.safe) {
+            ++eligible_count;
+            eligible_amount += coin.txout.nValue;
+        } else {
+            ++pending_or_unsafe_count;
+            pending_or_unsafe_amount += coin.txout.nValue;
+        }
+    }
+
+    static constexpr int MAX_INPUTS_PER_TX{120};
+    const int estimated_transactions = eligible_count == 0 ? 0 : (eligible_count + MAX_INPUTS_PER_TX - 1) / MAX_INPUTS_PER_TX;
+    const int64_t estimated_total_vbytes =
+        static_cast<int64_t>(estimated_transactions) * 10 +
+        static_cast<int64_t>(eligible_count) * 180 +
+        static_cast<int64_t>(estimated_transactions) * 34;
+
+    const CAmount fee_low = estimated_total_vbytes * 1;
+    const CAmount fee_medium = estimated_total_vbytes * 3;
+    const CAmount fee_high = estimated_total_vbytes * 10;
+
+    UniValue utxo_summary(UniValue::VOBJ);
+    utxo_summary.pushKV("eligible_count", eligible_count);
+    utxo_summary.pushKV("pending_or_unsafe_count", pending_or_unsafe_count);
+    utxo_summary.pushKV("locked_count", locked_count);
+    utxo_summary.pushKV("eligible_amount", ValueFromAmount(eligible_amount));
+    utxo_summary.pushKV("pending_or_unsafe_amount", ValueFromAmount(pending_or_unsafe_amount));
+    utxo_summary.pushKV("locked_amount", ValueFromAmount(locked_amount));
+
+    UniValue estimated_plan(UniValue::VOBJ);
+    estimated_plan.pushKV("estimated_transactions", estimated_transactions);
+    estimated_plan.pushKV("estimated_total_vbytes", estimated_total_vbytes);
+    estimated_plan.pushKV("fee_low", ValueFromAmount(fee_low));
+    estimated_plan.pushKV("fee_medium", ValueFromAmount(fee_medium));
+    estimated_plan.pushKV("fee_high", ValueFromAmount(fee_high));
+
+    UniValue warnings(UniValue::VARR);
+    if (eligible_count == 0) {
+        warnings.push_back("No confirmed safe spendable UTXOs are currently eligible for migration planning");
+    }
+    if (pending_or_unsafe_count > 0) {
+        warnings.push_back("Some UTXOs are pending or unsafe and are excluded from eligible estimates");
+    }
+    if (locked_count > 0) {
+        warnings.push_back("Some UTXOs are wallet-locked and excluded from eligible estimates");
+    }
+
+    UniValue result(UniValue::VOBJ);
+    result.pushKV("walletname", pwallet->GetName());
+    result.pushKV("phase", "scaffold");
+    result.pushKV("utxo_summary", std::move(utxo_summary));
+    result.pushKV("estimated_plan", std::move(estimated_plan));
+    result.pushKV("warnings", std::move(warnings));
     return result;
 },
     };
@@ -1192,6 +1315,7 @@ Span<const CRPCCommand> GetWalletRPCCommands()
         {"wallet", &gettransaction},
         {"wallet", &getunconfirmedbalance},
         {"wallet", &getbalances},
+        {"wallet", &estimatequantummigration},
         {"wallet", &getquantummigrationstatus},
         {"wallet", &getwalletinfo},
         {"wallet", &importaddress},
