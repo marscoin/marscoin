@@ -145,6 +145,70 @@ static RPCHelpMan getwalletinfo()
     };
 }
 
+static RPCHelpMan getquantummigrationstatus()
+{
+    return RPCHelpMan{"getquantummigrationstatus",
+                "Returns read-only scaffold status for wallet quantum migration planning.\n"
+                "This RPC does not move funds or modify wallet state.\n",
+                {},
+                RPCResult{
+                    RPCResult::Type::OBJ, "", "",
+                    {
+                        {RPCResult::Type::STR, "walletname", "the wallet name"},
+                        {RPCResult::Type::BOOL, "migration_enabled", "whether quantum migration transactions are enabled"},
+                        {RPCResult::Type::STR, "phase", "current migration implementation phase"},
+                        {RPCResult::Type::NUM, "txcount", "wallet transaction count"},
+                        {RPCResult::Type::OBJ, "balances", "balance snapshot for planning", {
+                            {RPCResult::Type::STR_AMOUNT, "trusted", "trusted spendable balance"},
+                            {RPCResult::Type::STR_AMOUNT, "untrusted_pending", "pending balance"},
+                            {RPCResult::Type::STR_AMOUNT, "immature", "immature balance"},
+                            {RPCResult::Type::STR_AMOUNT, "watchonly_trusted", "trusted watch-only balance"},
+                        }},
+                        {RPCResult::Type::STR_AMOUNT, "migrated_balance", "amount already migrated to post-quantum format (scaffold always 0)"},
+                        {RPCResult::Type::STR_AMOUNT, "remaining_legacy_balance", "amount remaining on legacy paths"},
+                        {RPCResult::Type::STR, "recommended_next_action", "operator guidance for current phase"},
+                    }
+                },
+                RPCExamples{
+                    HelpExampleCli("getquantummigrationstatus", "")
+            + HelpExampleRpc("getquantummigrationstatus", "")
+                },
+        [&](const RPCHelpMan& self, const JSONRPCRequest& request) -> UniValue
+{
+    const std::shared_ptr<const CWallet> pwallet = GetWalletForJSONRPCRequest(request);
+    if (!pwallet) return UniValue::VNULL;
+
+    pwallet->BlockUntilSyncedToCurrentChain();
+    LOCK(pwallet->cs_wallet);
+
+    const auto bal = GetBalance(*pwallet);
+
+    const CAmount trusted{bal.m_mine_trusted};
+    const CAmount untrusted{bal.m_mine_untrusted_pending};
+    const CAmount immature{bal.m_mine_immature};
+    const CAmount watchonly{bal.m_watchonly_trusted};
+    const CAmount remaining_legacy{trusted + untrusted + immature};
+
+    UniValue balances(UniValue::VOBJ);
+    balances.pushKV("trusted", ValueFromAmount(trusted));
+    balances.pushKV("untrusted_pending", ValueFromAmount(untrusted));
+    balances.pushKV("immature", ValueFromAmount(immature));
+    balances.pushKV("watchonly_trusted", ValueFromAmount(watchonly));
+
+    UniValue result(UniValue::VOBJ);
+    result.pushKV("walletname", pwallet->GetName());
+    result.pushKV("migration_enabled", false);
+    result.pushKV("phase", "scaffold");
+    result.pushKV("txcount", static_cast<int>(pwallet->mapWallet.size()));
+    result.pushKV("balances", std::move(balances));
+    result.pushKV("migrated_balance", ValueFromAmount(0));
+    result.pushKV("remaining_legacy_balance", ValueFromAmount(remaining_legacy));
+    result.pushKV("recommended_next_action", "Review quantum-upgrade docs and wait for migration activation release");
+    return result;
+},
+    };
+}
+
 static RPCHelpMan listwalletdir()
 {
     return RPCHelpMan{"listwalletdir",
@@ -1128,6 +1192,7 @@ Span<const CRPCCommand> GetWalletRPCCommands()
         {"wallet", &gettransaction},
         {"wallet", &getunconfirmedbalance},
         {"wallet", &getbalances},
+        {"wallet", &getquantummigrationstatus},
         {"wallet", &getwalletinfo},
         {"wallet", &importaddress},
         {"wallet", &importdescriptors},
