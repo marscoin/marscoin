@@ -736,6 +736,8 @@ libmarscoin_common_a_SOURCES = \
 
 if ENABLE_RANDOMX_VENDOR
 libmarscoin_common_a_SOURCES += \
+  randomx_wrapper.cpp \
+  randomx_wrapper.h \
   randomx_scaffold.cpp \
   randomx_scaffold.h
 endif

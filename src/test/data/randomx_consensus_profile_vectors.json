@@ -8,5 +8,17 @@
       "RANDOMX_FLAG_V2"
     ],
     "activation": "scaffold-only"
+  },
+  {
+    "name": "wrapper_vector_1",
+    "seed_key": "mars-seed-epoch-0001",
+    "input": "block-header-sample-0001",
+    "expected_hash_hex": "e6c41b3e7b9962956ec56910a39ab6998fcf742fb273620cd2b967c529062abd"
+  },
+  {
+    "name": "wrapper_vector_2",
+    "seed_key": "mars-seed-epoch-0002",
+    "input": "block-header-sample-0002",
+    "expected_hash_hex": "cb297913ba7beb91184079945d6dd86dd66b6b167394fc10c38dbdf4a2e14b16"
   }
 ]

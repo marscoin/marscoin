@@ -29,6 +29,10 @@ the quantum-upgrade program.
   `src/crypto/randomx_vendor/` for reproducible future integration.
 - Build integration remains non-activating and is gated by
   `--enable-randomx-vendor`.
+- Adds a thin internal wrapper scaffold (`InitCache`, `HashOnce`) in
+  `src/randomx_wrapper.{h,cpp}` with deterministic test vectors.
+- Wrapper currently uses deterministic scaffold hashing for CI stability and
+  does not yet execute RandomX VM code paths.
 
 ## Follow-up Work
 
