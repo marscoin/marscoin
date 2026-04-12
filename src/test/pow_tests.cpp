@@ -5,6 +5,7 @@
 #include <chain.h>
 #include <chainparams.h>
 #include <pow.h>
+#include <randomx_profile.h>
 #include <test/util/random.h>
 #include <test/util/setup_common.h>
 #include <util/chaintype.h>
@@ -206,6 +207,20 @@ BOOST_AUTO_TEST_CASE(ChainParams_TESTNET4_sanity)
 BOOST_AUTO_TEST_CASE(ChainParams_SIGNET_sanity)
 {
     sanity_check_chainparams(*m_node.args, ChainType::SIGNET);
+}
+
+BOOST_AUTO_TEST_CASE(RandomX_consensus_profile_scaffold)
+{
+    const auto profile = randomx::GetConsensusProfileV1();
+    BOOST_CHECK_EQUAL(profile.upstream_repo, "tevador/RandomX");
+    BOOST_CHECK_EQUAL(profile.upstream_tag, "v2.0");
+    BOOST_CHECK_EQUAL(profile.upstream_commit, "e0db3c4a8de36d77f50c12f7099bc37401cab88c");
+    BOOST_CHECK(randomx::IsConsensusProfilePinned(profile));
+
+    BOOST_CHECK(randomx::ValidateScaffoldFlags(randomx::FLAG_V2).empty());
+    BOOST_CHECK_EQUAL(
+        randomx::ValidateScaffoldFlags(randomx::FLAG_DEFAULT),
+        "RandomX v2 flag is required by consensus profile");
 }
 
 BOOST_AUTO_TEST_SUITE_END()

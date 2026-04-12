@@ -1,0 +1,4 @@
+upstream_repo=tevador/RandomX
+upstream_tag=v2.0
+upstream_commit=e0db3c4a8de36d77f50c12f7099bc37401cab88c
+snapshot_note=vendored_for_non_activating_scaffold_only

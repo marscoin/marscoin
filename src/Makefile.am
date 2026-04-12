@@ -733,6 +733,12 @@ libmarscoin_common_a_SOURCES = \
   script/signingprovider.cpp \
   script/solver.cpp \
   $(BITCOIN_CORE_H)
+
+if ENABLE_RANDOMX_VENDOR
+libmarscoin_common_a_SOURCES += \
+  randomx_scaffold.cpp \
+  randomx_scaffold.h
+endif
 #
 
 # util #
