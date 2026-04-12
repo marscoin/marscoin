@@ -102,7 +102,7 @@ jobs:
       - name: Upload build artifact
         uses: actions/upload-artifact@v4
         with:
-          name: marscoin-${{ github.ref_name }}-${{ matrix.target }}
+          name: marscoin-${{ matrix.target }}-${{ github.run_id }}
           path: marscoin-*-${{ matrix.target }}.tar.gz
 
   build-windows:
@@ -136,6 +136,9 @@ jobs:
         shell: msys2 {0}
         run: |
           export PATH="/mingw64/qt5/bin:/mingw64/lib/qt5/bin:/mingw64/bin:$PATH"
+          export PKG_CONFIG_PATH="/mingw64/lib/pkgconfig:/mingw64/share/pkgconfig"
+          export CPPFLAGS="-I/mingw64/include"
+          export LDFLAGS="-L/mingw64/lib -L/mingw64/qt5/lib -L/mingw64/lib/qt5/lib"
           MOC_BIN="$(command -v moc-qt5 || command -v moc || true)"
           if [ -z "$MOC_BIN" ] && [ -x /mingw64/qt5/bin/moc.exe ]; then
             MOC_BIN="/mingw64/qt5/bin/moc.exe"
@@ -165,12 +168,12 @@ jobs:
             LRELEASE_BIN="/mingw64/bin/lrelease.exe"
           fi
           ./autogen.sh
-          LIBS="-lcrypt32" MOC="$MOC_BIN" UIC="$UIC_BIN" RCC="$RCC_BIN" LRELEASE="$LRELEASE_BIN" ./configure --with-gui=yes --disable-tests --disable-bench
-          LIBS="-lcrypt32" make -j"$(nproc)" src/marscoind.exe
-          LIBS="-lcrypt32" make -j"$(nproc)" src/marscoin-cli.exe
-          LIBS="-lcrypt32" make -j"$(nproc)" src/marscoin-tx.exe
-          LIBS="-lcrypt32" make -j"$(nproc)" src/marscoin-util.exe
-          LIBS="-lcrypt32" make -j"$(nproc)" src/qt/marscoin-qt.exe
+          LIBS="-lcrypt32" MOC="$MOC_BIN" UIC="$UIC_BIN" RCC="$RCC_BIN" LRELEASE="$LRELEASE_BIN" ./configure --with-gui=yes --disable-tests --disable-bench --disable-static
+          make LIBTOOL_APP_LDFLAGS= -j"$(nproc)" src/marscoind.exe
+          make LIBTOOL_APP_LDFLAGS= -j"$(nproc)" src/marscoin-cli.exe
+          make LIBTOOL_APP_LDFLAGS= -j"$(nproc)" src/marscoin-tx.exe
+          make LIBTOOL_APP_LDFLAGS= -j"$(nproc)" src/marscoin-util.exe
+          make V=1 LIBTOOL_APP_LDFLAGS= -j"$(nproc)" src/qt/marscoin-qt.exe
 
       - name: Package artifacts
         shell: msys2 {0}
@@ -187,7 +190,7 @@ jobs:
       - name: Upload build artifact
         uses: actions/upload-artifact@v4
         with:
-          name: marscoin-${{ github.ref_name }}-windows-x86_64
+          name: marscoin-windows-x86_64-${{ github.run_id }}
           path: marscoin-*-windows-x86_64.tar.gz
 
   checksums:
@@ -210,7 +213,7 @@ jobs:
       - name: Upload checksums artifact
         uses: actions/upload-artifact@v4
         with:
-          name: marscoin-${{ github.ref_name }}-checksums
+          name: marscoin-checksums-${{ github.run_id }}
           path: SHA256SUMS
 
   publish:
