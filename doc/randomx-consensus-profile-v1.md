@@ -25,7 +25,10 @@ the quantum-upgrade program.
 
 - This branch adds profile constants and tests only.
 - No block validation, mining, retargeting, or chainparams activation changes.
-- No RandomX source vendoring in this PR.
+- Includes a vendored RandomX source snapshot under
+  `src/crypto/randomx_vendor/` for reproducible future integration.
+- Build integration remains non-activating and is gated by
+  `--enable-randomx-vendor`.
 
 ## Follow-up Work
 
