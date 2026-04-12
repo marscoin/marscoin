@@ -52,8 +52,8 @@ jobs:
           ./src/marscoind --version
           ./src/marscoin-cli --version
 
-  linux-qdevnet-randomx-smoke:
-    name: Linux qdevnet RandomX Smoke
+  linux-marsqnet-randomx-smoke:
+    name: Linux marsqnet RandomX Smoke
     runs-on: ubuntu-24.04
     timeout-minutes: 60
 
@@ -88,19 +88,19 @@ jobs:
           make -j"$(nproc)" src/marscoind
           make -j"$(nproc)" src/marscoin-cli
 
-      - name: Run qdevnet smoke
+      - name: Run marsqnet smoke
         env:
-          DATADIR_BASE: ${{ runner.temp }}/qdevnet-smoke
+          DATADIR_BASE: ${{ runner.temp }}/marsqnet-smoke
           BLOCKS: "2"
           TIMEOUT_SEC: "60"
-        run: contrib/devtools/qdevnet-randomx-smoke.sh
+        run: contrib/devtools/marsqnet-randomx-smoke.sh
 
-      - name: Upload qdevnet logs on failure
+      - name: Upload marsqnet logs on failure
         if: failure()
         uses: actions/upload-artifact@v4
         with:
-          name: qdevnet-smoke-logs
-          path: ${{ runner.temp }}/qdevnet-smoke
+          name: marsqnet-smoke-logs
+          path: ${{ runner.temp }}/marsqnet-smoke
 
   macos-arm64-gui-build:
     name: macOS ARM64 GUI Build

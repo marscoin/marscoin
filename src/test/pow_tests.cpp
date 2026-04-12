@@ -227,13 +227,13 @@ BOOST_AUTO_TEST_CASE(RandomX_consensus_profile_scaffold)
         "RandomX v2 flag is required by consensus profile");
 }
 
-BOOST_AUTO_TEST_CASE(ChainParams_QDEVNET_regtest_randomx_toggle)
+BOOST_AUTO_TEST_CASE(ChainParams_MARSQNET_regtest_randomx_toggle)
 {
     ArgsManager args;
-    args.ForceSetArg("-chain", "qdevnet");
+    args.ForceSetArg("-chain", "marsqnet");
     const auto params = CreateChainParams(args, ChainType::REGTEST);
     BOOST_CHECK(params->GetConsensus().fPowUseRandomX);
-    BOOST_CHECK_EQUAL(params->GetDefaultPort(), 19444);
+    BOOST_CHECK_EQUAL(params->GetDefaultPort(), 29338);
 }
 
 #ifdef ENABLE_RANDOMX_VENDOR

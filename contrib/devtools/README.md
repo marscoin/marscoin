@@ -155,14 +155,16 @@ Example usage:
     cd .../src
     ../contrib/devtools/circular-dependencies.py {*,*/*,*/*/*}.{h,cpp}
 
-qdevnet-randomx-smoke.sh
-========================
+marsqnet-randomx-smoke.sh
+=========================
 
-Starts a two-node local `-chain=qdevnet` network, mines a configurable number
+Starts a two-node local `-chain=marsqnet` network, mines a configurable number
 of blocks on node1, and verifies node2 syncs to the expected height.
 
 Example usage from the repository root:
 
 ```bash
-contrib/devtools/qdevnet-randomx-smoke.sh
+contrib/devtools/marsqnet-randomx-smoke.sh
 ```
+
+`contrib/devtools/qdevnet-randomx-smoke.sh` remains as a compatibility wrapper.
