@@ -169,11 +169,11 @@ jobs:
           fi
           ./autogen.sh
           LIBS="-lcrypt32" MOC="$MOC_BIN" UIC="$UIC_BIN" RCC="$RCC_BIN" LRELEASE="$LRELEASE_BIN" ./configure --with-gui=yes --disable-tests --disable-bench --disable-static
-          make -j"$(nproc)" src/marscoind.exe
-          make -j"$(nproc)" src/marscoin-cli.exe
-          make -j"$(nproc)" src/marscoin-tx.exe
-          make -j"$(nproc)" src/marscoin-util.exe
-          make V=1 -j"$(nproc)" src/qt/marscoin-qt.exe
+          make LIBTOOL_APP_LDFLAGS= -j"$(nproc)" src/marscoind.exe
+          make LIBTOOL_APP_LDFLAGS= -j"$(nproc)" src/marscoin-cli.exe
+          make LIBTOOL_APP_LDFLAGS= -j"$(nproc)" src/marscoin-tx.exe
+          make LIBTOOL_APP_LDFLAGS= -j"$(nproc)" src/marscoin-util.exe
+          make V=1 LIBTOOL_APP_LDFLAGS= -j"$(nproc)" src/qt/marscoin-qt.exe
 
       - name: Package artifacts
         shell: msys2 {0}
