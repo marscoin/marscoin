@@ -736,6 +736,44 @@ libmarscoin_common_a_SOURCES = \
 
 if ENABLE_RANDOMX_VENDOR
 libmarscoin_common_a_SOURCES += \
+  crypto/randomx_vendor/src/aes_hash.cpp \
+  crypto/randomx_vendor/src/allocator.cpp \
+  crypto/randomx_vendor/src/argon2_core.c \
+  crypto/randomx_vendor/src/argon2_ref.c \
+  crypto/randomx_vendor/src/argon2_ssse3.c \
+  crypto/randomx_vendor/src/argon2_avx2.c \
+  crypto/randomx_vendor/src/blake2/blake2b.c \
+  crypto/randomx_vendor/src/blake2_generator.cpp \
+  crypto/randomx_vendor/src/bytecode_machine.cpp \
+  crypto/randomx_vendor/src/cpu.cpp \
+  crypto/randomx_vendor/src/dataset.cpp \
+  crypto/randomx_vendor/src/instruction.cpp \
+  crypto/randomx_vendor/src/instructions_portable.cpp \
+  crypto/randomx_vendor/src/randomx.cpp \
+  crypto/randomx_vendor/src/reciprocal.c \
+  crypto/randomx_vendor/src/soft_aes.cpp \
+  crypto/randomx_vendor/src/superscalar.cpp \
+  crypto/randomx_vendor/src/virtual_machine.cpp \
+  crypto/randomx_vendor/src/virtual_memory.c \
+  crypto/randomx_vendor/src/vm_compiled.cpp \
+  crypto/randomx_vendor/src/vm_compiled_light.cpp \
+  crypto/randomx_vendor/src/vm_interpreted.cpp \
+  crypto/randomx_vendor/src/vm_interpreted_light.cpp
+
+if RANDOMX_ARCH_X86_64
+libmarscoin_common_a_SOURCES += \
+  crypto/randomx_vendor/src/assembly_generator_x86.cpp \
+  crypto/randomx_vendor/src/jit_compiler_x86.cpp \
+  crypto/randomx_vendor/src/jit_compiler_x86_static.S
+endif
+
+if RANDOMX_ARCH_AARCH64
+libmarscoin_common_a_SOURCES += \
+  crypto/randomx_vendor/src/jit_compiler_a64.cpp \
+  crypto/randomx_vendor/src/jit_compiler_a64_static.S
+endif
+
+libmarscoin_common_a_SOURCES += \
   randomx_wrapper.cpp \
   randomx_wrapper.h \
   randomx_scaffold.cpp \

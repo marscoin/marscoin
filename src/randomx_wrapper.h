@@ -15,13 +15,16 @@ namespace randomx {
 
 struct CacheHandle {
     std::vector<unsigned char> key;
+    void* cache;
+    void* vm;
     bool initialized;
 
-    CacheHandle() : initialized(false) {}
+    CacheHandle() : cache(nullptr), vm(nullptr), initialized(false) {}
 };
 
 bool InitCache(CacheHandle& cache, Span<const unsigned char> key, std::string& error);
 bool HashOnce(const CacheHandle& cache, Span<const unsigned char> input, std::array<unsigned char, 32>& hash_out, std::string& error);
+void ReleaseCache(CacheHandle& cache);
 
 } // namespace randomx
 
