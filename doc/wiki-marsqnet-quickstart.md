@@ -55,7 +55,3 @@ addnode=104.236.58.205:49338
 
 - Soak checklist: `doc/marsqnet-soak-checklist.md`
 - Onboarding guide: `doc/marsqnet-onboarding.md`
-- Explorer dashboard checklist on explorer4 host:
-  `/home/claude/marsqnet_explorer_dashboard_cheatsheet.md`
-- Pool operator checklist on marscoin-public host:
-  `/home/claude/marsqnet_operator_cheatsheet.md`
