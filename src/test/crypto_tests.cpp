@@ -9,6 +9,7 @@
 #include <crypto/hmac_sha256.h>
 #include <crypto/hmac_sha512.h>
 #include <crypto/poly1305.h>
+#include <crypto/pq_sphincs.h>
 #include <crypto/ripemd160.h>
 #include <crypto/sha1.h>
 #include <crypto/sha256.h>
@@ -1268,6 +1269,51 @@ BOOST_AUTO_TEST_CASE(muhash_tests)
     uint256 out4;
     overflowchk.Finalize(out4);
     BOOST_CHECK_EQUAL(HexStr(out4), "3a31e6903aff0de9f62f9a9f7f8b861de76ce2cda09822b90014319ae5dc2271");
+}
+
+BOOST_AUTO_TEST_CASE(pq_sphincs_signature_scaffold)
+{
+    using pq::sphincs::ParameterSet;
+    using pq::sphincs::SPHINCS_SIGNATURE_SIZE_SHA2_128S;
+
+    BOOST_CHECK(pq::sphincs::IsSupportedParameterSet(static_cast<uint8_t>(ParameterSet::SLH_DSA_SHA2_128S)));
+    BOOST_CHECK_EQUAL(pq::sphincs::ParameterSetName(ParameterSet::SLH_DSA_SHA2_128S), "SLH-DSA-SHA2-128s");
+
+    std::vector<unsigned char> payload_valid(1 + SPHINCS_SIGNATURE_SIZE_SHA2_128S, 0x00);
+    payload_valid[0] = static_cast<uint8_t>(ParameterSet::SLH_DSA_SHA2_128S);
+    BOOST_CHECK(pq::sphincs::ValidateSignatureEncoding(payload_valid).empty());
+
+    const std::vector<unsigned char> payload_empty;
+    BOOST_CHECK_EQUAL(pq::sphincs::ValidateSignatureEncoding(payload_empty), "Empty SPHINCS+ payload");
+
+    std::vector<unsigned char> payload_bad_set(1 + SPHINCS_SIGNATURE_SIZE_SHA2_128S, 0x00);
+    payload_bad_set[0] = 0x7f;
+    BOOST_CHECK_EQUAL(pq::sphincs::ValidateSignatureEncoding(payload_bad_set), "Unsupported SPHINCS+ parameter set");
+
+    std::vector<unsigned char> payload_bad_len(SPHINCS_SIGNATURE_SIZE_SHA2_128S, 0x00);
+    payload_bad_len[0] = static_cast<uint8_t>(ParameterSet::SLH_DSA_SHA2_128S);
+    BOOST_CHECK_EQUAL(pq::sphincs::ValidateSignatureEncoding(payload_bad_len), "Invalid SPHINCS+ payload length");
+
+    std::string backend_error;
+    if (!pq::sphincs::IsOQSBackendAvailable(ParameterSet::SLH_DSA_SHA2_128S, backend_error)) {
+        BOOST_TEST_MESSAGE("SPHINCS OQS backend unavailable on this platform/build: " + backend_error);
+        return;
+    }
+
+    std::vector<unsigned char> pub;
+    std::vector<unsigned char> priv;
+    BOOST_CHECK(pq::sphincs::GenerateKeypair(ParameterSet::SLH_DSA_SHA2_128S, pub, priv, backend_error));
+    BOOST_CHECK(!pub.empty());
+    BOOST_CHECK(!priv.empty());
+
+    const std::vector<unsigned char> msg{'m','a','r','s','q','n','e','t','-','s','i','g','n','-','t','e','s','t'};
+    std::vector<unsigned char> payload_sig;
+    BOOST_CHECK(pq::sphincs::SignMessage(ParameterSet::SLH_DSA_SHA2_128S, Span<const unsigned char>(priv.data(), priv.size()), Span<const unsigned char>(msg.data(), msg.size()), payload_sig, backend_error));
+    BOOST_CHECK(pq::sphincs::VerifyMessage(ParameterSet::SLH_DSA_SHA2_128S, Span<const unsigned char>(pub.data(), pub.size()), Span<const unsigned char>(msg.data(), msg.size()), Span<const unsigned char>(payload_sig.data(), payload_sig.size()), backend_error));
+
+    std::vector<unsigned char> tampered = payload_sig;
+    tampered.back() ^= 0x01;
+    BOOST_CHECK(!pq::sphincs::VerifyMessage(ParameterSet::SLH_DSA_SHA2_128S, Span<const unsigned char>(pub.data(), pub.size()), Span<const unsigned char>(msg.data(), msg.size()), Span<const unsigned char>(tampered.data(), tampered.size()), backend_error));
 }
 
 BOOST_AUTO_TEST_SUITE_END()

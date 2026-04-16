@@ -605,6 +605,12 @@ AC_ARG_ENABLE([experimental-util-chainstate],
   [build_marscoin_chainstate=$enableval],
   [build_marscoin_chainstate=no])
 
+AC_ARG_ENABLE([pq-oqs-vendor],
+  [AS_HELP_STRING([--enable-pq-oqs-vendor],
+  [enable vendored liboqs backend for SLH-DSA/SPHINCS integration (default=no)])],
+  [enable_pq_oqs_vendor=$enableval],
+  [enable_pq_oqs_vendor=no])
+
 AC_ARG_WITH([experimental-kernel-lib],
   [AS_HELP_STRING([--with-experimental-kernel-lib],
   [build experimental marscoinkernel library (default is to build if we're building the experimental build-chainstate executable)])],
@@ -1611,6 +1617,7 @@ AM_CONDITIONAL([ENABLE_AVX2], [test "$enable_avx2" = "yes"])
 AM_CONDITIONAL([ENABLE_X86_SHANI], [test "$enable_x86_shani" = "yes"])
 AM_CONDITIONAL([ENABLE_ARM_CRC], [test "$enable_arm_crc" = "yes"])
 AM_CONDITIONAL([ENABLE_ARM_SHANI], [test "$enable_arm_shani" = "yes"])
+AM_CONDITIONAL([ENABLE_PQ_OQS_VENDOR], [test "$enable_pq_oqs_vendor" = "yes"])
 AM_CONDITIONAL([WORDS_BIGENDIAN], [test "$ac_cv_c_bigendian" = "yes"])
 AM_CONDITIONAL([USE_NATPMP], [test "$use_natpmp" = "yes"])
 AM_CONDITIONAL([USE_UPNP], [test "$use_upnp" = "yes"])
@@ -1623,6 +1630,9 @@ AC_DEFINE([CLIENT_VERSION_MINOR], [_CLIENT_VERSION_MINOR], [Minor version])
 AC_DEFINE([CLIENT_VERSION_BUILD], [_CLIENT_VERSION_BUILD], [Version Build])
 AC_DEFINE([CLIENT_VERSION_IS_RELEASE], [_CLIENT_VERSION_IS_RELEASE], [Version is release])
 AC_DEFINE([COPYRIGHT_YEAR], [_COPYRIGHT_YEAR], [Copyright year])
+if test "$enable_pq_oqs_vendor" = "yes"; then
+  AC_DEFINE([ENABLE_PQ_OQS_VENDOR], [1], [Define to 1 to enable the vendored OQS backend])
+fi
 AC_DEFINE([COPYRIGHT_HOLDERS], ["_COPYRIGHT_HOLDERS"], [Copyright holder(s) before %s replacement])
 AC_DEFINE([COPYRIGHT_HOLDERS_SUBSTITUTION], ["_COPYRIGHT_HOLDERS_SUBSTITUTION"], [Replacement for %s in copyright holders string])
 define(_COPYRIGHT_HOLDERS_FINAL, [patsubst(_COPYRIGHT_HOLDERS, [%s], [_COPYRIGHT_HOLDERS_SUBSTITUTION])])

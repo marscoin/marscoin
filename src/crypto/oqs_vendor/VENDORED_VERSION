@@ -1,0 +1,5 @@
+upstream_repo=open-quantum-safe/liboqs
+upstream_tag=to-be-pinned
+upstream_commit=to-be-pinned
+integration_target=SLH-DSA-SHA2-128s
+status=selection-locked-vendoring-in-progress
