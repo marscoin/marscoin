@@ -702,6 +702,7 @@ libmarscoin_common_a_SOURCES = \
   common/signmessage.cpp \
   common/system.cpp \
   common/url.cpp \
+  crypto/pq_sphincs.cpp \
   compressor.cpp \
   core_read.cpp \
   core_write.cpp \

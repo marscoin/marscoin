@@ -9,6 +9,7 @@
 
 #include <cstdint>
 #include <string>
+#include <vector>
 
 namespace pq::sphincs {
 
@@ -69,6 +70,11 @@ inline std::string ValidateSignatureEncoding(const Span<const unsigned char> pay
 
     return {};
 }
+
+bool IsOQSBackendAvailable(ParameterSet parameter_set, std::string& error);
+bool GenerateKeypair(ParameterSet parameter_set, std::vector<unsigned char>& public_key, std::vector<unsigned char>& private_key, std::string& error);
+bool SignMessage(ParameterSet parameter_set, Span<const unsigned char> private_key, Span<const unsigned char> message, std::vector<unsigned char>& payload_out, std::string& error);
+bool VerifyMessage(ParameterSet parameter_set, Span<const unsigned char> public_key, Span<const unsigned char> message, Span<const unsigned char> payload, std::string& error);
 
 } // namespace pq::sphincs
 
