@@ -4,7 +4,9 @@
     "parameter_set": 0,
     "payload_length": 7857,
     "valid_encoding": true,
-    "backend": "oqs-vendor-gated"
+    "backend": "oqs-vendor-gated",
+    "deterministic_kat_public_key_hex": "8a69a3c0db2ef0d7c439fff27bab906d2b8bcb8c7048556e30bc3bb8ffc8403b",
+    "deterministic_kat_payload_sha256": "6b2f4f0a998f29de8919c170a8dad69a44c735e37deb3168c2a0b95d87c2fd23"
   },
   {
     "name": "empty_payload",

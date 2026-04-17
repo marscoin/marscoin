@@ -87,3 +87,47 @@ jobs:
           ./src/qt/marscoin-qt -version
           ./src/marscoind --version
           ./src/marscoin-cli --version
+
+  linux-pq-oqs-signature-kat:
+    name: Linux PQ OQS Signature KAT
+    runs-on: ubuntu-24.04
+    timeout-minutes: 75
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            build-essential \
+            automake \
+            libtool \
+            autotools-dev \
+            pkg-config \
+            python3 \
+            cmake \
+            libevent-dev \
+            libboost-dev \
+            libsqlite3-dev \
+            libssl-dev \
+            libminiupnpc-dev \
+            libnatpmp-dev
+
+      - name: Build vendored liboqs
+        run: |
+          OQS_BUILD_PARALLEL=2 ./src/crypto/oqs_vendor/build-liboqs-vendor.sh
+
+      - name: Configure
+        run: |
+          ./autogen.sh
+          ./configure --without-gui --disable-tests --disable-bench --enable-pq-oqs-vendor
+
+      - name: Build CLI
+        run: |
+          make -j"$(nproc)" src/marscoin-cli
+
+      - name: Run SPHINCS OQS KAT
+        run: |
+          ./contrib/devtools/oqs-sphincs-kat.sh

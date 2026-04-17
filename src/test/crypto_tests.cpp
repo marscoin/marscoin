@@ -22,6 +22,10 @@
 #include <test/util/setup_common.h>
 #include <util/strencodings.h>
 
+#ifdef ENABLE_PQ_OQS_VENDOR
+#include <oqs/rand.h>
+#endif
+
 #include <vector>
 
 #include <boost/test/unit_test.hpp>
@@ -1302,14 +1306,50 @@ BOOST_AUTO_TEST_CASE(pq_sphincs_signature_scaffold)
 
     std::vector<unsigned char> pub;
     std::vector<unsigned char> priv;
+
+#ifdef ENABLE_PQ_OQS_VENDOR
+    static uint64_t rng_state = 0;
+    const auto deterministic_rng = [](uint8_t* out, size_t outlen) {
+        uint64_t x = rng_state;
+        for (size_t i = 0; i < outlen; ++i) {
+            x ^= x << 13;
+            x ^= x >> 7;
+            x ^= x << 17;
+            out[i] = static_cast<uint8_t>(x & 0xFF);
+        }
+        rng_state = x;
+    };
+
+    rng_state = 0x4d415253514e4554ULL;
+    OQS_randombytes_custom_algorithm(deterministic_rng);
+#endif
+
     BOOST_CHECK(pq::sphincs::GenerateKeypair(ParameterSet::SLH_DSA_SHA2_128S, pub, priv, backend_error));
     BOOST_CHECK(!pub.empty());
     BOOST_CHECK(!priv.empty());
 
+#ifdef ENABLE_PQ_OQS_VENDOR
+    BOOST_CHECK_EQUAL(HexStr(pub), "8a69a3c0db2ef0d7c439fff27bab906d2b8bcb8c7048556e30bc3bb8ffc8403b");
+    BOOST_CHECK_EQUAL(HexStr(priv), "de47ddf86b59f322d2c9c81d992e20deeba21b9144cc3d43f9743e8c6f99cccf8a69a3c0db2ef0d7c439fff27bab906d2b8bcb8c7048556e30bc3bb8ffc8403b");
+#endif
+
     const std::vector<unsigned char> msg{'m','a','r','s','q','n','e','t','-','s','i','g','n','-','t','e','s','t'};
     std::vector<unsigned char> payload_sig;
+
+#ifdef ENABLE_PQ_OQS_VENDOR
+    rng_state = 0x5349474e41545552ULL;
+    OQS_randombytes_custom_algorithm(deterministic_rng);
+#endif
+
     BOOST_CHECK(pq::sphincs::SignMessage(ParameterSet::SLH_DSA_SHA2_128S, Span<const unsigned char>(priv.data(), priv.size()), Span<const unsigned char>(msg.data(), msg.size()), payload_sig, backend_error));
     BOOST_CHECK(pq::sphincs::VerifyMessage(ParameterSet::SLH_DSA_SHA2_128S, Span<const unsigned char>(pub.data(), pub.size()), Span<const unsigned char>(msg.data(), msg.size()), Span<const unsigned char>(payload_sig.data(), payload_sig.size()), backend_error));
+
+#ifdef ENABLE_PQ_OQS_VENDOR
+    unsigned char payload_hash[CSHA256::OUTPUT_SIZE];
+    CSHA256().Write(payload_sig.data(), payload_sig.size()).Finalize(payload_hash);
+    BOOST_CHECK_EQUAL(HexStr(payload_hash), "6b2f4f0a998f29de8919c170a8dad69a44c735e37deb3168c2a0b95d87c2fd23");
+    OQS_randombytes_switch_algorithm(OQS_RAND_alg_system);
+#endif
 
     std::vector<unsigned char> tampered = payload_sig;
     tampered.back() ^= 0x01;
