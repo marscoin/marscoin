@@ -3,7 +3,8 @@
     "name": "valid_sha2_128s_minimal_zeroed",
     "parameter_set": 0,
     "payload_length": 7857,
-    "valid_encoding": true
+    "valid_encoding": true,
+    "backend": "oqs-vendor-gated"
   },
   {
     "name": "empty_payload",
