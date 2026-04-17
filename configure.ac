@@ -617,6 +617,30 @@ AC_ARG_ENABLE([pq-oqs-vendor],
   [enable_pq_oqs_vendor=$enableval],
   [enable_pq_oqs_vendor=no])
 
+OQS_VENDOR_LIBS=""
+
+if test "$enable_pq_oqs_vendor" = "yes"; then
+  OQS_VENDOR_INSTALL_PATH="$ac_pwd/src/crypto/oqs_vendor/build/install"
+  OQS_VENDOR_HEADER_PATH="$OQS_VENDOR_INSTALL_PATH/include/oqs/oqs.h"
+  OQS_VENDOR_LIB_PATH="$OQS_VENDOR_INSTALL_PATH/lib/liboqs.a"
+
+  AC_MSG_CHECKING([for vendored liboqs header at $OQS_VENDOR_HEADER_PATH])
+  if test ! -f "$OQS_VENDOR_HEADER_PATH"; then
+    AC_MSG_ERROR([vendored liboqs header not found. Run src/crypto/oqs_vendor/build-liboqs-vendor.sh first.])
+  fi
+  AC_MSG_RESULT([yes])
+
+  AC_MSG_CHECKING([for vendored liboqs static library at $OQS_VENDOR_LIB_PATH])
+  if test ! -f "$OQS_VENDOR_LIB_PATH"; then
+    AC_MSG_ERROR([vendored liboqs static library not found. Run src/crypto/oqs_vendor/build-liboqs-vendor.sh first.])
+  fi
+  AC_MSG_RESULT([yes])
+
+  CPPFLAGS="$CPPFLAGS -I$OQS_VENDOR_INSTALL_PATH/include"
+  OQS_VENDOR_LIBS="$OQS_VENDOR_LIB_PATH"
+fi
+AC_SUBST([OQS_VENDOR_LIBS])
+
 AC_ARG_WITH([experimental-kernel-lib],
   [AS_HELP_STRING([--with-experimental-kernel-lib],
   [build experimental marscoinkernel library (default is to build if we're building the experimental build-chainstate executable)])],

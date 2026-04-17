@@ -1,5 +1,5 @@
 upstream_repo=open-quantum-safe/liboqs
-upstream_tag=to-be-pinned
-upstream_commit=to-be-pinned
+upstream_tag=0.15.0
+upstream_commit=97f6b86b1b6d109cfd43cf276ae39c2e776aed80
 integration_target=SLH-DSA-SHA2-128s
-status=selection-locked-vendoring-in-progress
+status=vendored-snapshot-pinned

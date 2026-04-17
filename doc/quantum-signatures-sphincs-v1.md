@@ -17,6 +17,8 @@ following the same determinism model used for RandomX integration.
 - Selected integration library: `open-quantum-safe/liboqs`
 - Build gate: `--enable-pq-oqs-vendor`
 - Default state: disabled (non-activating)
+- Vendored snapshot path: `src/crypto/oqs_vendor/liboqs`
+- Vendor build helper: `src/crypto/oqs_vendor/build-liboqs-vendor.sh`
 
 Rationale:
 
@@ -66,6 +68,6 @@ Deterministic error strings:
 ## Follow-up Work
 
 1. Bind parsed payloads to new signature destination/script types.
-2. Vendor pinned `liboqs` snapshot and wire backend build/link path.
-3. Add deterministic vector-based sign/verify tests.
-4. Gate consensus activation behind deployment parameters.
+2. Add deterministic vector-based sign/verify tests with pinned backend.
+3. Gate consensus activation behind deployment parameters.
+4. Commission external review for backend/runtime assumptions.
