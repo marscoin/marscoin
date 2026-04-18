@@ -152,6 +152,7 @@ BITCOIN_CORE_H = \
   common/signmessage.h \
   common/system.h \
   compressor.h \
+  consensus/blockweight.h \
   consensus/consensus.h \
   consensus/tx_check.h \
   consensus/tx_verify.h \
@@ -652,6 +653,8 @@ libmarscoin_consensus_a_SOURCES = \
   arith_uint256.cpp \
   arith_uint256.h \
   consensus/amount.h \
+  consensus/blockweight.cpp \
+  consensus/blockweight.h \
   consensus/merkle.cpp \
   consensus/merkle.h \
   consensus/params.h \

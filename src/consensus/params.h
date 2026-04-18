@@ -154,6 +154,9 @@ struct Params {
         return std::numeric_limits<int>::max();
     }
 
+    /** Adaptive Block Weight Limit activation height. 0 = not activated. */
+    int nABWLActivationHeight{0};
+
     /** Auxpow parameters */
     int32_t nAuxpowChainId;
     int nAuxpowStartHeight;

@@ -13,6 +13,7 @@
 #include <checkqueue.h>
 #include <clientversion.h>
 #include <consensus/amount.h>
+#include <consensus/blockweight.h>
 #include <consensus/consensus.h>
 #include <consensus/merkle.h>
 #include <consensus/tx_check.h>
@@ -3790,6 +3791,27 @@ void ChainstateManager::ReceivedBlockTransactions(const CBlock& block, CBlockInd
 {
     AssertLockHeld(cs_main);
     pindexNew->nTx = block.vtx.size();
+
+    // Compute and persist ABWL state for this block.
+    {
+        pindexNew->nBlockWeight = GetBlockWeight(block);
+        const auto& params = GetConsensus();
+        if (params.nABWLActivationHeight > 0 && pindexNew->nHeight >= params.nABWLActivationHeight) {
+            if (pindexNew->nHeight == params.nABWLActivationHeight) {
+                const ABWLState init = GetInitialABWLState();
+                pindexNew->nABWL_epsilon = init.epsilon;
+                pindexNew->nABWL_beta = init.beta;
+            } else if (pindexNew->pprev) {
+                const ABWLState next = ComputeNextABWLState(
+                    pindexNew->pprev->nABWL_epsilon,
+                    pindexNew->pprev->nABWL_beta,
+                    pindexNew->pprev->nBlockWeight);
+                pindexNew->nABWL_epsilon = next.epsilon;
+                pindexNew->nABWL_beta = next.beta;
+            }
+        }
+    }
+
     // Typically m_chain_tx_count will be 0 at this point, but it can be nonzero if this
     // is a pruned block which is being downloaded again, or if this is an
     // assumeutxo snapshot block which has a hardcoded m_chain_tx_count value from the
@@ -3967,8 +3989,8 @@ bool CheckBlock(const CBlock& block, BlockValidationState& state, const Consensu
     // Note that witness malleability is checked in ContextualCheckBlock, so no
     // checks that use witness data may be performed here.
 
-    // Size limits
-    if (block.vtx.empty() || block.vtx.size() * WITNESS_SCALE_FACTOR > MAX_BLOCK_WEIGHT || ::GetSerializeSize(TX_NO_WITNESS(block)) * WITNESS_SCALE_FACTOR > MAX_BLOCK_WEIGHT)
+    // Size limits (context-free fast-reject against absolute ceiling)
+    if (block.vtx.empty() || block.vtx.size() * WITNESS_SCALE_FACTOR > ABWL_TEMPORARY_MAX || ::GetSerializeSize(TX_NO_WITNESS(block)) * WITNESS_SCALE_FACTOR > ABWL_TEMPORARY_MAX)
         return state.Invalid(BlockValidationResult::BLOCK_CONSENSUS, "bad-blk-length", "size limits failed");
 
     // First transaction must be coinbase, the rest must not be
@@ -4217,8 +4239,9 @@ static bool ContextualCheckBlock(const CBlock& block, BlockValidationState& stat
     // large by filling up the coinbase witness, which doesn't change
     // the block hash, so we couldn't mark the block as permanently
     // failed).
-    if (GetBlockWeight(block) > MAX_BLOCK_WEIGHT) {
-        return state.Invalid(BlockValidationResult::BLOCK_CONSENSUS, "bad-blk-weight", strprintf("%s : weight limit failed", __func__));
+    const int64_t nMaxBlockWeight = GetAdaptiveBlockWeightLimit(pindexPrev, chainman.GetConsensus());
+    if (GetBlockWeight(block) > nMaxBlockWeight) {
+        return state.Invalid(BlockValidationResult::BLOCK_CONSENSUS, "bad-blk-weight", strprintf("%s : weight limit failed (limit=%d)", __func__, nMaxBlockWeight));
     }
 
     return true;

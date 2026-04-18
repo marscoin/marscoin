@@ -10,6 +10,7 @@
 #include <coins.h>
 #include <common/args.h>
 #include <consensus/amount.h>
+#include <consensus/blockweight.h>
 #include <consensus/consensus.h>
 #include <consensus/merkle.h>
 #include <consensus/tx_verify.h>
@@ -120,6 +121,14 @@ std::unique_ptr<CBlockTemplate> BlockAssembler::CreateNewBlock()
     CBlockIndex* pindexPrev = m_chainstate.m_chain.Tip();
     assert(pindexPrev != nullptr);
     nHeight = pindexPrev->nHeight + 1;
+
+    // Apply adaptive block weight limit if active
+    {
+        const int64_t dynamic_limit = GetAdaptiveBlockWeightLimit(pindexPrev, chainparams.GetConsensus());
+        const size_t effective_max = static_cast<size_t>(dynamic_limit) - m_options.coinbase_max_additional_weight;
+        // Cap at the dynamic ceiling (miner's -blockmaxweight can further reduce, never exceed)
+        const_cast<Options&>(m_options).nBlockMaxWeight = std::min(m_options.nBlockMaxWeight, effective_max);
+    }
 
     pblock->nVersion = m_chainstate.m_chainman.m_versionbitscache.ComputeBlockVersion(pindexPrev, chainparams.GetConsensus());
 
