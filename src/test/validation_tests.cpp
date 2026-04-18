@@ -4,6 +4,8 @@
 
 #include <chainparams.h>
 #include <consensus/amount.h>
+#include <consensus/blockweight.h>
+#include <consensus/consensus.h>
 #include <consensus/merkle.h>
 #include <core_io.h>
 #include <hash.h>
@@ -13,6 +15,7 @@
 #include <util/chaintype.h>
 #include <validation.h>
 
+#include <cmath>
 #include <string>
 
 #include <test/util/setup_common.h>
@@ -358,6 +361,129 @@ BOOST_AUTO_TEST_CASE(block_malleation)
         }
         BOOST_CHECK(is_mutated(block, /*check_witness_root=*/true));
     }
+}
+
+BOOST_AUTO_TEST_CASE(abwl_initial_state)
+{
+    const ABWLState init = GetInitialABWLState();
+    // Initial state: epsilon + beta = ABWL_WEIGHT_FLOOR
+    BOOST_CHECK_EQUAL(init.epsilon, ABWL_WEIGHT_FLOOR / 2);
+    BOOST_CHECK_EQUAL(init.beta, ABWL_WEIGHT_FLOOR / 2);
+    BOOST_CHECK_EQUAL(init.epsilon + init.beta, ABWL_WEIGHT_FLOOR);
+}
+
+BOOST_AUTO_TEST_CASE(abwl_empty_blocks_shrink_to_floor)
+{
+    // Starting from initial state, if all blocks are empty (weight=0),
+    // the control function should shrink but never go below the floor.
+    int64_t epsilon = ABWL_WEIGHT_FLOOR / 2;
+    int64_t beta = ABWL_WEIGHT_FLOOR / 2;
+
+    for (int i = 0; i < 100000; ++i) {
+        const ABWLState next = ComputeNextABWLState(epsilon, beta, 0);
+        // Limit must never drop below floor
+        BOOST_CHECK(next.epsilon + next.beta >= ABWL_WEIGHT_FLOOR);
+        epsilon = next.epsilon;
+        beta = next.beta;
+    }
+
+    // After many empty blocks, should be at the floor
+    BOOST_CHECK_EQUAL(epsilon + beta, ABWL_WEIGHT_FLOOR);
+}
+
+BOOST_AUTO_TEST_CASE(abwl_full_blocks_grow)
+{
+    // If blocks are consistently full, the limit should grow.
+    int64_t epsilon = ABWL_WEIGHT_FLOOR / 2;
+    int64_t beta = ABWL_WEIGHT_FLOOR / 2;
+    const int64_t initial_limit = epsilon + beta;
+
+    // Simulate 1000 blocks all at 100% capacity
+    for (int i = 0; i < 1000; ++i) {
+        const int64_t limit = epsilon + beta;
+        const ABWLState next = ComputeNextABWLState(epsilon, beta, limit);
+        epsilon = next.epsilon;
+        beta = next.beta;
+    }
+
+    // Limit should have grown
+    BOOST_CHECK(epsilon + beta > initial_limit);
+}
+
+BOOST_AUTO_TEST_CASE(abwl_ceiling_enforcement)
+{
+    // Even with sustained full blocks, limit must not exceed ABWL_TEMPORARY_MAX
+    int64_t epsilon = ABWL_TEMPORARY_MAX / 2;
+    int64_t beta = ABWL_TEMPORARY_MAX / 2;
+
+    for (int i = 0; i < 1000; ++i) {
+        const int64_t limit = epsilon + beta;
+        const ABWLState next = ComputeNextABWLState(epsilon, beta, limit);
+        epsilon = next.epsilon;
+        beta = next.beta;
+    }
+
+    BOOST_CHECK(epsilon <= ABWL_TEMPORARY_MAX);
+    BOOST_CHECK(beta <= ABWL_TEMPORARY_MAX);
+}
+
+BOOST_AUTO_TEST_CASE(abwl_neutral_point_stability)
+{
+    // At the neutral point (block weight = epsilon / zeta = epsilon * 2/3),
+    // the control function should remain approximately stable.
+    int64_t epsilon = 10000000; // 10M
+    int64_t beta = 5000000;    // 5M
+
+    const int64_t initial_epsilon = epsilon;
+
+    for (int i = 0; i < 1000; ++i) {
+        // Neutral point: weight = epsilon * ZETA_DEN / ZETA_NUM
+        const int64_t neutral_weight = epsilon * ABWL_ZETA_DEN / ABWL_ZETA_NUM;
+        const ABWLState next = ComputeNextABWLState(epsilon, beta, neutral_weight);
+        epsilon = next.epsilon;
+        beta = next.beta;
+    }
+
+    // Epsilon should remain approximately the same (within 1% drift from buffer decay)
+    const double drift = std::abs(static_cast<double>(epsilon - initial_epsilon)) / initial_epsilon;
+    BOOST_CHECK(drift < 0.03);
+}
+
+BOOST_AUTO_TEST_CASE(abwl_pre_activation_returns_fixed)
+{
+    // Before activation height, should return legacy MAX_BLOCK_WEIGHT
+    Consensus::Params params;
+    params.nABWLActivationHeight = 1000;
+
+    // Simulate pindexPrev at height 998 (next block = 999, before activation)
+    CBlockIndex prev;
+    prev.nHeight = 998;
+
+    BOOST_CHECK_EQUAL(GetAdaptiveBlockWeightLimit(&prev, params), MAX_BLOCK_WEIGHT);
+}
+
+BOOST_AUTO_TEST_CASE(abwl_at_activation_returns_floor)
+{
+    // At activation height, should return exactly ABWL_WEIGHT_FLOOR
+    Consensus::Params params;
+    params.nABWLActivationHeight = 1000;
+
+    CBlockIndex prev;
+    prev.nHeight = 999; // next block = 1000 = activation height
+
+    BOOST_CHECK_EQUAL(GetAdaptiveBlockWeightLimit(&prev, params), ABWL_WEIGHT_FLOOR);
+}
+
+BOOST_AUTO_TEST_CASE(abwl_not_activated_returns_fixed)
+{
+    // nABWLActivationHeight = 0 means not activated
+    Consensus::Params params;
+    params.nABWLActivationHeight = 0;
+
+    CBlockIndex prev;
+    prev.nHeight = 999999;
+
+    BOOST_CHECK_EQUAL(GetAdaptiveBlockWeightLimit(&prev, params), MAX_BLOCK_WEIGHT);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

@@ -122,6 +122,8 @@ public:
         consensus.nMinimumChainWork = uint256{"0000000000000000000000000000000000000000000000002f03094770f3d455"};  //block 3100000
         consensus.defaultAssumeValid = uint256{"633d6ddcddb33dfd8392a3650e04c2c3e353be575fe923615476ad603055e147"}; //block 3100000
 
+        consensus.nABWLActivationHeight = 0; // Not activated on mainnet yet
+
         consensus.nAuxpowChainId = 0x029c;
         consensus.nAuxpowStartHeight = 3145555;
         consensus.nLegacyBlocksBefore = -1;
@@ -276,6 +278,8 @@ public:
 
         consensus.nMinimumChainWork = uint256{"0000000000000000000000000000000000000000000000000000000000000000"};
         consensus.defaultAssumeValid = uint256{"0000000000000000000000000000000000000000000000000000000000000000"};
+
+        consensus.nABWLActivationHeight = 1; // Active from genesis on testnet/marsqnet
 
         consensus.nAuxpowChainId = 0x029d;
         consensus.nAuxpowStartHeight = std::numeric_limits<int>::max();
@@ -594,6 +598,8 @@ public:
 
         consensus.nMinimumChainWork = uint256{};
         consensus.defaultAssumeValid = uint256{};
+
+        consensus.nABWLActivationHeight = 1; // Active from genesis on regtest
 
         consensus.nAuxpowStartHeight = 0;
         consensus.nAuxpowChainId = 0x0001;

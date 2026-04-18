@@ -204,6 +204,12 @@ public:
     //! (memory only) Maximum nTime in the chain up to and including this block.
     unsigned int nTimeMax{0};
 
+    //! Adaptive Block Weight Limit (ABWL) state.
+    //! Persisted to disk via CDiskBlockIndex serialization.
+    int64_t nABWL_epsilon{0};  //!< ABWL control function value
+    int64_t nABWL_beta{0};     //!< ABWL elastic buffer value
+    int64_t nBlockWeight{0};   //!< actual block weight (algorithm input)
+
     explicit CBlockIndex(const CPureBlockHeader& block)
         : nVersion{block.nVersion},
           hashMerkleRoot{block.hashMerkleRoot},
@@ -415,6 +421,11 @@ public:
         READWRITE(obj.nTime);
         READWRITE(obj.nBits);
         READWRITE(obj.nNonce);
+
+        // ABWL state (appended; older serializations simply won't have these)
+        READWRITE(obj.nBlockWeight);
+        READWRITE(obj.nABWL_epsilon);
+        READWRITE(obj.nABWL_beta);
     }
 
     uint256 ConstructBlockHash() const
