@@ -131,3 +131,48 @@ jobs:
       - name: Run SPHINCS OQS KAT
         run: |
           ./contrib/devtools/oqs-sphincs-kat.sh
+
+  linux-pq-boost-tests:
+    name: Linux PQ Boost Unit Tests
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            build-essential \
+            automake \
+            libtool \
+            autotools-dev \
+            pkg-config \
+            python3 \
+            cmake \
+            libevent-dev \
+            libboost-dev \
+            libboost-test-dev \
+            libsqlite3-dev \
+            libssl-dev \
+            libminiupnpc-dev \
+            libnatpmp-dev
+
+      - name: Build vendored liboqs
+        run: |
+          OQS_BUILD_PARALLEL=2 ./src/crypto/oqs_vendor/build-liboqs-vendor.sh
+
+      - name: Configure
+        run: |
+          ./autogen.sh
+          ./configure --without-gui --disable-bench --enable-pq-oqs-vendor
+
+      - name: Build
+        run: |
+          make -j"$(nproc)"
+
+      - name: Run PQ crypto tests
+        run: |
+          ./src/test/test_marscoin --run_test=crypto_tests/pq_sphincs_signature_scaffold
