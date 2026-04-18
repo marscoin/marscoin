@@ -611,6 +611,12 @@ AC_ARG_ENABLE([randomx-vendor],
   [enable_randomx_vendor=$enableval],
   [enable_randomx_vendor=no])
 
+AC_ARG_ENABLE([pq-oqs-vendor],
+  [AS_HELP_STRING([--enable-pq-oqs-vendor],
+  [enable vendored liboqs backend for SLH-DSA/SPHINCS integration (default=no)])],
+  [enable_pq_oqs_vendor=$enableval],
+  [enable_pq_oqs_vendor=no])
+
 AC_ARG_WITH([experimental-kernel-lib],
   [AS_HELP_STRING([--with-experimental-kernel-lib],
   [build experimental marscoinkernel library (default is to build if we're building the experimental build-chainstate executable)])],
@@ -1618,6 +1624,7 @@ AM_CONDITIONAL([ENABLE_X86_SHANI], [test "$enable_x86_shani" = "yes"])
 AM_CONDITIONAL([ENABLE_ARM_CRC], [test "$enable_arm_crc" = "yes"])
 AM_CONDITIONAL([ENABLE_ARM_SHANI], [test "$enable_arm_shani" = "yes"])
 AM_CONDITIONAL([ENABLE_RANDOMX_VENDOR], [test "$enable_randomx_vendor" = "yes"])
+AM_CONDITIONAL([ENABLE_PQ_OQS_VENDOR], [test "$enable_pq_oqs_vendor" = "yes"])
 AM_CONDITIONAL([WORDS_BIGENDIAN], [test "$ac_cv_c_bigendian" = "yes"])
 AM_CONDITIONAL([USE_NATPMP], [test "$use_natpmp" = "yes"])
 AM_CONDITIONAL([USE_UPNP], [test "$use_upnp" = "yes"])
@@ -1632,6 +1639,9 @@ AC_DEFINE([CLIENT_VERSION_IS_RELEASE], [_CLIENT_VERSION_IS_RELEASE], [Version is
 AC_DEFINE([COPYRIGHT_YEAR], [_COPYRIGHT_YEAR], [Copyright year])
 if test "$enable_randomx_vendor" = "yes"; then
   AC_DEFINE([ENABLE_RANDOMX_VENDOR], [1], [Define to 1 to enable RandomX vendor scaffold checks])
+fi
+if test "$enable_pq_oqs_vendor" = "yes"; then
+  AC_DEFINE([ENABLE_PQ_OQS_VENDOR], [1], [Define to 1 to enable the vendored OQS backend])
 fi
 AC_DEFINE([COPYRIGHT_HOLDERS], ["_COPYRIGHT_HOLDERS"], [Copyright holder(s) before %s replacement])
 AC_DEFINE([COPYRIGHT_HOLDERS_SUBSTITUTION], ["_COPYRIGHT_HOLDERS_SUBSTITUTION"], [Replacement for %s in copyright holders string])

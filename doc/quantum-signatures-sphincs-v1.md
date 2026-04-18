@@ -9,6 +9,21 @@ signature handling in Marscoin Core.
 - Keep consensus behavior unchanged while implementation work is staged.
 - Provide stable test vectors and deterministic error outputs.
 
+## Backend decision
+
+Marscoin will use a pinned, vendored backend strategy for SPHINCS/SLH-DSA,
+following the same determinism model used for RandomX integration.
+
+- Selected integration library: `open-quantum-safe/liboqs`
+- Build gate: `--enable-pq-oqs-vendor`
+- Default state: disabled (non-activating)
+
+Rationale:
+
+- avoid system-dependent crypto availability differences,
+- ensure reproducible consensus behavior,
+- keep provenance explicit through pinned source metadata.
+
 ## Scaffold Payload Format
 
 For test-only parsing, the payload format is:
@@ -51,6 +66,6 @@ Deterministic error strings:
 ## Follow-up Work
 
 1. Bind parsed payloads to new signature destination/script types.
-2. Integrate concrete SPHINCS+ implementation and key management.
+2. Vendor pinned `liboqs` snapshot and wire backend build/link path.
 3. Add deterministic vector-based sign/verify tests.
 4. Gate consensus activation behind deployment parameters.
