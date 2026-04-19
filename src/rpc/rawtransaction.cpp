@@ -553,6 +553,7 @@ static RPCHelpMan decodescript()
         case TxoutType::SCRIPTHASH:
         case TxoutType::WITNESS_UNKNOWN:
         case TxoutType::WITNESS_V1_TAPROOT:
+        case TxoutType::WITNESS_V2_PQ:
         case TxoutType::ANCHOR:
             // Should not be wrapped
             return false;
@@ -596,6 +597,7 @@ static RPCHelpMan decodescript()
             case TxoutType::WITNESS_V0_KEYHASH:
             case TxoutType::WITNESS_V0_SCRIPTHASH:
             case TxoutType::WITNESS_V1_TAPROOT:
+            case TxoutType::WITNESS_V2_PQ:
             case TxoutType::ANCHOR:
                 // Should not be wrapped
                 return false;

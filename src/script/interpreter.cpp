@@ -1798,7 +1798,7 @@ uint256 GenericTransactionSignatureChecker<T>::GetSigHashPQ(ScriptExecutionData&
     ss << tag << tag;
 
     // Transaction fields
-    ss << txTo->nVersion;
+    ss << txTo->version;
     ss << txTo->nLockTime;
 
     // Prevouts hash

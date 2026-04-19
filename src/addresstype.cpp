@@ -143,6 +143,11 @@ public:
         return CScript() << OP_1 << ToByteVector(tap);
     }
 
+    CScript operator()(const WitnessV2PQ& pq) const
+    {
+        return CScript() << OP_2 << ToByteVector(pq);
+    }
+
     CScript operator()(const WitnessUnknown& id) const
     {
         return CScript() << CScript::EncodeOP_N(id.GetWitnessVersion()) << id.GetWitnessProgram();
@@ -159,6 +164,7 @@ public:
     bool operator()(const WitnessV0KeyHash& dest) const { return true; }
     bool operator()(const WitnessV0ScriptHash& dest) const { return true; }
     bool operator()(const WitnessV1Taproot& dest) const { return true; }
+    bool operator()(const WitnessV2PQ& dest) const { return true; }
     bool operator()(const WitnessUnknown& dest) const { return true; }
 };
 } // namespace

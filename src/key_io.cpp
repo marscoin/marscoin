@@ -195,7 +195,6 @@ CTxDestination DecodeDestination(const std::string& str, const CChainParams& par
             }
 
             if (version == 2 && data.size() == WITNESS_V2_PQ_PROGRAM_SIZE) {
-                static_assert(WITNESS_V2_PQ_PROGRAM_SIZE == WitnessV2PQ::size());
                 WitnessV2PQ pq;
                 std::copy(data.begin(), data.end(), pq.begin());
                 return pq;
