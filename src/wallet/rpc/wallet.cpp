@@ -6,6 +6,8 @@
 #include <config/bitcoin-config.h> // IWYU pragma: keep
 
 #include <core_io.h>
+#include <crypto/pq_sphincs.h>
+#include <crypto/sha256.h>
 #include <key_io.h>
 #include <rpc/server.h>
 #include <rpc/util.h>
@@ -204,6 +206,85 @@ static RPCHelpMan getquantummigrationstatus()
     result.pushKV("migrated_balance", ValueFromAmount(0));
     result.pushKV("remaining_legacy_balance", ValueFromAmount(remaining_legacy));
     result.pushKV("recommended_next_action", "Review quantum-upgrade docs and wait for migration activation release");
+    return result;
+},
+    };
+}
+
+static RPCHelpMan getnewpqaddress()
+{
+    return RPCHelpMan{"getnewpqaddress",
+                "Generates a new SPHINCS+ post-quantum keypair and returns the corresponding\n"
+                "mars1z... (witness v2) address. The keypair is stored in the wallet.\n"
+                "Requires the OQS backend (--enable-pq-oqs-vendor at build time).\n",
+                {
+                    {"label", RPCArg::Type::STR, RPCArg::Default{""}, "An optional label for the address."},
+                },
+                RPCResult{
+                    RPCResult::Type::OBJ, "", "",
+                    {
+                        {RPCResult::Type::STR, "address", "the new mars1z... post-quantum address"},
+                        {RPCResult::Type::STR_HEX, "pubkey", "the SPHINCS+ public key (hex)"},
+                        {RPCResult::Type::STR, "parameter_set", "the SPHINCS+ parameter set name"},
+                        {RPCResult::Type::STR_HEX, "program", "the witness v2 program (SHA256 commitment)"},
+                    }
+                },
+                RPCExamples{
+                    HelpExampleCli("getnewpqaddress", "")
+            + HelpExampleCli("getnewpqaddress", "\"my-pq-label\"")
+            + HelpExampleRpc("getnewpqaddress", "")
+                },
+        [&](const RPCHelpMan& self, const JSONRPCRequest& request) -> UniValue
+{
+    std::shared_ptr<CWallet> const pwallet = GetWalletForJSONRPCRequest(request);
+    if (!pwallet) return UniValue::VNULL;
+
+    // Check OQS backend availability
+    std::string oqs_error;
+    if (!pq::sphincs::IsOQSBackendAvailable(pq::sphincs::ParameterSet::SLH_DSA_SHA2_128S, oqs_error)) {
+        throw JSONRPCError(RPC_MISC_ERROR, "SPHINCS+ OQS backend not available: " + oqs_error);
+    }
+
+    // Generate SPHINCS+ keypair
+    std::vector<unsigned char> pubkey;
+    std::vector<unsigned char> privkey;
+    std::string keygen_error;
+    if (!pq::sphincs::GenerateKeypair(pq::sphincs::ParameterSet::SLH_DSA_SHA2_128S, pubkey, privkey, keygen_error)) {
+        throw JSONRPCError(RPC_WALLET_ERROR, "Failed to generate SPHINCS+ keypair: " + keygen_error);
+    }
+
+    // Compute witness v2 program: SHA256(param_set_id || pubkey)
+    const uint8_t param_set_id = static_cast<uint8_t>(pq::sphincs::ParameterSet::SLH_DSA_SHA2_128S);
+    uint256 program;
+    CSHA256().Write(&param_set_id, 1)
+             .Write(pubkey.data(), pubkey.size())
+             .Finalize(program.begin());
+
+    // Create the destination and encode address
+    WitnessV2PQ pq_dest(program);
+    CTxDestination dest = pq_dest;
+    std::string address = EncodeDestination(dest);
+
+    // Store the PQ keypair in the wallet database
+    {
+        LOCK(pwallet->cs_wallet);
+
+        WalletBatch batch(pwallet->GetDatabase());
+        if (!batch.WritePQKey(program, param_set_id, pubkey, privkey)) {
+            throw JSONRPCError(RPC_WALLET_ERROR, "Failed to store SPHINCS+ key in wallet database");
+        }
+
+        // Add to address book with label
+        const std::string label{LabelFromValue(request.params[0])};
+        pwallet->SetAddressBook(dest, label, wallet::AddressPurpose::RECEIVE);
+    }
+
+    // Build response
+    UniValue result(UniValue::VOBJ);
+    result.pushKV("address", address);
+    result.pushKV("pubkey", HexStr(pubkey));
+    result.pushKV("parameter_set", pq::sphincs::ParameterSetName(pq::sphincs::ParameterSet::SLH_DSA_SHA2_128S));
+    result.pushKV("program", HexStr(program));
     return result;
 },
     };
@@ -1192,6 +1273,7 @@ Span<const CRPCCommand> GetWalletRPCCommands()
         {"wallet", &gettransaction},
         {"wallet", &getunconfirmedbalance},
         {"wallet", &getbalances},
+        {"wallet", &getnewpqaddress},
         {"wallet", &getquantummigrationstatus},
         {"wallet", &getwalletinfo},
         {"wallet", &importaddress},

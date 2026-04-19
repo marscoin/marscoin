@@ -266,6 +266,12 @@ public:
     bool WriteDescriptorLastHardenedCache(const CExtPubKey& xpub, const uint256& desc_id, uint32_t key_exp_index);
     bool WriteDescriptorCacheItems(const uint256& desc_id, const DescriptorCache& cache);
 
+    //! Write a post-quantum SPHINCS+ keypair to the database.
+    //! Key: "pqkey" + program_hash, Value: param_set_id + pubkey + privkey
+    bool WritePQKey(const uint256& program, uint8_t param_set_id,
+                    const std::vector<unsigned char>& pubkey,
+                    const std::vector<unsigned char>& privkey);
+
     bool WriteLockedUTXO(const COutPoint& output);
     bool EraseLockedUTXO(const COutPoint& output);
 
