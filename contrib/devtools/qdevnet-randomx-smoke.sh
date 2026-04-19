@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+CHAIN="${CHAIN:-qdevnet}"
+exec "$SCRIPT_DIR/marsqnet-randomx-smoke.sh" "$@"

@@ -44,6 +44,9 @@ void ReadSigNetArgs(const ArgsManager& args, CChainParams::SigNetOptions& option
 void ReadRegTestArgs(const ArgsManager& args, CChainParams::RegTestOptions& options)
 {
     if (auto value = args.GetBoolArg("-fastprune")) options.fastprune = *value;
+    if (args.GetBoolArg("-marsqnet", false) || args.GetBoolArg("-qdevnet", false) || args.GetArg("-chain", "") == "marsqnet" || args.GetArg("-chain", "") == "qdevnet") {
+        options.randomx_devnet = true;
+    }
 
     for (const std::string& arg : args.GetArgs("-testactivationheight")) {
         const auto found{arg.find('@')};

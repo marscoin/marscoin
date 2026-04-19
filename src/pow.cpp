@@ -9,8 +9,31 @@
 #include <bignum.h>
 #include <chain.h>
 #include <logging.h>
+#include <primitives/pureheader.h>
 #include <primitives/block.h>
+#include <streams.h>
 #include <uint256.h>
+
+#ifdef ENABLE_RANDOMX_VENDOR
+#include <randomx_wrapper.h>
+
+#include <mutex>
+#endif
+
+namespace {
+
+#ifdef ENABLE_RANDOMX_VENDOR
+struct RandomXCacheState {
+    randomx::CacheHandle handle;
+    uint256 prev_block_hash;
+    bool has_cache{false};
+    std::mutex mutex;
+};
+
+RandomXCacheState g_randomx_cache;
+#endif
+
+} // namespace
 
 unsigned int DarkGravityWave2(const CBlockIndex* pindexLast, const CBlockHeader *pblock, const Consensus::Params& params) {
     /* current difficulty formula, darkcoin - DarkGravity v2, written by Evan Duffield - evan@darkcoin.io */
@@ -381,6 +404,47 @@ bool CheckProofOfWork(uint256 hash, unsigned int nBits, const Consensus::Params&
 {
     //if constexpr (G_FUZZING) return (hash.data()[31] & 0x80) == 0;
     return CheckProofOfWorkImpl(hash, nBits, params);
+}
+
+uint256 GetProofOfWorkHash(const CPureBlockHeader& header, const Consensus::Params& params)
+{
+    if (!params.fPowUseRandomX) {
+        return header.GetPoWHash();
+    }
+
+#ifndef ENABLE_RANDOMX_VENDOR
+    return uint256{};
+#else
+    std::vector<unsigned char> key(header.hashPrevBlock.begin(), header.hashPrevBlock.end());
+    DataStream input_stream;
+    input_stream << header;
+
+    std::array<unsigned char, 32> hash_out{};
+    std::string error;
+
+    std::lock_guard<std::mutex> lock(g_randomx_cache.mutex);
+    if (!g_randomx_cache.has_cache || g_randomx_cache.prev_block_hash != header.hashPrevBlock) {
+        if (!randomx::InitCache(g_randomx_cache.handle, Span<const unsigned char>(key.data(), key.size()), error)) {
+            LogError("%s: randomx cache init failed: %s\n", __func__, error);
+            return uint256{};
+        }
+        g_randomx_cache.prev_block_hash = header.hashPrevBlock;
+        g_randomx_cache.has_cache = true;
+    }
+
+    std::vector<unsigned char> input(input_stream.begin(), input_stream.end());
+    if (!randomx::HashOnce(g_randomx_cache.handle, Span<const unsigned char>(input.data(), input.size()), hash_out, error)) {
+        LogError("%s: randomx hash failed: %s\n", __func__, error);
+        return uint256{};
+    }
+
+    return uint256{Span<const unsigned char>(hash_out.data(), hash_out.size())};
+#endif
+}
+
+bool CheckProofOfWork(const CPureBlockHeader& header, unsigned int nBits, const Consensus::Params& params)
+{
+    return CheckProofOfWork(GetProofOfWorkHash(header, params), nBits, params);
 }
 
 bool CheckProofOfWorkImpl(uint256 hash, unsigned int nBits, const Consensus::Params& params)

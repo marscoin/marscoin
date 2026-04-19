@@ -12,6 +12,7 @@
 
 class CBlockHeader;
 class CBlockIndex;
+class CPureBlockHeader;
 class uint256;
 
 unsigned int GetNextWorkRequired(const CBlockIndex* pindexLast, const CBlockHeader *pblock, const Consensus::Params&);
@@ -20,6 +21,8 @@ unsigned int CalculateNextWorkRequired(const CBlockIndex* pindexLast, int64_t nF
 /** Check whether a block hash satisfies the proof-of-work requirement specified by nBits */
 bool CheckProofOfWork(uint256 hash, unsigned int nBits, const Consensus::Params&);
 bool CheckProofOfWorkImpl(uint256 hash, unsigned int nBits, const Consensus::Params&);
+uint256 GetProofOfWorkHash(const CPureBlockHeader& header, const Consensus::Params& params);
+bool CheckProofOfWork(const CPureBlockHeader& header, unsigned int nBits, const Consensus::Params& params);
 
 /**
  * Return false if the proof-of-work requirement specified by new_nbits at a

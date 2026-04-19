@@ -137,7 +137,7 @@ static bool GenerateBlock(ChainstateManager& chainman, Mining& miner, CBlock&& b
     block.hashMerkleRoot = BlockMerkleRoot(block);
 
     auto& miningHeader = CAuxPow::initAuxPow(block);
-    while (max_tries > 0 && miningHeader.nNonce < std::numeric_limits<uint32_t>::max() && !CheckProofOfWork(miningHeader.GetPoWHash(), block.nBits, chainman.GetConsensus()) && !chainman.m_interrupt) {
+    while (max_tries > 0 && miningHeader.nNonce < std::numeric_limits<uint32_t>::max() && !CheckProofOfWork(miningHeader, block.nBits, chainman.GetConsensus()) && !chainman.m_interrupt) {
         ++miningHeader.nNonce;
         --max_tries;
     }

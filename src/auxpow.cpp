@@ -226,7 +226,7 @@ bool CheckProofOfWork(const CBlockHeader& block, const Consensus::Params& params
             return false;
         }
 
-        if (!CheckProofOfWork(block.GetPoWHash(), block.nBits, params)) {
+        if (!::CheckProofOfWork(static_cast<const CPureBlockHeader&>(block), block.nBits, params)) {
             LogError("%s : non-AUX proof of work failed\n", __func__);
             return false;
         }
@@ -245,7 +245,7 @@ bool CheckProofOfWork(const CBlockHeader& block, const Consensus::Params& params
         return false;
     }
 
-    if (!CheckProofOfWork(block.auxpow->getParentBlockPoWHash(), block.nBits, params)) {
+    if (!::CheckProofOfWork(block.auxpow->getParentBlock(), block.nBits, params)) {
         LogError("%s : AUX proof of work failed\n", __func__);
         return false;
     }

@@ -29,6 +29,12 @@ the quantum-upgrade program.
   `src/crypto/randomx_vendor/` for reproducible future integration.
 - Build integration remains non-activating and is gated by
   `--enable-randomx-vendor`.
+- Adds a thin internal wrapper scaffold (`InitCache`, `HashOnce`) in
+  `src/randomx_wrapper.{h,cpp}` with deterministic behavior tests.
+- Wrapper now executes vendored RandomX VM hashing in light mode with
+  `RANDOMX_FLAG_V2` enforced by profile policy.
+- Consensus PoW path remains unchanged; wrapper is still gated behind
+  `--enable-randomx-vendor`.
 
 ## Follow-up Work
 
