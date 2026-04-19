@@ -19,6 +19,7 @@ static const std::string OUTPUT_TYPE_STRING_LEGACY = "legacy";
 static const std::string OUTPUT_TYPE_STRING_P2SH_SEGWIT = "p2sh-segwit";
 static const std::string OUTPUT_TYPE_STRING_BECH32 = "bech32";
 static const std::string OUTPUT_TYPE_STRING_BECH32M = "bech32m";
+static const std::string OUTPUT_TYPE_STRING_BECH32_PQ = "bech32-pq";
 static const std::string OUTPUT_TYPE_STRING_UNKNOWN = "unknown";
 
 std::optional<OutputType> ParseOutputType(const std::string& type)
@@ -31,6 +32,8 @@ std::optional<OutputType> ParseOutputType(const std::string& type)
         return OutputType::BECH32;
     } else if (type == OUTPUT_TYPE_STRING_BECH32M) {
         return OutputType::BECH32M;
+    } else if (type == OUTPUT_TYPE_STRING_BECH32_PQ) {
+        return OutputType::BECH32_PQ;
     }
     return std::nullopt;
 }
@@ -42,6 +45,7 @@ const std::string& FormatOutputType(OutputType type)
     case OutputType::P2SH_SEGWIT: return OUTPUT_TYPE_STRING_P2SH_SEGWIT;
     case OutputType::BECH32: return OUTPUT_TYPE_STRING_BECH32;
     case OutputType::BECH32M: return OUTPUT_TYPE_STRING_BECH32M;
+    case OutputType::BECH32_PQ: return OUTPUT_TYPE_STRING_BECH32_PQ;
     case OutputType::UNKNOWN: return OUTPUT_TYPE_STRING_UNKNOWN;
     } // no default case, so the compiler can warn about missing cases
     assert(false);
@@ -63,7 +67,8 @@ CTxDestination GetDestinationForKey(const CPubKey& key, OutputType type)
         }
     }
     case OutputType::BECH32M:
-    case OutputType::UNKNOWN: {} // This function should never be used with BECH32M or UNKNOWN, so let it assert
+    case OutputType::BECH32_PQ:
+    case OutputType::UNKNOWN: {} // These types don't use CPubKey-based key generation
     } // no default case, so the compiler can warn about missing cases
     assert(false);
 }
@@ -102,7 +107,8 @@ CTxDestination AddAndGetDestinationForScript(FlatSigningProvider& keystore, cons
         }
     }
     case OutputType::BECH32M:
-    case OutputType::UNKNOWN: {} // This function should not be used for BECH32M or UNKNOWN, so let it assert
+    case OutputType::BECH32_PQ:
+    case OutputType::UNKNOWN: {} // These types don't use script-based destination generation
     } // no default case, so the compiler can warn about missing cases
     assert(false);
 }
@@ -119,6 +125,9 @@ std::optional<OutputType> OutputTypeFromDestination(const CTxDestination& dest) 
     if (std::holds_alternative<WitnessV1Taproot>(dest) ||
         std::holds_alternative<WitnessUnknown>(dest)) {
         return OutputType::BECH32M;
+    }
+    if (std::holds_alternative<WitnessV2PQ>(dest)) {
+        return OutputType::BECH32_PQ;
     }
     return std::nullopt;
 }

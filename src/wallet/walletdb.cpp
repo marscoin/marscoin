@@ -303,6 +303,17 @@ bool WalletBatch::WriteDescriptorCacheItems(const uint256& desc_id, const Descri
     return true;
 }
 
+bool WalletBatch::WritePQKey(const uint256& program, uint8_t param_set_id,
+                            const std::vector<unsigned char>& pubkey,
+                            const std::vector<unsigned char>& privkey)
+{
+    std::vector<unsigned char> value;
+    value.push_back(param_set_id);
+    value.insert(value.end(), pubkey.begin(), pubkey.end());
+    value.insert(value.end(), privkey.begin(), privkey.end());
+    return WriteIC(std::make_pair(std::string("pqkey"), program), value);
+}
+
 bool WalletBatch::WriteLockedUTXO(const COutPoint& output)
 {
     return WriteIC(std::make_pair(DBKeys::LOCKED_UTXO, std::make_pair(output.hash, output.n)), uint8_t{'1'});
