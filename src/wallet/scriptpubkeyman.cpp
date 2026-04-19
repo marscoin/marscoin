@@ -115,6 +115,7 @@ IsMineResult IsMineInner(const LegacyDataSPKM& keystore, const CScript& scriptPu
     case TxoutType::NULL_DATA:
     case TxoutType::WITNESS_UNKNOWN:
     case TxoutType::WITNESS_V1_TAPROOT:
+    case TxoutType::WITNESS_V2_PQ:
     case TxoutType::ANCHOR:
         break;
     case TxoutType::PUBKEY:

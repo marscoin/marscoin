@@ -111,6 +111,16 @@ std::string ScriptErrorString(const ScriptError serror)
             return "OP_CHECKMULTISIG(VERIFY) is not available in tapscript";
         case SCRIPT_ERR_TAPSCRIPT_MINIMALIF:
             return "OP_IF/NOTIF argument must be minimal in tapscript";
+        case SCRIPT_ERR_PQ_UNSUPPORTED_PARAM_SET:
+            return "Unsupported SPHINCS+ parameter set";
+        case SCRIPT_ERR_PQ_PUBKEY_SIZE:
+            return "Invalid SPHINCS+ public key size";
+        case SCRIPT_ERR_PQ_SIG_FORMAT:
+            return "Invalid SPHINCS+ signature format";
+        case SCRIPT_ERR_PQ_SIG_VERIFY:
+            return "SPHINCS+ signature verification failed";
+        case SCRIPT_ERR_PQ_PROGRAM_MISMATCH:
+            return "Witness v2 program commitment mismatch";
         case SCRIPT_ERR_OP_CODESEPARATOR:
             return "Using OP_CODESEPARATOR in non-witness script";
         case SCRIPT_ERR_SIG_FINDANDDELETE:

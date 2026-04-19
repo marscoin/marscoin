@@ -5,6 +5,7 @@
 
 #include <script/interpreter.h>
 
+#include <crypto/pq_sphincs.h>
 #include <crypto/ripemd160.h>
 #include <crypto/sha1.h>
 #include <crypto/sha256.h>
@@ -1781,6 +1782,38 @@ bool GenericTransactionSignatureChecker<T>::CheckSequence(const CScriptNum& nSeq
     return true;
 }
 
+template <class T>
+uint256 GenericTransactionSignatureChecker<T>::GetSigHashPQ(ScriptExecutionData& execdata) const
+{
+    // PQ sighash: tagged hash over transaction data.
+    // SHA256(SHA256("PQSighash") || SHA256("PQSighash") ||
+    //        nVersion || nLockTime || sha_prevouts || sha_sequences ||
+    //        sha_outputs || input_index)
+    if (!this->txdata) return uint256{};
+
+    HashWriter ss{};
+    // Tag: double-SHA256 of "PQSighash"
+    uint256 tag;
+    CSHA256().Write(reinterpret_cast<const unsigned char*>("PQSighash"), 9).Finalize(tag.begin());
+    ss << tag << tag;
+
+    // Transaction fields
+    ss << txTo->version;
+    ss << txTo->nLockTime;
+
+    // Prevouts hash
+    ss << txdata->m_prevouts_single_hash;
+    // Sequences hash
+    ss << txdata->m_sequences_single_hash;
+    // Outputs hash
+    ss << txdata->m_outputs_single_hash;
+
+    // Input index
+    ss << nIn;
+
+    return ss.GetSHA256();
+}
+
 // explicit instantiation
 template class GenericTransactionSignatureChecker<CTransaction>;
 template class GenericTransactionSignatureChecker<CMutableTransaction>;
@@ -1943,6 +1976,61 @@ static bool VerifyWitnessProgram(const CScriptWitness& witness, int witversion, 
             }
             return set_success(serror);
         }
+    } else if (witversion == 2 && program.size() == WITNESS_V2_PQ_PROGRAM_SIZE && !is_p2sh) {
+        // Post-quantum witness v2: SPHINCS+ signature verification
+        if (!(flags & SCRIPT_VERIFY_WITNESS_V2)) return set_success(serror);
+
+        // Witness stack: <signature_payload> <parameter_set_id> <public_key>
+        if (witness.stack.size() != 3) {
+            return set_error(serror, SCRIPT_ERR_WITNESS_PROGRAM_MISMATCH);
+        }
+
+        const valtype& sig_payload = witness.stack[0];
+        const valtype& param_set_raw = witness.stack[1];
+        const valtype& pubkey = witness.stack[2];
+
+        // Validate parameter set (must be exactly 1 byte)
+        if (param_set_raw.size() != 1 || !pq::sphincs::IsSupportedParameterSet(param_set_raw[0])) {
+            return set_error(serror, SCRIPT_ERR_PQ_UNSUPPORTED_PARAM_SET);
+        }
+        const auto param_set = static_cast<pq::sphincs::ParameterSet>(param_set_raw[0]);
+
+        // Validate public key length
+        if (pubkey.size() != pq::sphincs::SPHINCS_PUBLIC_KEY_SIZE_SHA2_128S) {
+            return set_error(serror, SCRIPT_ERR_PQ_PUBKEY_SIZE);
+        }
+
+        // Verify program commitment: program == SHA256(param_set_id || pubkey)
+        uint256 expected_program;
+        CSHA256().Write(param_set_raw.data(), 1)
+                 .Write(pubkey.data(), pubkey.size())
+                 .Finalize(expected_program.begin());
+        if (memcmp(expected_program.begin(), program.data(), 32) != 0) {
+            return set_error(serror, SCRIPT_ERR_PQ_PROGRAM_MISMATCH);
+        }
+
+        // Validate signature encoding
+        const std::string format_err = pq::sphincs::ValidateSignatureEncoding(sig_payload);
+        if (!format_err.empty()) {
+            return set_error(serror, SCRIPT_ERR_PQ_SIG_FORMAT);
+        }
+
+        // Compute PQ sighash: SHA256("PQSighash" || transaction_data)
+        // For the scaffold, we use the checker's sighash mechanism.
+        // The message to verify is the serialized transaction sighash.
+        uint256 sighash = checker.GetSigHashPQ(execdata);
+
+        // Verify SPHINCS+ signature
+        std::string verify_err;
+        if (!pq::sphincs::VerifyMessage(param_set,
+                Span<const unsigned char>(pubkey.data(), pubkey.size()),
+                Span<const unsigned char>(sighash.begin(), 32),
+                Span<const unsigned char>(sig_payload.data(), sig_payload.size()),
+                verify_err)) {
+            return set_error(serror, SCRIPT_ERR_PQ_SIG_VERIFY);
+        }
+
+        return set_success(serror);
     } else if (!is_p2sh && CScript::IsPayToAnchor(witversion, program)) {
         return true;
     } else {
