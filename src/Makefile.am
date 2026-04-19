@@ -656,6 +656,8 @@ libmarscoin_consensus_a_SOURCES = \
   consensus/blockweight.cpp \
   consensus/blockweight.h \
   consensus/merkle.cpp \
+  crypto/pq_sphincs.cpp \
+  crypto/pq_sphincs.h \
   consensus/merkle.h \
   consensus/params.h \
   consensus/tx_check.cpp \
