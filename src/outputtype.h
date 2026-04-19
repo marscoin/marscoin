@@ -28,8 +28,10 @@ static constexpr auto OUTPUT_TYPES = std::array{
     OutputType::P2SH_SEGWIT,
     OutputType::BECH32,
     OutputType::BECH32M,
-    OutputType::BECH32_PQ,
 };
+// BECH32_PQ is intentionally excluded from OUTPUT_TYPES because PQ keys
+// use a separate generation path (getnewpqaddress), not the standard
+// descriptor-based ScriptPubKeyMan system.
 
 std::optional<OutputType> ParseOutputType(const std::string& str);
 const std::string& FormatOutputType(OutputType type);
