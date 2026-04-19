@@ -56,6 +56,7 @@ AH_BOTTOM([#endif //BITCOIN_CONFIG_H])
 
 dnl Automake init set-up and checks
 AM_INIT_AUTOMAKE([1.13 no-define subdir-objects foreign])
+AM_PROG_AS
 
 AM_MAINTAINER_MODE([enable])
 
@@ -640,6 +641,20 @@ if test "$enable_pq_oqs_vendor" = "yes"; then
   OQS_VENDOR_LIBS="$OQS_VENDOR_LIB_PATH"
 fi
 AC_SUBST([OQS_VENDOR_LIBS])
+case $host_cpu in
+  x86_64*|amd64*)
+    randomx_arch_x86_64=yes
+    randomx_arch_aarch64=no
+    ;;
+  aarch64*|arm64*)
+    randomx_arch_x86_64=no
+    randomx_arch_aarch64=yes
+    ;;
+  *)
+    randomx_arch_x86_64=no
+    randomx_arch_aarch64=no
+    ;;
+esac
 
 AC_ARG_WITH([experimental-kernel-lib],
   [AS_HELP_STRING([--with-experimental-kernel-lib],
@@ -1649,6 +1664,8 @@ AM_CONDITIONAL([ENABLE_ARM_CRC], [test "$enable_arm_crc" = "yes"])
 AM_CONDITIONAL([ENABLE_ARM_SHANI], [test "$enable_arm_shani" = "yes"])
 AM_CONDITIONAL([ENABLE_RANDOMX_VENDOR], [test "$enable_randomx_vendor" = "yes"])
 AM_CONDITIONAL([ENABLE_PQ_OQS_VENDOR], [test "$enable_pq_oqs_vendor" = "yes"])
+AM_CONDITIONAL([RANDOMX_ARCH_X86_64], [test "$randomx_arch_x86_64" = "yes"])
+AM_CONDITIONAL([RANDOMX_ARCH_AARCH64], [test "$randomx_arch_aarch64" = "yes"])
 AM_CONDITIONAL([WORDS_BIGENDIAN], [test "$ac_cv_c_bigendian" = "yes"])
 AM_CONDITIONAL([USE_NATPMP], [test "$use_natpmp" = "yes"])
 AM_CONDITIONAL([USE_UPNP], [test "$use_upnp" = "yes"])
