@@ -160,6 +160,12 @@ public:
     virtual bool GetTaprootSpendData(const XOnlyPubKey& output_key, TaprootSpendData& spenddata) const { return false; }
     virtual bool GetTaprootBuilder(const XOnlyPubKey& output_key, TaprootBuilder& builder) const { return false; }
 
+    /** Get a SPHINCS+ PQ keypair by witness v2 program hash.
+     *  Returns param_set_id, pubkey, and privkey if found. */
+    virtual bool GetPQKey(const uint256& program, uint8_t& param_set_id,
+                          std::vector<unsigned char>& pubkey,
+                          std::vector<unsigned char>& privkey) const { return false; }
+
     bool GetKeyByXOnly(const XOnlyPubKey& pubkey, CKey& key) const
     {
         for (const auto& id : pubkey.GetKeyIDs()) {
@@ -204,6 +210,13 @@ public:
     bool GetTaprootBuilder(const XOnlyPubKey& output_key, TaprootBuilder& builder) const override;
 };
 
+/** PQ key data: param_set_id, pubkey, privkey */
+struct PQKeyData {
+    uint8_t param_set_id;
+    std::vector<unsigned char> pubkey;
+    std::vector<unsigned char> privkey;
+};
+
 struct FlatSigningProvider final : public SigningProvider
 {
     std::map<CScriptID, CScript> scripts;
@@ -211,6 +224,7 @@ struct FlatSigningProvider final : public SigningProvider
     std::map<CKeyID, std::pair<CPubKey, KeyOriginInfo>> origins;
     std::map<CKeyID, CKey> keys;
     std::map<XOnlyPubKey, TaprootBuilder> tr_trees; /** Map from output key to Taproot tree (which can then make the TaprootSpendData */
+    std::map<uint256, PQKeyData> pq_keys; /** Map from witness v2 program to SPHINCS+ key data */
 
     bool GetCScript(const CScriptID& scriptid, CScript& script) const override;
     bool GetPubKey(const CKeyID& keyid, CPubKey& pubkey) const override;
@@ -218,6 +232,9 @@ struct FlatSigningProvider final : public SigningProvider
     bool GetKey(const CKeyID& keyid, CKey& key) const override;
     bool GetTaprootSpendData(const XOnlyPubKey& output_key, TaprootSpendData& spenddata) const override;
     bool GetTaprootBuilder(const XOnlyPubKey& output_key, TaprootBuilder& builder) const override;
+    bool GetPQKey(const uint256& program, uint8_t& param_set_id,
+                  std::vector<unsigned char>& pubkey,
+                  std::vector<unsigned char>& privkey) const override;
 
     FlatSigningProvider& Merge(FlatSigningProvider&& b) LIFETIMEBOUND;
 };

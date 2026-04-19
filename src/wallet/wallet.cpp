@@ -17,6 +17,7 @@
 #include <common/system.h>
 #include <consensus/amount.h>
 #include <consensus/consensus.h>
+#include <crypto/pq_sphincs.h>
 #include <consensus/validation.h>
 #include <external_signer.h>
 #include <interfaces/chain.h>
@@ -2178,6 +2179,34 @@ bool CWallet::SignTransaction(CMutableTransaction& tx, const std::map<COutPoint,
         // so we can exit early and return true if that happens
         if (spk_man->SignTransaction(tx, coins, sighash, input_errors)) {
             return true;
+        }
+    }
+
+    // Try PQ key signing for any witness v2 inputs
+    // Build a FlatSigningProvider with PQ keys from the wallet DB
+    {
+        FlatSigningProvider pq_provider;
+        bool has_pq_inputs = false;
+        for (const auto& coin_pair : coins) {
+            int witness_version;
+            std::vector<unsigned char> witness_program;
+            if (coin_pair.second.out.scriptPubKey.IsWitnessProgram(witness_version, witness_program) &&
+                witness_version == 2 && witness_program.size() == 32) {
+                uint256 program(witness_program);
+                WalletBatch batch(GetDatabase());
+                uint8_t param_set_id;
+                std::vector<unsigned char> pubkey;
+                std::vector<unsigned char> privkey;
+                if (batch.ReadPQKey(program, param_set_id, pubkey, privkey)) {
+                    pq_provider.pq_keys[program] = PQKeyData{param_set_id, pubkey, privkey};
+                    has_pq_inputs = true;
+                }
+            }
+        }
+        if (has_pq_inputs) {
+            if (::SignTransaction(tx, &pq_provider, coins, sighash, input_errors)) {
+                return true;
+            }
         }
     }
 

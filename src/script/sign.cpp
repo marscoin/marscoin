@@ -6,6 +6,7 @@
 #include <script/sign.h>
 
 #include <consensus/amount.h>
+#include <crypto/pq_sphincs.h>
 #include <key.h>
 #include <policy/policy.h>
 #include <primitives/transaction.h>
@@ -87,6 +88,36 @@ bool MutableTransactionSignatureCreator::CreateSchnorrSig(const SigningProvider&
     // Use uint256{} as aux_rnd for now.
     if (!key.SignSchnorr(hash, sig, merkle_root, {})) return false;
     if (nHashType) sig.push_back(nHashType);
+    return true;
+}
+
+bool MutableTransactionSignatureCreator::CreatePQSig(const SigningProvider& provider, std::vector<unsigned char>& sig_payload, const uint256& program, SigVersion sigversion) const
+{
+    assert(sigversion == SigVersion::WITNESS_V2_PQ);
+
+    // Retrieve PQ private key from provider
+    uint8_t param_set_id;
+    std::vector<unsigned char> pubkey;
+    std::vector<unsigned char> privkey;
+    if (!provider.GetPQKey(program, param_set_id, pubkey, privkey)) {
+        return false;
+    }
+
+    // Compute PQ sighash using the checker
+    ScriptExecutionData execdata;
+    uint256 sighash = checker.GetSigHashPQ(execdata);
+    if (sighash.IsNull()) return false;
+
+    // Sign with SPHINCS+
+    const auto param_set = static_cast<pq::sphincs::ParameterSet>(param_set_id);
+    std::string sign_error;
+    if (!pq::sphincs::SignMessage(param_set,
+            Span<const unsigned char>(privkey.data(), privkey.size()),
+            Span<const unsigned char>(sighash.begin(), 32),
+            sig_payload, sign_error)) {
+        return false;
+    }
+
     return true;
 }
 
@@ -474,8 +505,28 @@ static bool SignStep(const SigningProvider& provider, const BaseSignatureCreator
         return false;
 
     case TxoutType::WITNESS_V1_TAPROOT:
-    case TxoutType::WITNESS_V2_PQ:
         return SignTaproot(provider, creator, WitnessV1Taproot(XOnlyPubKey{vSolutions[0]}), sigdata, ret);
+
+    case TxoutType::WITNESS_V2_PQ: {
+        // Post-quantum SPHINCS+ signing: produce witness stack
+        // <sig_payload> <param_set_id> <pubkey>
+        uint256 program(vSolutions[0]);
+        std::vector<unsigned char> sig_payload;
+        if (!creator.CreatePQSig(provider, sig_payload, program, SigVersion::WITNESS_V2_PQ)) {
+            return false;
+        }
+        // Retrieve pubkey and param_set_id from provider for witness stack
+        uint8_t param_set_id;
+        std::vector<unsigned char> pubkey;
+        std::vector<unsigned char> privkey;
+        if (!provider.GetPQKey(program, param_set_id, pubkey, privkey)) {
+            return false;
+        }
+        ret.push_back(std::move(sig_payload));
+        ret.push_back({param_set_id});
+        ret.push_back(std::move(pubkey));
+        return true;
+    }
 
     case TxoutType::ANCHOR:
         return true;
@@ -554,6 +605,12 @@ bool ProduceSignature(const SigningProvider& provider, const BaseSignatureCreato
         sigdata.witness = true;
         result.clear();
     } else if (whichType == TxoutType::WITNESS_V1_TAPROOT && !P2SH) {
+        sigdata.witness = true;
+        if (solved) {
+            sigdata.scriptWitness.stack = std::move(result);
+        }
+        result.clear();
+    } else if (whichType == TxoutType::WITNESS_V2_PQ && !P2SH) {
         sigdata.witness = true;
         if (solved) {
             sigdata.scriptWitness.stack = std::move(result);

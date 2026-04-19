@@ -314,6 +314,26 @@ bool WalletBatch::WritePQKey(const uint256& program, uint8_t param_set_id,
     return WriteIC(std::make_pair(std::string("pqkey"), program), value);
 }
 
+bool WalletBatch::ReadPQKey(const uint256& program, uint8_t& param_set_id,
+                           std::vector<unsigned char>& pubkey,
+                           std::vector<unsigned char>& privkey)
+{
+    std::vector<unsigned char> raw_value;
+    if (!m_batch->Read(std::make_pair(std::string("pqkey"), program), raw_value)) {
+        return false;
+    }
+    if (raw_value.size() < 2) return false;
+    param_set_id = raw_value[0];
+    // Expected: 1 + pubkey_size + privkey_size
+    // For SLH-DSA-SHA2-128s: 1 + 32 + 64 = 97
+    size_t pk_end = 1 + 32; // SPHINCS_PUBLIC_KEY_SIZE_SHA2_128S
+    size_t sk_end = pk_end + 64; // SPHINCS_SECRET_KEY_SIZE_SHA2_128S
+    if (raw_value.size() != sk_end) return false;
+    pubkey.assign(raw_value.begin() + 1, raw_value.begin() + pk_end);
+    privkey.assign(raw_value.begin() + pk_end, raw_value.end());
+    return true;
+}
+
 bool WalletBatch::WriteLockedUTXO(const COutPoint& output)
 {
     return WriteIC(std::make_pair(DBKeys::LOCKED_UTXO, std::make_pair(output.hash, output.n)), uint8_t{'1'});
