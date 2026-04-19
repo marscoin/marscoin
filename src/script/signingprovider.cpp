@@ -77,6 +77,18 @@ bool FlatSigningProvider::GetTaprootBuilder(const XOnlyPubKey& output_key, Tapro
     return LookupHelper(tr_trees, output_key, builder);
 }
 
+bool FlatSigningProvider::GetPQKey(const uint256& program, uint8_t& param_set_id,
+                                   std::vector<unsigned char>& pubkey,
+                                   std::vector<unsigned char>& privkey) const
+{
+    auto it = pq_keys.find(program);
+    if (it == pq_keys.end()) return false;
+    param_set_id = it->second.param_set_id;
+    pubkey = it->second.pubkey;
+    privkey = it->second.privkey;
+    return true;
+}
+
 FlatSigningProvider& FlatSigningProvider::Merge(FlatSigningProvider&& b)
 {
     scripts.merge(b.scripts);
@@ -84,6 +96,7 @@ FlatSigningProvider& FlatSigningProvider::Merge(FlatSigningProvider&& b)
     keys.merge(b.keys);
     origins.merge(b.origins);
     tr_trees.merge(b.tr_trees);
+    pq_keys.merge(b.pq_keys);
     return *this;
 }
 

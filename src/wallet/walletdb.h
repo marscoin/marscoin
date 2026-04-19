@@ -272,6 +272,11 @@ public:
                     const std::vector<unsigned char>& pubkey,
                     const std::vector<unsigned char>& privkey);
 
+    //! Read a post-quantum SPHINCS+ keypair from the database.
+    bool ReadPQKey(const uint256& program, uint8_t& param_set_id,
+                   std::vector<unsigned char>& pubkey,
+                   std::vector<unsigned char>& privkey);
+
     bool WriteLockedUTXO(const COutPoint& output);
     bool EraseLockedUTXO(const COutPoint& output);
 
