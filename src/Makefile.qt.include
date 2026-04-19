@@ -340,7 +340,7 @@ marscoin_qt_libtoolflags = $(AM_LIBTOOLFLAGS) --tag CXX
 qt_marscoin_qt_CPPFLAGS = $(marscoin_qt_cppflags)
 qt_marscoin_qt_CXXFLAGS = $(marscoin_qt_cxxflags)
 qt_marscoin_qt_SOURCES = $(marscoin_qt_sources) init/bitcoin-qt.cpp
-qt_marscoin_qt_LDADD = $(marscoin_qt_ldadd) $(CRYPTO_LIBS)
+qt_marscoin_qt_LDADD = $(marscoin_qt_ldadd) $(CRYPTO_LIBS) $(OQS_VENDOR_LIBS)
 qt_marscoin_qt_LDFLAGS = $(marscoin_qt_ldflags)
 qt_marscoin_qt_LIBTOOLFLAGS = $(marscoin_qt_libtoolflags)
 
