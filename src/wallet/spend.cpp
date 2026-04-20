@@ -84,6 +84,19 @@ static std::optional<int64_t> MaxInputWeight(const Descriptor& desc, const std::
 
 int CalculateMaximumSignedInputSize(const CTxOut& txout, const COutPoint outpoint, const SigningProvider* provider, bool can_grind_r, const CCoinControl* coin_control)
 {
+    // P2WPQH inputs have a known fixed size: ~8058 weight units
+    // Non-witness: 41 bytes (prevout 36 + sequence 4 + scriptSig len 1)
+    // Witness: sig_payload 7857 + param_set 1 + pubkey 32 + stack encoding ~4
+    int witness_version;
+    std::vector<unsigned char> witness_program;
+    if (txout.scriptPubKey.IsWitnessProgram(witness_version, witness_program) &&
+        witness_version == 2 && witness_program.size() == 32) {
+        const int non_witness = 41;
+        const int witness = 7857 + 1 + 32 + 4; // sig + paramset + pubkey + encoding overhead
+        const int weight = non_witness * 4 + witness;
+        return static_cast<int>(GetVirtualTransactionSize(weight, 0, 0));
+    }
+
     if (!provider) return -1;
 
     if (const auto desc = InferDescriptor(txout.scriptPubKey, *provider)) {
