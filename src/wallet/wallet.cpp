@@ -1630,6 +1630,21 @@ isminetype CWallet::IsMine(const CScript& script) const
         return res;
     }
 
+    // Check for post-quantum witness v2 outputs
+    int witness_version;
+    std::vector<unsigned char> witness_program;
+    if (script.IsWitnessProgram(witness_version, witness_program) &&
+        witness_version == 2 && witness_program.size() == 32) {
+        uint256 program(witness_program);
+        WalletBatch batch(GetDatabase());
+        uint8_t param_set_id;
+        std::vector<unsigned char> pubkey;
+        std::vector<unsigned char> privkey;
+        if (batch.ReadPQKey(program, param_set_id, pubkey, privkey)) {
+            return ISMINE_SPENDABLE;
+        }
+    }
+
     // Legacy wallet
     if (LegacyScriptPubKeyMan* spkm = GetLegacyScriptPubKeyMan()) {
         return spkm->IsMine(script);
