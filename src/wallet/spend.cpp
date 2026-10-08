@@ -1399,6 +1399,11 @@ util::Result<CreatedTransactionResult> CreateTransaction(
 
     LOCK(wallet.cs_wallet);
 
+    if (!wallet.IsPQActive() &&
+        std::any_of(vecSend.cbegin(), vecSend.cend(), [](const auto& recipient) { return std::holds_alternative<WitnessV2PQ>(recipient.dest); })) {
+        return util::Error{_("Cannot send to a post-quantum (witness v2) address: these outputs are not enforced by consensus on this chain yet, so anyone could spend them")};
+    }
+
     auto res = CreateTransactionInternal(wallet, vecSend, change_pos, coin_control, sign);
     TRACE4(coin_selection, normal_create_tx_internal,
            wallet.GetName().c_str(),

@@ -9,6 +9,7 @@
 #include <addresstype.h>
 #include <blockfilter.h>
 #include <chain.h>
+#include <chainparams.h>
 #include <coins.h>
 #include <common/args.h>
 #include <common/messages.h>
@@ -2214,6 +2215,11 @@ bool CWallet::SignTransaction(CMutableTransaction& tx, const std::map<COutPoint,
     {
         FlatSigningProvider pq_provider;
         std::map<int, bilingual_str> pq_errors;
+        bool pq_active;
+        {
+            LOCK(cs_wallet);
+            pq_active = IsPQActive();
+        }
         for (unsigned int i = 0; i < tx.vin.size(); ++i) {
             const auto coin_it = coins.find(tx.vin[i].prevout);
             if (coin_it == coins.end()) continue;
@@ -2225,6 +2231,10 @@ bool CWallet::SignTransaction(CMutableTransaction& tx, const std::map<COutPoint,
             }
             const uint256 program(witness_program);
             if (!HavePQKey(program)) continue;
+            if (!pq_active) {
+                pq_errors[i] = _("Post-quantum signing is disabled: witness v2 spends are not enforced by consensus on this chain yet");
+                continue;
+            }
             if (IsLocked()) {
                 pq_errors[i] = _("Wallet is locked; unlock it to sign post-quantum inputs");
                 continue;
@@ -3746,6 +3756,12 @@ bool CWallet::WithEncryptionKey(std::function<bool (const CKeyingMaterial&)> cb)
 {
     LOCK(cs_wallet);
     return cb(vMasterKey);
+}
+
+bool CWallet::IsPQActive() const
+{
+    AssertLockHeld(cs_wallet);
+    return Params().GetConsensus().IsPQWitnessActive(m_last_block_processed_height + 1);
 }
 
 namespace {

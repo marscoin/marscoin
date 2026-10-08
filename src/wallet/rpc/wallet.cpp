@@ -217,6 +217,8 @@ static RPCHelpMan getnewpqaddress()
     return RPCHelpMan{"getnewpqaddress",
                 "Generates a new SLH-DSA (FIPS 205) post-quantum keypair and returns the corresponding\n"
                 "mars1z... (witness v2) address. The keypair is stored in the wallet.\n"
+                "Only available on chains where consensus verifies witness v2 spends; elsewhere\n"
+                "coins sent to such an address could be spent by anyone.\n"
                 + HELP_REQUIRING_PASSPHRASE,
                 {
                     {"label", RPCArg::Type::STR, RPCArg::Default{""}, "An optional label for the address."},
@@ -240,8 +242,14 @@ static RPCHelpMan getnewpqaddress()
     std::shared_ptr<CWallet> const pwallet = GetWalletForJSONRPCRequest(request);
     if (!pwallet) return UniValue::VNULL;
 
+    // Make sure the activation check below sees the current tip
+    pwallet->BlockUntilSyncedToCurrentChain();
+
     {
         LOCK(pwallet->cs_wallet);
+        if (!pwallet->IsPQActive()) {
+            throw JSONRPCError(RPC_WALLET_ERROR, "Post-quantum addresses are disabled: witness v2 spends are not enforced by consensus on this chain yet, so coins sent to them could be spent by anyone");
+        }
         EnsureWalletIsUnlocked(*pwallet);
     }
 

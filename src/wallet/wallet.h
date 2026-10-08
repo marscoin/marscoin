@@ -591,6 +591,10 @@ public:
     bool ChangeWalletPassphrase(const SecureString& strOldWalletPassphrase, const SecureString& strNewWalletPassphrase);
     bool EncryptWallet(const SecureString& strWalletPassphrase);
 
+    //! Whether consensus verifies post-quantum witness v2 spends in the next block.
+    //! While it does not, outputs to mars1z addresses can be spent by anyone, so
+    //! the wallet refuses to create PQ addresses, send to them, or sign PQ inputs.
+    bool IsPQActive() const EXCLUSIVE_LOCKS_REQUIRED(cs_wallet);
     //! Store a new post-quantum keypair. The secret key is encrypted with the
     //! wallet master key if the wallet is encrypted, which requires it to be unlocked.
     bool AddPQKey(const uint256& program, uint8_t param_set_id,

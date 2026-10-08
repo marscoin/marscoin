@@ -2399,10 +2399,9 @@ static unsigned int GetBlockScriptFlags(const CBlockIndex& block_index, const Ch
         flags |= SCRIPT_VERIFY_NULLDUMMY;
     }
 
-    // Enable post-quantum witness v2 verification after ABWL activation
-    // (PQ witness uses the same activation gate as adaptive block weight)
-    if (consensusparams.nABWLActivationHeight > 0 &&
-        block_index.nHeight >= consensusparams.nABWLActivationHeight) {
+    // Enable post-quantum witness v2 verification once PQ is active
+    // (currently the same activation gate as adaptive block weight)
+    if (consensusparams.IsPQWitnessActive(block_index.nHeight)) {
         flags |= SCRIPT_VERIFY_WITNESS_V2;
     }
 
