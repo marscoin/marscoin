@@ -712,6 +712,10 @@ Also failing before any of today's changes, judged from the errors:
   text where Marscoin logs `ReadBlockOrHeader`.
 - `key_io_valid_gen`/`key_io_valid_parse` use Bitcoin test data.
 
+CI, 2026-10-08: the macOS ARM64 GUI job fails on every PR because Homebrew now
+ships Boost 1.92. Its `is_index_list` rejects index lists declared as structs
+derived from `indexed_by<...>`. Fixed in PR #60, which uses type aliases.
+
 Running the whole suite in one process makes it worse: the first abort leaves
 the process broken and many later tests fail on a duplicate-argument
 assertion. Run each case in its own process until the inherited tests are
