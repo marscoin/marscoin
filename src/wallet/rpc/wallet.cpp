@@ -11,6 +11,7 @@
 #include <key_io.h>
 #include <rpc/server.h>
 #include <rpc/util.h>
+#include <support/cleanse.h>
 #include <util/translation.h>
 #include <wallet/context.h>
 #include <wallet/receive.h>
@@ -215,7 +216,8 @@ static RPCHelpMan getnewpqaddress()
 {
     return RPCHelpMan{"getnewpqaddress",
                 "Generates a new SLH-DSA (FIPS 205) post-quantum keypair and returns the corresponding\n"
-                "mars1z... (witness v2) address. The keypair is stored in the wallet.\n",
+                "mars1z... (witness v2) address. The keypair is stored in the wallet.\n"
+                + HELP_REQUIRING_PASSPHRASE,
                 {
                     {"label", RPCArg::Type::STR, RPCArg::Default{""}, "An optional label for the address."},
                 },
@@ -238,6 +240,11 @@ static RPCHelpMan getnewpqaddress()
     std::shared_ptr<CWallet> const pwallet = GetWalletForJSONRPCRequest(request);
     if (!pwallet) return UniValue::VNULL;
 
+    {
+        LOCK(pwallet->cs_wallet);
+        EnsureWalletIsUnlocked(*pwallet);
+    }
+
     // Generate SPHINCS+ keypair
     std::vector<unsigned char> pubkey;
     std::vector<unsigned char> privkey;
@@ -258,12 +265,15 @@ static RPCHelpMan getnewpqaddress()
     CTxDestination dest = pq_dest;
     std::string address = EncodeDestination(dest);
 
-    // Store the PQ keypair in the wallet database
+    // Store the PQ keypair in the wallet database (encrypted if the wallet is encrypted)
     {
         LOCK(pwallet->cs_wallet);
 
-        WalletBatch batch(pwallet->GetDatabase());
-        if (!batch.WritePQKey(program, param_set_id, pubkey, privkey)) {
+        // The wallet may have been locked since the check above
+        EnsureWalletIsUnlocked(*pwallet);
+        const bool stored = pwallet->AddPQKey(program, param_set_id, pubkey, privkey);
+        memory_cleanse(privkey.data(), privkey.size());
+        if (!stored) {
             throw JSONRPCError(RPC_WALLET_ERROR, "Failed to store SPHINCS+ key in wallet database");
         }
 

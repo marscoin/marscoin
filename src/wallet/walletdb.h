@@ -79,6 +79,8 @@ extern const std::string NAME;
 extern const std::string OLD_KEY;
 extern const std::string ORDERPOSNEXT;
 extern const std::string POOL;
+extern const std::string PQKEY;
+extern const std::string CRYPTED_PQKEY;
 extern const std::string PURPOSE;
 extern const std::string SETTINGS;
 extern const std::string TX;
@@ -266,16 +268,32 @@ public:
     bool WriteDescriptorLastHardenedCache(const CExtPubKey& xpub, const uint256& desc_id, uint32_t key_exp_index);
     bool WriteDescriptorCacheItems(const uint256& desc_id, const DescriptorCache& cache);
 
-    //! Write a post-quantum SPHINCS+ keypair to the database.
+    //! Write an unencrypted post-quantum SPHINCS+ keypair to the database.
+    //! Only for wallets without encryption; encrypted wallets use WriteCryptedPQKey.
     //! Key: "pqkey" + program_hash, Value: param_set_id + pubkey + privkey
     bool WritePQKey(const uint256& program, uint8_t param_set_id,
                     const std::vector<unsigned char>& pubkey,
                     const std::vector<unsigned char>& privkey);
 
-    //! Read a post-quantum SPHINCS+ keypair from the database.
+    //! Read an unencrypted post-quantum SPHINCS+ keypair from the database.
     bool ReadPQKey(const uint256& program, uint8_t& param_set_id,
                    std::vector<unsigned char>& pubkey,
                    std::vector<unsigned char>& privkey);
+    bool ErasePQKey(const uint256& program);
+
+    //! Write a post-quantum SPHINCS+ keypair whose secret key is encrypted with the wallet master key.
+    //! Key: "cpqkey" + program_hash, Value: param_set_id + pubkey + crypted_secret
+    bool WriteCryptedPQKey(const uint256& program, uint8_t param_set_id,
+                           const std::vector<unsigned char>& pubkey,
+                           const std::vector<unsigned char>& crypted_secret);
+    bool ReadCryptedPQKey(const uint256& program, uint8_t& param_set_id,
+                          std::vector<unsigned char>& pubkey,
+                          std::vector<unsigned char>& crypted_secret);
+
+    //! Whether an encrypted or unencrypted PQ key exists for this program.
+    bool HasPQKey(const uint256& program);
+    //! Programs of all unencrypted PQ key records.
+    bool ListPlaintextPQKeyPrograms(std::vector<uint256>& programs);
 
     bool WriteLockedUTXO(const COutPoint& output);
     bool EraseLockedUTXO(const COutPoint& output);
