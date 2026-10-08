@@ -236,6 +236,42 @@ BOOST_AUTO_TEST_CASE(ChainParams_MARSQNET_regtest_randomx_toggle)
     BOOST_CHECK_EQUAL(params->GetDefaultPort(), 29338);
 }
 
+BOOST_AUTO_TEST_CASE(RandomX_pow_fails_closed)
+{
+    ArgsManager args;
+    args.ForceSetArg("-chain", "marsqnet");
+    const auto params = CreateChainParams(args, ChainType::REGTEST);
+    const auto& consensus = params->GetConsensus();
+    const CBlockHeader header = params->GenesisBlock().GetBlockHeader();
+    const unsigned int easiest_bits = UintToArith256(consensus.powLimit).GetCompact();
+
+    // A zero hash meets any valid target, so a failed hash must never become one.
+    BOOST_CHECK(CheckProofOfWork(uint256{}, easiest_bits, consensus));
+
+#ifdef ENABLE_RANDOMX_VENDOR
+    BOOST_CHECK(IsProofOfWorkSupported(consensus));
+    const auto hash = GetProofOfWorkHash(header, consensus);
+    BOOST_REQUIRE(hash.has_value());
+    BOOST_CHECK(!hash->IsNull());
+    BOOST_CHECK(*hash != header.GetPoWHash());
+    BOOST_CHECK_EQUAL(CheckProofOfWork(header, easiest_bits, consensus), CheckProofOfWork(*hash, easiest_bits, consensus));
+#else
+    BOOST_CHECK(!IsProofOfWorkSupported(consensus));
+    BOOST_CHECK(!GetProofOfWorkHash(header, consensus).has_value());
+    BOOST_CHECK(!CheckProofOfWork(header, easiest_bits, consensus));
+#endif
+}
+
+BOOST_AUTO_TEST_CASE(Scrypt_pow_hash_unchanged)
+{
+    const auto params = CreateChainParams(*m_node.args, ChainType::MAIN);
+    BOOST_CHECK(IsProofOfWorkSupported(params->GetConsensus()));
+    const CBlockHeader header = params->GenesisBlock().GetBlockHeader();
+    const auto hash = GetProofOfWorkHash(header, params->GetConsensus());
+    BOOST_REQUIRE(hash.has_value());
+    BOOST_CHECK_EQUAL(*hash, header.GetPoWHash());
+}
+
 #ifdef ENABLE_RANDOMX_VENDOR
 BOOST_AUTO_TEST_CASE(RandomX_wrapper_deterministic_vectors)
 {

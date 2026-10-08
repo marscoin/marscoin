@@ -406,14 +406,23 @@ bool CheckProofOfWork(uint256 hash, unsigned int nBits, const Consensus::Params&
     return CheckProofOfWorkImpl(hash, nBits, params);
 }
 
-uint256 GetProofOfWorkHash(const CPureBlockHeader& header, const Consensus::Params& params)
+bool IsProofOfWorkSupported(const Consensus::Params& params)
+{
+#ifdef ENABLE_RANDOMX_VENDOR
+    return true;
+#else
+    return !params.fPowUseRandomX;
+#endif
+}
+
+std::optional<uint256> GetProofOfWorkHash(const CPureBlockHeader& header, const Consensus::Params& params)
 {
     if (!params.fPowUseRandomX) {
         return header.GetPoWHash();
     }
 
 #ifndef ENABLE_RANDOMX_VENDOR
-    return uint256{};
+    return std::nullopt;
 #else
     std::vector<unsigned char> key(header.hashPrevBlock.begin(), header.hashPrevBlock.end());
     DataStream input_stream;
@@ -426,7 +435,7 @@ uint256 GetProofOfWorkHash(const CPureBlockHeader& header, const Consensus::Para
     if (!g_randomx_cache.has_cache || g_randomx_cache.prev_block_hash != header.hashPrevBlock) {
         if (!randomx::InitCache(g_randomx_cache.handle, Span<const unsigned char>(key.data(), key.size()), error)) {
             LogError("%s: randomx cache init failed: %s\n", __func__, error);
-            return uint256{};
+            return std::nullopt;
         }
         g_randomx_cache.prev_block_hash = header.hashPrevBlock;
         g_randomx_cache.has_cache = true;
@@ -435,7 +444,7 @@ uint256 GetProofOfWorkHash(const CPureBlockHeader& header, const Consensus::Para
     std::vector<unsigned char> input(input_stream.begin(), input_stream.end());
     if (!randomx::HashOnce(g_randomx_cache.handle, Span<const unsigned char>(input.data(), input.size()), hash_out, error)) {
         LogError("%s: randomx hash failed: %s\n", __func__, error);
-        return uint256{};
+        return std::nullopt;
     }
 
     return uint256{Span<const unsigned char>(hash_out.data(), hash_out.size())};
@@ -444,7 +453,10 @@ uint256 GetProofOfWorkHash(const CPureBlockHeader& header, const Consensus::Para
 
 bool CheckProofOfWork(const CPureBlockHeader& header, unsigned int nBits, const Consensus::Params& params)
 {
-    return CheckProofOfWork(GetProofOfWorkHash(header, params), nBits, params);
+    // A header whose proof-of-work hash cannot be computed is invalid.
+    const std::optional<uint256> pow_hash{GetProofOfWorkHash(header, params)};
+    if (!pow_hash) return false;
+    return CheckProofOfWork(*pow_hash, nBits, params);
 }
 
 bool CheckProofOfWorkImpl(uint256 hash, unsigned int nBits, const Consensus::Params& params)
