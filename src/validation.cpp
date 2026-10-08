@@ -3996,8 +3996,9 @@ bool CheckBlock(const CBlock& block, BlockValidationState& state, const Consensu
     // Note that witness malleability is checked in ContextualCheckBlock, so no
     // checks that use witness data may be performed here.
 
-    // Size limits (context-free fast-reject against absolute ceiling)
-    if (block.vtx.empty() || block.vtx.size() * WITNESS_SCALE_FACTOR > ABWL_TEMPORARY_MAX || ::GetSerializeSize(TX_NO_WITNESS(block)) * WITNESS_SCALE_FACTOR > ABWL_TEMPORARY_MAX)
+    // Size limits (context-free fast-reject against this chain's absolute ceiling)
+    const int64_t max_block_weight{GetContextFreeMaxBlockWeight(consensusParams)};
+    if (block.vtx.empty() || block.vtx.size() * WITNESS_SCALE_FACTOR > max_block_weight || ::GetSerializeSize(TX_NO_WITNESS(block)) * WITNESS_SCALE_FACTOR > max_block_weight)
         return state.Invalid(BlockValidationResult::BLOCK_CONSENSUS, "bad-blk-length", "size limits failed");
 
     // First transaction must be coinbase, the rest must not be
