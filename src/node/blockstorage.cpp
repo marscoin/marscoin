@@ -46,6 +46,22 @@ static constexpr uint8_t DB_BLOCK_INDEX{'b'};
 static constexpr uint8_t DB_FLAG{'F'};
 static constexpr uint8_t DB_REINDEX_FLAG{'R'};
 static constexpr uint8_t DB_LAST_BLOCK{'l'};
+static constexpr uint8_t DB_ABWL_STATE{'W'};
+
+/** Per-block ABWL state, stored separately so block index records keep the upstream format. */
+struct ABWLDiskState {
+    int64_t block_weight{0};
+    int64_t epsilon{0};
+    int64_t beta{0};
+
+    SERIALIZE_METHODS(ABWLDiskState, obj) { READWRITE(obj.block_weight, obj.epsilon, obj.beta); }
+};
+
+/** Only blocks at or after ABWL activation carry state; mainnet writes none. */
+static bool HasABWLState(const CBlockIndex& index)
+{
+    return index.nABWL_epsilon != 0 || index.nABWL_beta != 0;
+}
 // Keys used in previous version that might still be found in the DB:
 // BlockTreeDB::DB_TXINDEX_BLOCK{'T'};
 // BlockTreeDB::DB_TXINDEX{'t'}
@@ -84,6 +100,9 @@ bool BlockTreeDB::WriteBatchSync(const std::vector<std::pair<int, const CBlockFi
     batch.Write(DB_LAST_BLOCK, nLastFile);
     for (const CBlockIndex* bi : blockinfo) {
         batch.Write(std::make_pair(DB_BLOCK_INDEX, bi->GetBlockHash()), CDiskBlockIndex{bi});
+        if (HasABWLState(*bi)) {
+            batch.Write(std::make_pair(DB_ABWL_STATE, bi->GetBlockHash()), ABWLDiskState{bi->nBlockWeight, bi->nABWL_epsilon, bi->nABWL_beta});
+        }
     }
     return WriteBatch(batch, true);
 }
@@ -106,6 +125,26 @@ bool BlockTreeDB::ReadFlag(const std::string& name, bool& fValue)
 bool BlockTreeDB::LoadBlockIndexGuts(const Consensus::Params& consensusParams, std::function<CBlockIndex*(const uint256&)> insertBlockIndex, const util::SignalInterrupt& interrupt)
 {
     AssertLockHeld(::cs_main);
+
+    // Load ABWL state first. Only chains with ABWL active have any records.
+    std::unordered_map<uint256, ABWLDiskState, BlockHasher> abwl_states;
+    {
+        std::unique_ptr<CDBIterator> abwl_cursor(NewIterator());
+        abwl_cursor->Seek(std::make_pair(DB_ABWL_STATE, uint256()));
+        while (abwl_cursor->Valid()) {
+            if (interrupt) return false;
+            std::pair<uint8_t, uint256> key;
+            if (!abwl_cursor->GetKey(key) || key.first != DB_ABWL_STATE) break;
+            ABWLDiskState abwl_state;
+            if (!abwl_cursor->GetValue(abwl_state)) {
+                LogError("%s: failed to read ABWL state\n", __func__);
+                return false;
+            }
+            abwl_states.emplace(key.second, abwl_state);
+            abwl_cursor->Next();
+        }
+    }
+
     std::unique_ptr<CDBIterator> pcursor(NewIterator());
     pcursor->Seek(std::make_pair(DB_BLOCK_INDEX, uint256()));
 
@@ -130,6 +169,12 @@ bool BlockTreeDB::LoadBlockIndexGuts(const Consensus::Params& consensusParams, s
                 pindexNew->nNonce         = diskindex.nNonce;
                 pindexNew->nStatus        = diskindex.nStatus;
                 pindexNew->nTx            = diskindex.nTx;
+
+                if (const auto it{abwl_states.find(pindexNew->GetBlockHash())}; it != abwl_states.end()) {
+                    pindexNew->nBlockWeight  = it->second.block_weight;
+                    pindexNew->nABWL_epsilon = it->second.epsilon;
+                    pindexNew->nABWL_beta    = it->second.beta;
+                }
 
                 pcursor->Next();
             } else {
