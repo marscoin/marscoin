@@ -3,6 +3,8 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
+#include <config/bitcoin-config.h> // IWYU pragma: keep
+
 #include <pow.h>
 
 #include <arith_uint256.h>
@@ -441,8 +443,7 @@ std::optional<uint256> GetProofOfWorkHash(const CPureBlockHeader& header, const 
         g_randomx_cache.has_cache = true;
     }
 
-    std::vector<unsigned char> input(input_stream.begin(), input_stream.end());
-    if (!randomx::HashOnce(g_randomx_cache.handle, Span<const unsigned char>(input.data(), input.size()), hash_out, error)) {
+    if (!randomx::HashOnce(g_randomx_cache.handle, MakeUCharSpan(input_stream), hash_out, error)) {
         LogError("%s: randomx hash failed: %s\n", __func__, error);
         return std::nullopt;
     }

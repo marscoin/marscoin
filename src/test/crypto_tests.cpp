@@ -2,6 +2,8 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
+#include <config/bitcoin-config.h> // IWYU pragma: keep
+
 #include <crypto/aes.h>
 #include <crypto/chacha20.h>
 #include <crypto/chacha20poly1305.h>
