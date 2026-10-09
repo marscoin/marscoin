@@ -89,9 +89,11 @@ class AssumeutxoTest(BitcoinTestFramework):
         self.log.info("  - snapshot file with mismatching network magic")
         invalid_magics = [
             # magic, name, real
-            [0xf9beb4d9, "main", True],
-            [0x0b110907, "test", True],
-            [0x0a03cf40, "signet", True],
+            # Marscoin's network magics (Bitcoin's are unknown networks here).
+            [0xfbc0b6db, "main", True],
+            [0xfaafdeed, "test", True],
+            [0xfcc1b7dc, "testnet4", True],
+            [0xf9beb4d9, "", False],
             [0x00000000, "", False],
             [0xffffffff, "", False],
         ]
@@ -147,7 +149,7 @@ class AssumeutxoTest(BitcoinTestFramework):
 
     def test_headers_not_synced(self, valid_snapshot_path):
         for node in self.nodes[1:]:
-            msg = "Unable to load UTXO snapshot: The base block header (3bb7ce5eba0be48939b7a521ac1ba9316afee2c7bada3a0cca24188e6d7d96c0) must appear in the headers chain. Make sure all headers are syncing, and call loadtxoutset again."
+            msg = "Unable to load UTXO snapshot: The base block header (cbcc14a936bba6ae1d346d4054bf95af7d5231c944b6292c36d02ef59a8d1085) must appear in the headers chain. Make sure all headers are syncing, and call loadtxoutset again."
             assert_raises_rpc_error(-32603, msg, node.loadtxoutset, valid_snapshot_path)
 
     def test_invalid_chainstate_scenarios(self):
@@ -206,7 +208,7 @@ class AssumeutxoTest(BitcoinTestFramework):
             block_hash = node.getblockhash(height)
             node.invalidateblock(block_hash)
             assert_equal(node.getblockcount(), height - 1)
-            msg = "Unable to load UTXO snapshot: The base block header (3bb7ce5eba0be48939b7a521ac1ba9316afee2c7bada3a0cca24188e6d7d96c0) is part of an invalid chain."
+            msg = "Unable to load UTXO snapshot: The base block header (cbcc14a936bba6ae1d346d4054bf95af7d5231c944b6292c36d02ef59a8d1085) is part of an invalid chain."
             assert_raises_rpc_error(-32603, msg, node.loadtxoutset, dump_output_path)
             node.reconsiderblock(block_hash)
 
