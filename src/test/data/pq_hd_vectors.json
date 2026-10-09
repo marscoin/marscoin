@@ -7,7 +7,9 @@
       "root": {
         "key": "6d1f73432224c34498260a02cd8418325dde9207cff2127984de48f83e0c8388",
         "chaincode": "5ef9815414fef167f337ef5907213e094d5047a0e19be9ba50fa9fa589f23c70",
-        "encoded": "mpqprv1d50hxsezynp5fxpxpgpvmpqcxfwaays8elepy7vymey0s0svswy9a7vp2s20aut87vm77kg8yylqjn2sg7swrxlfhfg048a938ercuqzt3v44"
+        "encoded": "mpqprv1d50hxsezynp5fxpxpgpvmpqcxfwaays8elepy7vymey0s0svswy9a7vp2s20aut87vm77kg8yylqjn2sg7swrxlfhfg048a938ercuqzt3v44",
+        "id": "06f2106bfead8a33b9aa6506da021a97ed2781dd64f86c7fcc7cda6a811cb7c3",
+        "id_encoded": "mpqid1qmepq6l74k9r8wd2v5rd5qs6jlkj0qwavnuxcl7v0ndx4qguklpsfemlxv"
       },
       "keys": [
         {
@@ -78,7 +80,9 @@
       "root": {
         "key": "bffbecb854f4dfba7195e8f1ae5ba185583f264c8eee516225c32e8ea5cc3613",
         "chaincode": "b3564a1390455c4112399eea19874f7e06ec15c23f334bb47fbbd21ae42450bd",
-        "encoded": "mpqprv1hla7ewz57n0m5uv4arc6ukaps4vr7fjv3mh9zc39cvhgafwvxcfmx4j2zwgy2hzpzguea6sesa8huphvzhpr7v6tk3lmh5s6usj9p0gsntce9"
+        "encoded": "mpqprv1hla7ewz57n0m5uv4arc6ukaps4vr7fjv3mh9zc39cvhgafwvxcfmx4j2zwgy2hzpzguea6sesa8huphvzhpr7v6tk3lmh5s6usj9p0gsntce9",
+        "id": "c4adca398498987cb6a671906a26aa2183dbfacbf1ea26fbd91d36f6662f2592",
+        "id_encoded": "mpqid1cjku5wvynzv8ed4xwxgx5f42yxpah7kt784zd77er5m0ve30ykfqashmks"
       },
       "keys": [
         {
@@ -113,7 +117,9 @@
       "root": {
         "key": "5d14b93a46ee6662aafba7f70f65e48d28c9386015b6cb56667c229f24aae2e0",
         "chaincode": "f88b3965f3bc1bd9d579b7c55fd59147a721ac2cd560c72e614edeebd7ba098b",
-        "encoded": "mpqprv1t52tjwjxaenx92hm5lms7e0y355vjwrqzkmvk4nx0s3f7f92uts03zeevhemcx7e64um032l6kg50fep4skd2cx89es5ahht67aqnzckhtz5g"
+        "encoded": "mpqprv1t52tjwjxaenx92hm5lms7e0y355vjwrqzkmvk4nx0s3f7f92uts03zeevhemcx7e64um032l6kg50fep4skd2cx89es5ahht67aqnzckhtz5g",
+        "id": "8b2bffd73784046f3c9375a74492769f85c6cecd150a7aad46e08551db07da1c",
+        "id_encoded": "mpqid13v4ll4ehsszx70ynwkn5fynkn7zudnkdz5984t2xuzz4rkc8mgwq9m95lv"
       },
       "keys": [
         {
@@ -179,6 +185,28 @@
     {
       "encoded": "MPQPRV1D50hxsezynp5fxpxpgpvmpqcxfwaays8elepy7vymey0s0svswy9a7vp2s20aut87vm77kg8yylqjn2sg7swrxlfhfg048a938ercuqzt3v44",
       "comment": "mixed case"
+    },
+    {
+      "encoded": "mpqid1qmepq6l74k9r8wd2v5rd5qs6jlkj0qwavnuxcl7v0ndx4qguklpsfemlxv",
+      "comment": "an identifier is not a node"
+    }
+  ],
+  "invalid_id_encodings": [
+    {
+      "encoded": "mpqid1qmepq6l74k9r8wd2v5rd5qs6jlkj0qwavnuxcl7v0ndx4qguklpsfemlxq",
+      "comment": "bad checksum"
+    },
+    {
+      "encoded": "mpqid1qmepq6l74k9r8wd2v5rd5qs6jlkj0qwavnuxcl7v0ndx4qguklpsu9tnrw",
+      "comment": "Bech32 instead of Bech32m"
+    },
+    {
+      "encoded": "mpqid1qmepq6l74k9r8wd2v5rd5qs6jlkj0qwavnuxcl7v0ndx4qguku6k6ask",
+      "comment": "31-byte identifier"
+    },
+    {
+      "encoded": "mpqprv1d50hxsezynp5fxpxpgpvmpqcxfwaays8elepy7vymey0s0svswy9a7vp2s20aut87vm77kg8yylqjn2sg7swrxlfhfg048a938ercuqzt3v44",
+      "comment": "a node is not an identifier"
     }
   ]
 }

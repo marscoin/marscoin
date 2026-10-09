@@ -136,6 +136,18 @@ detected with high probability, and a descriptor adds its own checksum.
 The encoding is a private key: anyone holding it can spend every coin below
 that node.
 
+### 3.1 Node identifier
+
+A node is named in public (for example in a descriptor without private keys)
+by its identifier, a tagged hash as in BIP340:
+
+```
+id = SHA256(SHA256("Marscoin/PQHD/node-id") || SHA256("Marscoin/PQHD/node-id") || k || c)
+```
+
+It is encoded as Bech32m with the prefix `mpqid` and the 32-byte payload `id`,
+64 characters in all. An identifier reveals nothing about the node.
+
 ## 4. Descriptors (planned, MQ-22 and MQ-23)
 
 Marscoin Core will describe the keys with
@@ -149,8 +161,10 @@ including the wildcard, is hardened. Example on mainnet:
 `wpq(mpqprv1.../107h/0h/0h/*h)` for receiving and `.../107h/0h/1h/*h` for
 change.
 
-- A `wpq()` descriptor only exists with its private node. `listdescriptors`
-  without private keys must not print it in any form that leads to the node.
+- The public form names the node by its identifier,
+  `wpq(mpqid1.../107h/0h/0h/*h)`. That is what the wallet file and
+  `listdescriptors` without private keys show. Nothing in it leads to the
+  node, and nobody can derive keys from it.
 - Watch-only P2WPQH tracking uses `addr()` descriptors.
 - Generating a key takes about 28 ms (SLH-DSA-SHA2-128s, MQ-28 benchmarks), so
   the wallet caches derived public keys and uses a smaller lookahead than for

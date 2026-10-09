@@ -80,6 +80,11 @@ BOOST_AUTO_TEST_CASE(pq_hd_vectors)
         BOOST_REQUIRE(decoded);
         BOOST_CHECK(*decoded == *root);
 
+        const uint256 id{pq::hd::NodeId(*root)};
+        BOOST_CHECK_EQUAL(HexStr(id), vector["root"]["id"].get_str());
+        BOOST_CHECK_EQUAL(pq::hd::EncodeNodeId(id), vector["root"]["id_encoded"].get_str());
+        BOOST_CHECK(pq::hd::DecodeNodeId(vector["root"]["id_encoded"].get_str()) == id);
+
         for (const UniValue& key : vector["keys"].getValues()) {
             const std::string path{key["path"].get_str()};
             BOOST_TEST_MESSAGE("seed " << vector["seed"].get_str() << " path " << path);
@@ -140,6 +145,9 @@ BOOST_AUTO_TEST_CASE(pq_hd_invalid_inputs)
 
     for (const UniValue& entry : data["invalid_encodings"].getValues()) {
         BOOST_CHECK_MESSAGE(!pq::hd::DecodeNode(entry["encoded"].get_str()), entry["comment"].get_str());
+    }
+    for (const UniValue& entry : data["invalid_id_encodings"].getValues()) {
+        BOOST_CHECK_MESSAGE(!pq::hd::DecodeNodeId(entry["encoded"].get_str()), entry["comment"].get_str());
     }
 }
 

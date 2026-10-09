@@ -7,6 +7,7 @@
 
 #include <crypto/pq_sphincs.h>
 #include <span.h>
+#include <uint256.h>
 
 #include <array>
 #include <cstdint>
@@ -32,6 +33,10 @@ static constexpr std::string_view ROOT_HMAC_KEY{"Marscoin PQ seed"};
 static constexpr std::string_view KEYGEN_INFO{"Marscoin P2WPQH keygen"};
 //! Bech32m prefix of an encoded node. A node is always secret.
 static constexpr std::string_view NODE_HRP{"mpqprv"};
+//! Tag of the tagged hash that identifies a node.
+static constexpr std::string_view NODE_ID_TAG{"Marscoin/PQHD/node-id"};
+//! Bech32m prefix of an encoded node identifier. An identifier is public.
+static constexpr std::string_view NODE_ID_HRP{"mpqid"};
 
 static constexpr uint32_t HARDENED{0x80000000};
 //! SLIP-44 coin type for mainnet paths (Marscoin is 107); every test network uses 1.
@@ -88,6 +93,13 @@ bool DeriveKeypair(const Node& leaf, sphincs::ParameterSet parameter_set, std::v
 //! Bech32m encoding of a node: NODE_HRP with the 64-byte payload key || chaincode.
 std::string EncodeNode(const Node& node);
 std::optional<Node> DecodeNode(std::string_view str);
+
+//! Public identifier of a node, TaggedHash(NODE_ID_TAG, key || chaincode). It
+//! names a node (for example in a public descriptor) without revealing it.
+uint256 NodeId(const Node& node);
+//! Bech32m encoding of a node identifier: NODE_ID_HRP with the 32-byte identifier.
+std::string EncodeNodeId(const uint256& id);
+std::optional<uint256> DecodeNodeId(std::string_view str);
 
 } // namespace pq::hd
 

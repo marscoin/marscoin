@@ -7,6 +7,7 @@
 #include <bech32.h>
 #include <crypto/common.h>
 #include <crypto/hmac_sha512.h>
+#include <hash.h>
 #include <support/cleanse.h>
 #include <util/strencodings.h>
 
@@ -171,6 +172,32 @@ std::optional<Node> DecodeNode(const std::string_view str)
     std::copy(payload.begin() + 32, payload.end(), node.chaincode.begin());
     Cleanse(payload);
     return node;
+}
+
+uint256 NodeId(const Node& node)
+{
+    return (TaggedHash(std::string{NODE_ID_TAG}) << node.key << node.chaincode).GetSHA256();
+}
+
+std::string EncodeNodeId(const uint256& id)
+{
+    std::vector<uint8_t> data;
+    data.reserve((uint256::size() * 8 + 4) / 5);
+    ConvertBits<8, 5, true>([&](uint8_t c) { data.push_back(c); }, id.begin(), id.end());
+    return bech32::Encode(bech32::Encoding::BECH32M, std::string{NODE_ID_HRP}, data);
+}
+
+std::optional<uint256> DecodeNodeId(const std::string_view str)
+{
+    const bech32::DecodeResult decoded{bech32::Decode(std::string{str})};
+    if (decoded.encoding != bech32::Encoding::BECH32M || decoded.hrp != NODE_ID_HRP) return std::nullopt;
+    std::vector<unsigned char> payload;
+    payload.reserve(uint256::size());
+    if (!ConvertBits<5, 8, false>([&](unsigned char c) { payload.push_back(c); }, decoded.data.begin(), decoded.data.end()) ||
+        payload.size() != uint256::size()) {
+        return std::nullopt;
+    }
+    return uint256{payload};
 }
 
 } // namespace pq::hd
