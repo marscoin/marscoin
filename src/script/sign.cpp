@@ -103,13 +103,17 @@ bool MutableTransactionSignatureCreator::CreatePQSig(const SigningProvider& prov
         return false;
     }
 
-    // Compute PQ sighash using the checker
-    ScriptExecutionData execdata;
-    uint256 sighash = checker.GetSigHashPQ(execdata);
-    if (sighash.IsNull()) return false;
-
     // Keys with a retired or unknown parameter set (such as round-3 SPHINCS+, 0x00) can't sign.
     if (!pq::sphincs::IsSupportedParameterSet(param_set_id)) return false;
+
+    // The P2WPQH signature hash commits to every spent amount and scriptPubKey,
+    // so signing needs the full precomputed data (doc/quantum-p2wpqh-sighash-v1.md).
+    if (!m_txdata || !m_txdata->m_bip341_taproot_ready || !m_txdata->m_spent_outputs_ready) return false;
+    if (nHashType < 0 || nHashType > 0xff || !IsValidPQHashType(static_cast<uint8_t>(nHashType))) return false;
+    const uint8_t hash_type = static_cast<uint8_t>(nHashType);
+
+    uint256 sighash;
+    if (!SignatureHashPQ(sighash, m_txto, nIn, hash_type, param_set_id, pubkey, *m_txdata, MissingDataBehavior::FAIL)) return false;
 
     // Sign with SLH-DSA
     const auto param_set = static_cast<pq::sphincs::ParameterSet>(param_set_id);
@@ -120,6 +124,8 @@ bool MutableTransactionSignatureCreator::CreatePQSig(const SigningProvider& prov
             sig_payload, sign_error)) {
         return false;
     }
+    // SIGHASH_DEFAULT is implied by a missing hash type byte.
+    if (hash_type != SIGHASH_DEFAULT) sig_payload.push_back(hash_type);
 
     return true;
 }
