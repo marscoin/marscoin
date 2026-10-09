@@ -746,6 +746,12 @@ class CBlockHeader:
         self.calc_sha256()
         return self.sha256
 
+    def calc_pow_hash(self):
+        """Marscoin proof-of-work hash: scrypt(N=1024, r=1, p=1) over the 80-byte
+        header. The block id (sha256/hash) stays double-SHA256."""
+        header = CBlockHeader.serialize(self)
+        return uint256_from_str(hashlib.scrypt(header, salt=header, n=1024, r=1, p=1, dklen=32))
+
     def __repr__(self):
         return "CBlockHeader(nVersion=%i hashPrevBlock=%064x hashMerkleRoot=%064x nTime=%s nBits=%08x nNonce=%08x)" \
             % (self.nVersion, self.hashPrevBlock, self.hashMerkleRoot,
@@ -806,7 +812,7 @@ class CBlock(CBlockHeader):
     def is_valid(self):
         self.calc_sha256()
         target = uint256_from_compact(self.nBits)
-        if self.sha256 > target:
+        if self.calc_pow_hash() > target:
             return False
         for tx in self.vtx:
             if not tx.is_valid():
@@ -818,9 +824,9 @@ class CBlock(CBlockHeader):
     def solve(self):
         self.rehash()
         target = uint256_from_compact(self.nBits)
-        while self.sha256 > target:
+        while self.calc_pow_hash() > target:
             self.nNonce += 1
-            self.rehash()
+        self.rehash()
 
     # Calculate the block weight using witness and non-witness
     # serialization size (does NOT use sigops).

@@ -63,6 +63,13 @@ WITNESS_COMMITMENT_HEADER = b"\xaa\x21\xa9\xed"
 
 NORMAL_GBT_REQUEST_PARAMS = {"rules": ["segwit"]}
 VERSIONBITS_LAST_OLD_BLOCK_VERSION = 4
+
+# Marscoin uses merged mining (auxpow): the chain ID occupies the upper 16 bits of
+# nVersion, and with a strict chain-ID check, blocks without it are rejected.
+# Plain versions 1-4 count as legacy blocks, which regtest rejects from height 0.
+VERSION_CHAIN_START = 1 << 16
+REGTEST_AUXPOW_CHAIN_ID = 0x0001
+DEFAULT_BLOCK_VERSION = VERSIONBITS_LAST_OLD_BLOCK_VERSION | (REGTEST_AUXPOW_CHAIN_ID * VERSION_CHAIN_START)
 MIN_BLOCKS_TO_KEEP = 288
 
 
@@ -71,7 +78,7 @@ def create_block(hashprev=None, coinbase=None, ntime=None, *, version=None, tmpl
     block = CBlock()
     if tmpl is None:
         tmpl = {}
-    block.nVersion = version or tmpl.get('version') or VERSIONBITS_LAST_OLD_BLOCK_VERSION
+    block.nVersion = version or tmpl.get('version') or DEFAULT_BLOCK_VERSION
     block.nTime = ntime or tmpl.get('curtime') or int(time.time() + 600)
     block.hashPrevBlock = hashprev or int(tmpl['previousblockhash'], 0x10)
     if tmpl and not tmpl.get('bits') is None:
