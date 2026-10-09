@@ -82,6 +82,7 @@ tracked in #32, #34, #36, #37 and #43.
 | [MQ-44](#mq-44--correct-public-claims-about-marsqnet) | Correct public claims about marsqnet | G · Mainnet | Queued | — |
 | [MQ-45](#mq-45--secret-scanning-in-ci) | Secret scanning in CI | E · Verification | PR #54 | — |
 | [MQ-46](#mq-46--regtest-that-can-mine) | Regtest that can mine (unblocks functional tests) | E · Verification | PR #62 | — |
+| [MQ-47](#mq-47--fresh-mainnet-nodes-dont-bootstrap) | Fresh mainnet nodes don't bootstrap | B · Network ops | Queued | — |
 
 ---
 
@@ -1064,3 +1065,23 @@ Progress, 2026-10-08 (branch `fix/regtest-mining`, local, one commit):
   - With #55's framework fixes, `test_runner.py` builds its block cache.
     `rpc_generate`, `wallet_encryption --descriptors` and
     `wallet_pq_safety --descriptors` pass. Published as PR #62.
+
+### MQ-47 · Fresh mainnet nodes don't bootstrap
+
+**Status:** Queued
+
+Finding, 2026-10-08:
+- A fresh v28.1.2 mainnet node (empty data directory, default seeding) made no
+  outbound connection attempts at all over 28 minutes, and then again in a
+  second run with `-debug=net`. The DNS seed returned 3 addresses, all of which
+  accept connections on 8338, and 5 hard-coded seeds were loaded, but the log
+  shows no "trying ... connection" lines.
+- With one `-addnode` the node connected at once, synced 130,000 headers in
+  under a minute, and then began automatic outbound connections normally.
+- New users who install a release without an `-addnode` may never sync. This
+  needs reproducing on a second machine and a root cause, starting with
+  addrman selection of DNS and fixed-seed addresses (service flags,
+  timestamps).
+
+Acceptance: a fresh release node syncs with default settings, and a regression
+test or documented procedure covers it.
