@@ -1,11 +1,14 @@
 # Marsqnet Quickstart (Wiki Draft)
 
-Marsqnet is the Marscoin RandomX development network.
+Marsqnet is the Marscoin post-quantum test network: RandomX proof of work,
+P2WPQH (SPHINCS+) outputs and the adaptive block weight limit.
 
-## Current baseline
+## Current network
 
-- Baseline tag: `marsqnet-baseline-2026-04-13`
-- Example reference best hash: `5a03638e8bee12da16975369afd379520a5621172fc87b955a6aaaef41a65bf5`
+- Marsqnet v2, restarted from a new genesis on 2026-10-09. Data from the
+  earlier marsqnet doesn't sync with it.
+- Genesis block: `61174bcc4b3b9face187ef053b97aad26a07ab227a6647cc6ef38f21d0249a08`
+- Default ports: P2P 29338, RPC 29337. Data subdirectory: `marsqnet`.
 
 ## Build
 
@@ -14,12 +17,13 @@ sudo apt-get update
 sudo apt-get install -y \
   build-essential automake libtool autotools-dev pkg-config python3 \
   libevent-dev libboost-dev libsqlite3-dev libssl-dev \
-  libminiupnpc-dev libnatpmp-dev git
+  libminiupnpc-dev libnatpmp-dev git cmake
 
-git clone --branch feat/pow-randomx https://github.com/marscoin/marscoin.git
+git clone --branch feature/quantum-upgrade https://github.com/marscoin/marscoin.git
 cd marscoin
+bash src/crypto/oqs_vendor/build-liboqs-vendor.sh
 ./autogen.sh
-./configure --without-gui --disable-tests --disable-bench --enable-randomx-vendor
+./configure --without-gui --disable-tests --disable-bench --enable-randomx-vendor --enable-pq-oqs-vendor
 make -j"$(nproc)" src/marscoind src/marscoin-cli
 ```
 
