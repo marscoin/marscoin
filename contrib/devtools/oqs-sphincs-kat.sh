@@ -1,18 +1,13 @@
 #!/usr/bin/env bash
+# Check the vendored liboqs SLH-DSA-SHA2-128s build against NIST ACVP vectors
+# (src/test/data/slh_dsa_sha2_128s_acvp.json) and the Marscoin P2WPQH signing context.
 set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 OQS_INSTALL="${OQS_INSTALL:-$ROOT_DIR/src/crypto/oqs_vendor/build/install}"
-OPENSSL_PREFIX="${OPENSSL_PREFIX:-}"
-
-if [[ -z "$OPENSSL_PREFIX" ]]; then
-  if command -v brew >/dev/null 2>&1; then
-    OPENSSL_PREFIX="$(brew --prefix openssl@3 2>/dev/null || true)"
-  fi
-fi
-
-EXPECTED_PUB="8a69a3c0db2ef0d7c439fff27bab906d2b8bcb8c7048556e30bc3bb8ffc8403b"
-EXPECTED_PAYLOAD_HASH="6b2f4f0a998f29de8919c170a8dad69a44c735e37deb3168c2a0b95d87c2fd23"
+VECTORS="$ROOT_DIR/src/test/data/slh_dsa_sha2_128s_acvp.json"
+WORK_DIR="$(mktemp -d)"
+trap 'rm -rf "$WORK_DIR"' EXIT
 
 if [[ ! -f "$OQS_INSTALL/include/oqs/oqs.h" ]] || [[ ! -f "$OQS_INSTALL/lib/liboqs.a" ]]; then
   echo "Missing vendored liboqs install artifacts under: $OQS_INSTALL" >&2
@@ -20,116 +15,113 @@ if [[ ! -f "$OQS_INSTALL/include/oqs/oqs.h" ]] || [[ ! -f "$OQS_INSTALL/lib/libo
   exit 1
 fi
 
-cat > /tmp/marscoin_oqs_kat.cpp <<'CPP'
+# Turn the JSON vectors into C++ initializers.
+python3 - "$VECTORS" > "$WORK_DIR/vectors.h" <<'PY'
+import json, sys
+vectors = [v for v in json.load(open(sys.argv[1])) if isinstance(v, dict)]
+def s(x): return '"' + x + '"'
+print("static const KeyGenVector KEYGEN[] = {")
+for v in vectors:
+    if v["type"] == "keyGen":
+        print("  {%d, %s, %s, %s, %s, %s}," % (v["tcId"], s(v["skSeed"]), s(v["skPrf"]), s(v["pkSeed"]), s(v["sk"]), s(v["pk"])))
+print("};")
+print("static const SigVerVector SIGVER[] = {")
+for v in vectors:
+    if v["type"] == "sigVer":
+        print("  {%d, %s, %s, %s, %s, %s}," % (v["tcId"], s(v["pk"]), s(v["message"]), s(v["context"]), s(v["signature"]), "true" if v["testPassed"] else "false"))
+print("};")
+print("static const SigGenVector SIGGEN[] = {")
+for v in vectors:
+    if v["type"] == "sigGen":
+        print("  {%d, %s, %s, %s, %s, %s, %s}," % (v["tcId"], "true" if v["deterministic"] else "false", s(v["sk"]), s(v["message"]), s(v["context"]), s(v["additionalRandomness"]), s(v["signature"])))
+print("};")
+PY
+
+cat > "$WORK_DIR/kat.cpp" <<'CPP'
 #include <oqs/oqs.h>
-#include <oqs/rand.h>
-#include <openssl/sha.h>
 
 #include <cstdint>
 #include <cstdio>
 #include <cstring>
+#include <string>
 #include <vector>
 
-static uint64_t g_state = 0;
+struct KeyGenVector { int tc; const char* sk_seed; const char* sk_prf; const char* pk_seed; const char* sk; const char* pk; };
+struct SigVerVector { int tc; const char* pk; const char* message; const char* context; const char* signature; bool passed; };
+struct SigGenVector { int tc; bool deterministic; const char* sk; const char* message; const char* context; const char* addrnd; const char* signature; };
+#include "vectors.h"
 
-static void deterministic_rng(uint8_t *out, size_t outlen) {
-    uint64_t x = g_state;
-    for (size_t i = 0; i < outlen; ++i) {
-        x ^= x << 13;
-        x ^= x >> 7;
-        x ^= x << 17;
-        out[i] = static_cast<uint8_t>(x & 0xFF);
-    }
-    g_state = x;
+static std::vector<uint8_t> Hex(const char* hex)
+{
+    std::vector<uint8_t> out;
+    for (size_t i = 0; hex[i] && hex[i + 1]; i += 2) out.push_back(static_cast<uint8_t>(std::stoul(std::string(hex + i, 2), nullptr, 16)));
+    return out;
 }
 
-static void reset_rng(uint64_t seed) {
-    g_state = seed;
-    OQS_randombytes_custom_algorithm(deterministic_rng);
+static std::vector<uint8_t> g_rng;
+static size_t g_rng_pos = 0;
+static bool g_rng_overrun = false;
+static void ReplayRng(uint8_t* out, size_t len)
+{
+    if (g_rng_pos + len > g_rng.size()) { g_rng_overrun = true; std::memset(out, 0, len); return; }
+    std::memcpy(out, g_rng.data() + g_rng_pos, len);
+    g_rng_pos += len;
 }
+static void Replay(std::vector<uint8_t> bytes) { g_rng = std::move(bytes); g_rng_pos = 0; OQS_randombytes_custom_algorithm(ReplayRng); }
 
-static void print_hex(const uint8_t* data, size_t len) {
-    for (size_t i = 0; i < len; ++i) std::printf("%02x", data[i]);
-    std::printf("\n");
-}
+int main()
+{
+    OQS_SIG* sig = OQS_SIG_new(OQS_SIG_alg_slh_dsa_pure_sha2_128s);
+    if (!sig || !sig->sig_with_ctx_support) { std::fprintf(stderr, "SLH-DSA-SHA2-128s with context support unavailable\n"); return 2; }
+    int failures = 0;
 
-int main() {
-    OQS_SIG* sig = OQS_SIG_new(OQS_SIG_alg_sphincs_sha2_128s_simple);
-    if (!sig) {
-        std::fprintf(stderr, "SPHINCS SHA2-128s backend unavailable\n");
-        return 2;
+    for (const auto& v : KEYGEN) {
+        std::vector<uint8_t> seeds = Hex(v.sk_seed), prf = Hex(v.sk_prf), pk_seed = Hex(v.pk_seed);
+        seeds.insert(seeds.end(), prf.begin(), prf.end());
+        seeds.insert(seeds.end(), pk_seed.begin(), pk_seed.end());
+        Replay(seeds);
+        std::vector<uint8_t> pk(sig->length_public_key), sk(sig->length_secret_key);
+        if (OQS_SIG_keypair(sig, pk.data(), sk.data()) != OQS_SUCCESS || pk != Hex(v.pk) || sk != Hex(v.sk)) {
+            std::fprintf(stderr, "keyGen tcId %d failed\n", v.tc); ++failures;
+        }
+    }
+    for (const auto& v : SIGVER) {
+        const auto pk = Hex(v.pk), msg = Hex(v.message), ctx = Hex(v.context), s = Hex(v.signature);
+        const bool ok = OQS_SIG_verify_with_ctx_str(sig, msg.data(), msg.size(), s.data(), s.size(), ctx.data(), ctx.size(), pk.data()) == OQS_SUCCESS;
+        if (ok != v.passed) { std::fprintf(stderr, "sigVer tcId %d: got %d, expected %d\n", v.tc, ok, v.passed); ++failures; }
+    }
+    for (const auto& v : SIGGEN) {
+        const auto sk = Hex(v.sk), msg = Hex(v.message), ctx = Hex(v.context);
+        Replay(v.deterministic ? std::vector<uint8_t>(sk.begin() + 32, sk.begin() + 48) : Hex(v.addrnd));
+        std::vector<uint8_t> s(sig->length_signature);
+        size_t len = 0;
+        if (OQS_SIG_sign_with_ctx_str(sig, s.data(), &len, msg.data(), msg.size(), ctx.data(), ctx.size(), sk.data()) != OQS_SUCCESS) {
+            std::fprintf(stderr, "sigGen tcId %d: signing failed\n", v.tc); ++failures; continue;
+        }
+        s.resize(len);
+        if (s != Hex(v.signature)) { std::fprintf(stderr, "sigGen tcId %d: signature mismatch\n", v.tc); ++failures; }
+    }
+    OQS_randombytes_switch_algorithm(OQS_RAND_alg_system);
+    if (g_rng_overrun) { std::fprintf(stderr, "replayed randomness exhausted\n"); ++failures; }
+
+    // Marscoin P2WPQH context: round trip, and rejection under other contexts.
+    const char* ctx = "marscoin-p2wpqh-v1";
+    const uint8_t msg[32] = {0x5a};
+    std::vector<uint8_t> pk(sig->length_public_key), sk(sig->length_secret_key), s(sig->length_signature);
+    size_t len = 0;
+    if (OQS_SIG_keypair(sig, pk.data(), sk.data()) != OQS_SUCCESS ||
+        OQS_SIG_sign_with_ctx_str(sig, s.data(), &len, msg, sizeof(msg), reinterpret_cast<const uint8_t*>(ctx), std::strlen(ctx), sk.data()) != OQS_SUCCESS ||
+        OQS_SIG_verify_with_ctx_str(sig, msg, sizeof(msg), s.data(), len, reinterpret_cast<const uint8_t*>(ctx), std::strlen(ctx), pk.data()) != OQS_SUCCESS ||
+        OQS_SIG_verify(sig, msg, sizeof(msg), s.data(), len, pk.data()) == OQS_SUCCESS) {
+        std::fprintf(stderr, "Marscoin context round trip failed\n"); ++failures;
     }
 
-    reset_rng(0x4d415253514e4554ULL);
-    std::vector<uint8_t> pub(sig->length_public_key), priv(sig->length_secret_key);
-    if (OQS_SIG_keypair(sig, pub.data(), priv.data()) != OQS_SUCCESS) {
-        std::fprintf(stderr, "keypair generation failed\n");
-        OQS_SIG_free(sig);
-        return 3;
-    }
-
-    const char msg[] = "marsqnet-sign-test";
-    reset_rng(0x5349474e41545552ULL);
-    std::vector<uint8_t> signature(sig->length_signature);
-    size_t sig_len = 0;
-    if (OQS_SIG_sign(sig, signature.data(), &sig_len, reinterpret_cast<const uint8_t*>(msg), std::strlen(msg), priv.data()) != OQS_SUCCESS) {
-        std::fprintf(stderr, "signature generation failed\n");
-        OQS_SIG_free(sig);
-        return 4;
-    }
-    signature.resize(sig_len);
-
-    std::vector<uint8_t> payload;
-    payload.push_back(0x00);
-    payload.insert(payload.end(), signature.begin(), signature.end());
-
-    uint8_t digest[SHA256_DIGEST_LENGTH];
-    SHA256(payload.data(), payload.size(), digest);
-
-    std::printf("PUB=");
-    print_hex(pub.data(), pub.size());
-    std::printf("PAYLOAD_SHA256=");
-    print_hex(digest, sizeof(digest));
-
-    const int verify_rc = OQS_SIG_verify(sig, reinterpret_cast<const uint8_t*>(msg), std::strlen(msg), signature.data(), signature.size(), pub.data());
+    std::printf("keyGen=%zu sigVer=%zu sigGen=%zu failures=%d\n", sizeof(KEYGEN) / sizeof(KEYGEN[0]), sizeof(SIGVER) / sizeof(SIGVER[0]), sizeof(SIGGEN) / sizeof(SIGGEN[0]), failures);
     OQS_SIG_free(sig);
-    if (verify_rc != OQS_SUCCESS) {
-        std::fprintf(stderr, "verify failed\n");
-        return 5;
-    }
-    return 0;
+    return failures == 0 ? 0 : 1;
 }
 CPP
 
-OPENSSL_INCLUDE_FLAGS=""
-OPENSSL_LIB_FLAGS=""
-if [[ -n "$OPENSSL_PREFIX" ]]; then
-  OPENSSL_INCLUDE_FLAGS="-I$OPENSSL_PREFIX/include"
-  OPENSSL_LIB_FLAGS="-L$OPENSSL_PREFIX/lib"
-fi
-
-g++ -std=c++17 \
-  $OPENSSL_INCLUDE_FLAGS \
-  -I"$OQS_INSTALL/include" \
-  /tmp/marscoin_oqs_kat.cpp \
-  "$OQS_INSTALL/lib/liboqs.a" \
-  $OPENSSL_LIB_FLAGS \
-  -lcrypto \
-  -o /tmp/marscoin_oqs_kat
-
-OUTPUT="$(/tmp/marscoin_oqs_kat)"
-echo "$OUTPUT"
-
-PUB="$(printf '%s\n' "$OUTPUT" | sed -n 's/^PUB=//p')"
-PAYLOAD_HASH="$(printf '%s\n' "$OUTPUT" | sed -n 's/^PAYLOAD_SHA256=//p')"
-
-if [[ "$PUB" != "$EXPECTED_PUB" ]]; then
-  echo "KAT failure: unexpected public key" >&2
-  exit 10
-fi
-if [[ "$PAYLOAD_HASH" != "$EXPECTED_PAYLOAD_HASH" ]]; then
-  echo "KAT failure: unexpected payload hash" >&2
-  exit 11
-fi
-
-echo "OQS SPHINCS KAT passed."
+c++ -std=c++17 -O1 -I"$WORK_DIR" -I"$OQS_INSTALL/include" "$WORK_DIR/kat.cpp" "$OQS_INSTALL/lib/liboqs.a" -lpthread -o "$WORK_DIR/kat"
+"$WORK_DIR/kat"
+echo "OQS SLH-DSA KAT passed."

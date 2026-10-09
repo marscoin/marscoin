@@ -19,9 +19,14 @@ const char* OQSAlgName(const ParameterSet parameter_set)
 {
     switch (parameter_set) {
     case ParameterSet::SLH_DSA_SHA2_128S:
-        return OQS_SIG_alg_sphincs_sha2_128s_simple;
+        return OQS_SIG_alg_slh_dsa_pure_sha2_128s;
     }
     return nullptr;
+}
+
+const uint8_t* SigningContextData()
+{
+    return reinterpret_cast<const uint8_t*>(P2WPQH_SIGNING_CONTEXT.data());
 }
 #endif
 
@@ -122,7 +127,8 @@ bool SignMessage(const ParameterSet parameter_set, const Span<const unsigned cha
 
     std::vector<unsigned char> signature(sig->length_signature);
     size_t signature_len{0};
-    if (OQS_SIG_sign(sig, signature.data(), &signature_len, message.data(), message.size(), private_key.data()) != OQS_SUCCESS) {
+    if (OQS_SIG_sign_with_ctx_str(sig, signature.data(), &signature_len, message.data(), message.size(),
+                                  SigningContextData(), P2WPQH_SIGNING_CONTEXT.size(), private_key.data()) != OQS_SUCCESS) {
         OQS_SIG_free(sig);
         error = "Failed to compute SPHINCS+ signature via OQS backend";
         return false;
@@ -192,7 +198,8 @@ bool VerifyMessage(const ParameterSet parameter_set, const Span<const unsigned c
 
     const unsigned char* signature = payload.data() + 1;
     const size_t signature_len = payload.size() - 1;
-    if (OQS_SIG_verify(sig, message.data(), message.size(), signature, signature_len, public_key.data()) != OQS_SUCCESS) {
+    if (OQS_SIG_verify_with_ctx_str(sig, message.data(), message.size(), signature, signature_len,
+                                    SigningContextData(), P2WPQH_SIGNING_CONTEXT.size(), public_key.data()) != OQS_SUCCESS) {
         OQS_SIG_free(sig);
         error = "SPHINCS+ signature verification failed";
         return false;

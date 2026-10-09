@@ -178,7 +178,7 @@ jobs:
         run: |
           make -j"$(nproc)" src/marscoin-cli
 
-      - name: Run SPHINCS OQS KAT
+      - name: Run SLH-DSA OQS KAT
         run: |
           ./contrib/devtools/oqs-sphincs-kat.sh
 
@@ -225,4 +225,4 @@ jobs:
 
       - name: Run PQ crypto tests
         run: |
-          ./src/test/test_marscoin --run_test=crypto_tests/pq_sphincs_signature_scaffold
+          ./src/test/test_marscoin --run_test='crypto_tests/pq_*'

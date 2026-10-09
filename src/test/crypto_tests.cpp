@@ -2,6 +2,8 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
+#include <config/bitcoin-config.h> // IWYU pragma: keep
+
 #include <crypto/aes.h>
 #include <crypto/chacha20.h>
 #include <crypto/chacha20poly1305.h>
@@ -18,14 +20,19 @@
 #include <crypto/muhash.h>
 #include <random.h>
 #include <streams.h>
+#include <test/util/json.h>
 #include <test/util/random.h>
 #include <test/util/setup_common.h>
+#include <univalue.h>
 #include <util/strencodings.h>
 
 #ifdef ENABLE_PQ_OQS_VENDOR
-#include <oqs/rand.h>
+#include <oqs/oqs.h>
+#include <test/data/slh_dsa_sha2_128s_acvp.json.h>
 #endif
 
+#include <algorithm>
+#include <string_view>
 #include <vector>
 
 #include <boost/test/unit_test.hpp>
@@ -1275,12 +1282,16 @@ BOOST_AUTO_TEST_CASE(muhash_tests)
     BOOST_CHECK_EQUAL(HexStr(out4), "3a31e6903aff0de9f62f9a9f7f8b861de76ce2cda09822b90014319ae5dc2271");
 }
 
-BOOST_AUTO_TEST_CASE(pq_sphincs_signature_scaffold)
+BOOST_AUTO_TEST_CASE(pq_slh_dsa_payload_encoding)
 {
     using pq::sphincs::ParameterSet;
     using pq::sphincs::SPHINCS_SIGNATURE_SIZE_SHA2_128S;
 
-    BOOST_CHECK(pq::sphincs::IsSupportedParameterSet(static_cast<uint8_t>(ParameterSet::SLH_DSA_SHA2_128S)));
+    // 0x01 is FIPS 205 SLH-DSA-SHA2-128s; 0x00 (round-3 SPHINCS+) is retired.
+    BOOST_CHECK_EQUAL(static_cast<int>(ParameterSet::SLH_DSA_SHA2_128S), 0x01);
+    BOOST_CHECK(pq::sphincs::IsSupportedParameterSet(0x01));
+    BOOST_CHECK(!pq::sphincs::IsSupportedParameterSet(0x00));
+    BOOST_CHECK(!pq::sphincs::IsSupportedParameterSet(0x7f));
     BOOST_CHECK_EQUAL(pq::sphincs::ParameterSetName(ParameterSet::SLH_DSA_SHA2_128S), "SLH-DSA-SHA2-128s");
 
     std::vector<unsigned char> payload_valid(1 + SPHINCS_SIGNATURE_SIZE_SHA2_128S, 0x00);
@@ -1294,66 +1305,172 @@ BOOST_AUTO_TEST_CASE(pq_sphincs_signature_scaffold)
     payload_bad_set[0] = 0x7f;
     BOOST_CHECK_EQUAL(pq::sphincs::ValidateSignatureEncoding(payload_bad_set), "Unsupported SPHINCS+ parameter set");
 
+    std::vector<unsigned char> payload_retired(1 + SPHINCS_SIGNATURE_SIZE_SHA2_128S, 0x00);
+    payload_retired[0] = 0x00;
+    BOOST_CHECK_EQUAL(pq::sphincs::ValidateSignatureEncoding(payload_retired), "Unsupported SPHINCS+ parameter set");
+
     std::vector<unsigned char> payload_bad_len(SPHINCS_SIGNATURE_SIZE_SHA2_128S, 0x00);
     payload_bad_len[0] = static_cast<uint8_t>(ParameterSet::SLH_DSA_SHA2_128S);
     BOOST_CHECK_EQUAL(pq::sphincs::ValidateSignatureEncoding(payload_bad_len), "Invalid SPHINCS+ payload length");
+}
 
-    std::string backend_error;
-    if (!pq::sphincs::IsOQSBackendAvailable(ParameterSet::SLH_DSA_SHA2_128S, backend_error)) {
-        BOOST_TEST_MESSAGE("SPHINCS OQS backend unavailable on this platform/build: " + backend_error);
+#ifdef ENABLE_PQ_OQS_VENDOR
+namespace {
+//! Bytes handed out by ReplayRng, so liboqs key generation and signing are reproducible.
+std::vector<unsigned char> g_replay_rng_bytes;
+size_t g_replay_rng_pos{0};
+bool g_replay_rng_overrun{false};
+
+void ReplayRng(uint8_t* out, size_t len)
+{
+    if (g_replay_rng_pos + len > g_replay_rng_bytes.size()) {
+        g_replay_rng_overrun = true;
+        std::fill(out, out + len, 0);
+        return;
+    }
+    std::copy_n(g_replay_rng_bytes.begin() + g_replay_rng_pos, len, out);
+    g_replay_rng_pos += len;
+}
+
+void ReplayRandomness(std::vector<unsigned char> bytes)
+{
+    g_replay_rng_bytes = std::move(bytes);
+    g_replay_rng_pos = 0;
+    OQS_randombytes_custom_algorithm(ReplayRng);
+}
+
+//! Verify a raw SLH-DSA-SHA2-128s signature under an arbitrary FIPS 205 context.
+bool VerifyWithContext(OQS_SIG* sig, Span<const unsigned char> public_key, Span<const unsigned char> message,
+                       Span<const unsigned char> signature, Span<const unsigned char> context)
+{
+    return OQS_SIG_verify_with_ctx_str(sig, message.data(), message.size(), signature.data(), signature.size(),
+                                       context.data(), context.size(), public_key.data()) == OQS_SUCCESS;
+}
+} // namespace
+#endif
+
+BOOST_AUTO_TEST_CASE(pq_slh_dsa_acvp_vectors)
+{
+#ifndef ENABLE_PQ_OQS_VENDOR
+    BOOST_TEST_MESSAGE("Built without the OQS backend; skipping SLH-DSA ACVP vectors");
+#else
+    OQS_SIG* sig = OQS_SIG_new(OQS_SIG_alg_slh_dsa_pure_sha2_128s);
+    BOOST_REQUIRE(sig != nullptr);
+    BOOST_REQUIRE(sig->sig_with_ctx_support);
+
+    int keygen_count{0}, sigver_count{0}, siggen_count{0};
+    g_replay_rng_overrun = false;
+    const UniValue vectors{read_json(json_tests::slh_dsa_sha2_128s_acvp)};
+    for (const UniValue& entry : vectors.getValues()) {
+        if (!entry.isObject()) continue; // provenance note
+        const std::string type{entry["type"].get_str()};
+        const std::string label{type + " tcId " + entry["tcId"].getValStr()};
+
+        if (type == "keyGen") {
+            // FIPS 205 key generation draws SK.seed || SK.prf || PK.seed.
+            std::vector<unsigned char> seeds{ParseHex(entry["skSeed"].get_str())};
+            const auto sk_prf{ParseHex(entry["skPrf"].get_str())};
+            const auto pk_seed{ParseHex(entry["pkSeed"].get_str())};
+            seeds.insert(seeds.end(), sk_prf.begin(), sk_prf.end());
+            seeds.insert(seeds.end(), pk_seed.begin(), pk_seed.end());
+            ReplayRandomness(seeds);
+            std::vector<unsigned char> pk(sig->length_public_key), sk(sig->length_secret_key);
+            BOOST_CHECK_MESSAGE(OQS_SIG_keypair(sig, pk.data(), sk.data()) == OQS_SUCCESS, label);
+            BOOST_CHECK_MESSAGE(pk == ParseHex(entry["pk"].get_str()), label);
+            BOOST_CHECK_MESSAGE(sk == ParseHex(entry["sk"].get_str()), label);
+            ++keygen_count;
+        } else if (type == "sigVer") {
+            const bool verified{VerifyWithContext(sig, ParseHex(entry["pk"].get_str()), ParseHex(entry["message"].get_str()),
+                                                  ParseHex(entry["signature"].get_str()), ParseHex(entry["context"].get_str()))};
+            BOOST_CHECK_MESSAGE(verified == entry["testPassed"].get_bool(), label + ": " + entry["reason"].get_str());
+            ++sigver_count;
+        } else if (type == "sigGen") {
+            // Signing draws 16 bytes of additional randomness; the deterministic
+            // variant uses PK.seed (bytes 32..47 of the secret key) instead.
+            const auto sk{ParseHex(entry["sk"].get_str())};
+            const auto message{ParseHex(entry["message"].get_str())};
+            const auto context{ParseHex(entry["context"].get_str())};
+            ReplayRandomness(entry["deterministic"].get_bool() ? std::vector<unsigned char>(sk.begin() + 32, sk.begin() + 48)
+                                                                : ParseHex(entry["additionalRandomness"].get_str()));
+            std::vector<unsigned char> signature(sig->length_signature);
+            size_t signature_len{0};
+            BOOST_CHECK_MESSAGE(OQS_SIG_sign_with_ctx_str(sig, signature.data(), &signature_len, message.data(), message.size(),
+                                                          context.data(), context.size(), sk.data()) == OQS_SUCCESS, label);
+            signature.resize(signature_len);
+            BOOST_CHECK_MESSAGE(signature == ParseHex(entry["signature"].get_str()), label);
+            ++siggen_count;
+        }
+    }
+    OQS_randombytes_switch_algorithm(OQS_RAND_alg_system);
+    OQS_SIG_free(sig);
+
+    BOOST_CHECK(!g_replay_rng_overrun);
+    BOOST_CHECK_EQUAL(keygen_count, 10);
+    BOOST_CHECK_EQUAL(sigver_count, 14);
+    BOOST_CHECK_EQUAL(siggen_count, 6);
+#endif
+}
+
+BOOST_AUTO_TEST_CASE(pq_slh_dsa_signing_context)
+{
+    using pq::sphincs::ParameterSet;
+    using pq::sphincs::SPHINCS_SIGNATURE_SIZE_SHA2_128S;
+
+    BOOST_CHECK(pq::sphincs::P2WPQH_SIGNING_CONTEXT == "marscoin-p2wpqh-v1");
+
+    std::string error;
+    if (!pq::sphincs::IsOQSBackendAvailable(ParameterSet::SLH_DSA_SHA2_128S, error)) {
+        BOOST_TEST_MESSAGE("SLH-DSA backend unavailable in this build: " + error);
         return;
     }
 
-    std::vector<unsigned char> pub;
-    std::vector<unsigned char> priv;
+    std::vector<unsigned char> pub, priv;
+    BOOST_REQUIRE(pq::sphincs::GenerateKeypair(ParameterSet::SLH_DSA_SHA2_128S, pub, priv, error));
+    BOOST_REQUIRE_EQUAL(pub.size(), pq::sphincs::SPHINCS_PUBLIC_KEY_SIZE_SHA2_128S);
+    BOOST_REQUIRE_EQUAL(priv.size(), pq::sphincs::SPHINCS_SECRET_KEY_SIZE_SHA2_128S);
+    // FIPS 205 secret key layout is SK.seed || SK.prf || PK.seed || PK.root, so it ends with the public key.
+    BOOST_CHECK(std::equal(pub.begin(), pub.end(), priv.end() - pub.size()));
+
+    const std::vector<unsigned char> msg(32, 0x5a);
+    std::vector<unsigned char> payload;
+    BOOST_REQUIRE(pq::sphincs::SignMessage(ParameterSet::SLH_DSA_SHA2_128S, priv, msg, payload, error));
+    BOOST_REQUIRE_EQUAL(payload.size(), 1 + SPHINCS_SIGNATURE_SIZE_SHA2_128S);
+    BOOST_CHECK_EQUAL(int{payload[0]}, 0x01);
+    BOOST_CHECK(pq::sphincs::VerifyMessage(ParameterSet::SLH_DSA_SHA2_128S, pub, msg, payload, error));
 
 #ifdef ENABLE_PQ_OQS_VENDOR
-    static uint64_t rng_state = 0;
-    const auto deterministic_rng = [](uint8_t* out, size_t outlen) {
-        uint64_t x = rng_state;
-        for (size_t i = 0; i < outlen; ++i) {
-            x ^= x << 13;
-            x ^= x >> 7;
-            x ^= x << 17;
-            out[i] = static_cast<uint8_t>(x & 0xFF);
-        }
-        rng_state = x;
-    };
+    OQS_SIG* sig = OQS_SIG_new(OQS_SIG_alg_slh_dsa_pure_sha2_128s);
+    BOOST_REQUIRE(sig != nullptr);
+    const Span<const unsigned char> raw_signature{Span{payload}.subspan(1)};
+    const auto ctx_bytes{[](std::string_view s) { return Span<const unsigned char>{UCharCast(s.data()), s.size()}; }};
 
-    rng_state = 0x4d415253514e4554ULL;
-    OQS_randombytes_custom_algorithm(deterministic_rng);
+    // The wrapper signs under the Marscoin context and nothing else.
+    BOOST_CHECK(VerifyWithContext(sig, pub, msg, raw_signature, ctx_bytes("marscoin-p2wpqh-v1")));
+    BOOST_CHECK(!VerifyWithContext(sig, pub, msg, raw_signature, {}));
+    BOOST_CHECK(!VerifyWithContext(sig, pub, msg, raw_signature, ctx_bytes("marscoin-p2wpqh-v2")));
+
+    // A signature made by the same key under another context is not a valid P2WPQH signature.
+    for (const std::string_view other_context : {std::string_view{}, std::string_view{"another-protocol"}}) {
+        std::vector<unsigned char> other(sig->length_signature);
+        size_t other_len{0};
+        BOOST_REQUIRE(OQS_SIG_sign_with_ctx_str(sig, other.data(), &other_len, msg.data(), msg.size(),
+                                                UCharCast(other_context.data()), other_context.size(), priv.data()) == OQS_SUCCESS);
+        std::vector<unsigned char> other_payload{static_cast<uint8_t>(ParameterSet::SLH_DSA_SHA2_128S)};
+        other_payload.insert(other_payload.end(), other.begin(), other.begin() + other_len);
+        BOOST_CHECK(!pq::sphincs::VerifyMessage(ParameterSet::SLH_DSA_SHA2_128S, pub, msg, other_payload, error));
+    }
+    OQS_SIG_free(sig);
 #endif
 
-    BOOST_CHECK(pq::sphincs::GenerateKeypair(ParameterSet::SLH_DSA_SHA2_128S, pub, priv, backend_error));
-    BOOST_CHECK(!pub.empty());
-    BOOST_CHECK(!priv.empty());
-
-#ifdef ENABLE_PQ_OQS_VENDOR
-    BOOST_CHECK_EQUAL(HexStr(pub), "8a69a3c0db2ef0d7c439fff27bab906d2b8bcb8c7048556e30bc3bb8ffc8403b");
-    BOOST_CHECK_EQUAL(HexStr(priv), "de47ddf86b59f322d2c9c81d992e20deeba21b9144cc3d43f9743e8c6f99cccf8a69a3c0db2ef0d7c439fff27bab906d2b8bcb8c7048556e30bc3bb8ffc8403b");
-#endif
-
-    const std::vector<unsigned char> msg{'m','a','r','s','q','n','e','t','-','s','i','g','n','-','t','e','s','t'};
-    std::vector<unsigned char> payload_sig;
-
-#ifdef ENABLE_PQ_OQS_VENDOR
-    rng_state = 0x5349474e41545552ULL;
-    OQS_randombytes_custom_algorithm(deterministic_rng);
-#endif
-
-    BOOST_CHECK(pq::sphincs::SignMessage(ParameterSet::SLH_DSA_SHA2_128S, Span<const unsigned char>(priv.data(), priv.size()), Span<const unsigned char>(msg.data(), msg.size()), payload_sig, backend_error));
-    BOOST_CHECK(pq::sphincs::VerifyMessage(ParameterSet::SLH_DSA_SHA2_128S, Span<const unsigned char>(pub.data(), pub.size()), Span<const unsigned char>(msg.data(), msg.size()), Span<const unsigned char>(payload_sig.data(), payload_sig.size()), backend_error));
-
-#ifdef ENABLE_PQ_OQS_VENDOR
-    unsigned char payload_hash[CSHA256::OUTPUT_SIZE];
-    CSHA256().Write(payload_sig.data(), payload_sig.size()).Finalize(payload_hash);
-    BOOST_CHECK_EQUAL(HexStr(payload_hash), "6b2f4f0a998f29de8919c170a8dad69a44c735e37deb3168c2a0b95d87c2fd23");
-    OQS_randombytes_switch_algorithm(OQS_RAND_alg_system);
-#endif
-
-    std::vector<unsigned char> tampered = payload_sig;
+    std::vector<unsigned char> tampered{payload};
     tampered.back() ^= 0x01;
-    BOOST_CHECK(!pq::sphincs::VerifyMessage(ParameterSet::SLH_DSA_SHA2_128S, Span<const unsigned char>(pub.data(), pub.size()), Span<const unsigned char>(msg.data(), msg.size()), Span<const unsigned char>(tampered.data(), tampered.size()), backend_error));
+    BOOST_CHECK(!pq::sphincs::VerifyMessage(ParameterSet::SLH_DSA_SHA2_128S, pub, msg, tampered, error));
+
+    // A payload claiming the retired round-3 id is rejected before any verification.
+    std::vector<unsigned char> retired{payload};
+    retired[0] = 0x00;
+    BOOST_CHECK(!pq::sphincs::VerifyMessage(ParameterSet::SLH_DSA_SHA2_128S, pub, msg, retired, error));
+    BOOST_CHECK_EQUAL(error, "Unsupported SPHINCS+ parameter set");
 }
 
 BOOST_AUTO_TEST_SUITE_END()
