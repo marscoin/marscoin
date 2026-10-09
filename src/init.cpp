@@ -58,6 +58,7 @@
 #include <policy/fees_args.h>
 #include <policy/policy.h>
 #include <policy/settings.h>
+#include <pow.h>
 #include <protocol.h>
 #include <rpc/blockchain.h>
 #include <rpc/register.h>
@@ -913,6 +914,10 @@ bool AppInitParameterInteraction(const ArgsManager& args)
 
     if (!errors.empty()) {
         return InitError(errors);
+    }
+
+    if (!IsProofOfWorkSupported(chainparams.GetConsensus())) {
+        return InitError(Untranslated("This chain uses RandomX proof of work, but this build lacks RandomX support. Rebuild with --enable-randomx-vendor."));
     }
 
     // Testnet3 deprecation warning
