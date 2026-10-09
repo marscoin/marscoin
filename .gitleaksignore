@@ -36,3 +36,8 @@ e1e5960e10a9329d9f55a3967d546ffbdd896030:contrib/devtools/previous_release.py:ge
 e263a343d4b6a2622df6bb734cd9d51a0d20a663:test/functional/rpc_users.py:generic-api-key:42
 e3609cdc01cf992800f28b20b0107b7fdc1f880e:test/functional/wallet_descriptor.py:generic-api-key:96
 f8f0d9893d7969bdaa870fadb94ec5d0dfa8334d:src/test/util_tests.cpp:generic-api-key:2035
+882be0c4f342d7081d4766162391a9acb276202d:src/test/key_tests.cpp:generic-api-key:25
+882be0c4f342d7081d4766162391a9acb276202d:src/test/key_tests.cpp:generic-api-key:26
+882be0c4f342d7081d4766162391a9acb276202d:src/test/key_tests.cpp:generic-api-key:27
+882be0c4f342d7081d4766162391a9acb276202d:src/test/key_tests.cpp:generic-api-key:28
+882be0c4f342d7081d4766162391a9acb276202d:src/test/util_tests.cpp:generic-api-key:1602
