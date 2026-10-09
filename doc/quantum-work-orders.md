@@ -66,7 +66,7 @@ tracked in #32, #34, #36, #37 and #43.
 | [MQ-28](#mq-28--performance-and-stress-testing) | Performance and stress testing | E · Verification | Queued | MQ-25 |
 | [MQ-29](#mq-29--documentation-refresh) | Documentation refresh | E · Verification | In progress: sighash spec in #64 | — |
 | [MQ-30](#mq-30--marsqnet-v2-fresh-genesis) | Marsqnet v2 (fresh genesis) | F · Network | Queued | Track C, MQ-22 |
-| [MQ-31](#mq-31--mainnet-exposure-census) | Mainnet exposure census | G · Mainnet | PR #73 (part 1; address reuse pending) | — |
+| [MQ-31](#mq-31--mainnet-exposure-census) | Mainnet exposure census | G · Mainnet | PR #73 | — |
 | [MQ-32](#mq-32--unbundled-roadmap-and-crypto-policy) | Unbundled roadmap and crypto policy | G · Mainnet | Waiting: owner decision | MQ-31 helps |
 | [MQ-33](#mq-33--external-security-review) | External security review | G · Mainnet | Queued | Tracks C, D |
 | [MQ-34](#mq-34--mainnet-pq-soft-fork-activation) | Mainnet PQ soft-fork activation | G · Mainnet | Queued | MQ-30, MQ-33 |
@@ -85,6 +85,7 @@ tracked in #32, #34, #36, #37 and #43.
 | [MQ-47](#mq-47--fresh-mainnet-nodes-dont-bootstrap) | Fresh mainnet nodes don't bootstrap | B · Network ops | PR #67, backport #68 | — |
 | [MQ-48](#mq-48--backport-the-generatetoaddress-fix-to-28x) | Backport the generatetoaddress fix to 28.x | B · Network ops | PR #68 (with #67) | #65 |
 | [MQ-49](#mq-49--signet-cant-start) | Signet can't start | E · Verification | Queued | — |
+| [MQ-50](#mq-50--end-address-reuse-in-marscoin-wallets-and-services) | End address reuse in Marscoin wallets and services | G · Mainnet | Queued | MQ-31 |
 
 ---
 
@@ -916,8 +917,14 @@ Result, 2026-10-09 (PR #73), mainnet at height 3,576,274, totals matching
 - 97.75% is hashed: P2PKH 97.67%, P2SH 0.08%.
 - There are no SegWit, Taproot or P2WPQH outputs.
 - About 85% of the supply hasn't moved in five years or more.
-- Part 2 (open): count P2PKH addresses whose key an earlier spend revealed,
-  which needs a scan of spent inputs.
+- Part 2 (address reuse): **47.37% of the supply is exposed in total.**
+  - 45.12% is P2PKH at 4,176 addresses whose key an earlier spend revealed.
+  - Only 52.63% is behind an unrevealed hash.
+  - 31.52% of the supply is exposed and untouched for 10+ years.
+  - Commit–delay–reveal can't protect the reused 45%; only pre-emptive
+    migration, or an HD-only derivation-secret rescue, can.
+  - Checks: all 3,576,283 blocks and 3,924,405 transactions parsed, and 25/25
+    spot checks matched.
 
 ### MQ-32 · Unbundled roadmap and crypto policy
 
@@ -1205,3 +1212,26 @@ and `tool_signet_miner` fail.
 
 Scope: give signet a Marscoin genesis, or remove signet support if it isn't
 wanted.
+
+### MQ-50 · End address reuse in Marscoin wallets and services
+
+**Status:** Queued
+
+Finding, 2026-10-09 (MQ-31): 45.12% of the supply sits at 4,176 P2PKH
+addresses whose public key an earlier spend already revealed. After an
+elliptic-curve break, these coins could be taken directly, and
+commit–delay–reveal can't protect them.
+
+Scope:
+- Audit the project's own wallets and services for address reuse: the web
+  wallet, the Martian Republic stack, pool payouts, the faucet, and Electrum
+  and mobile wallets. Fix default behavior that reuses addresses, such as
+  fixed payout or change addresses.
+- Publish guidance for holders and services: stop reusing addresses now, and
+  prepare to move to P2WPQH once it activates.
+- Target migration outreach at the largest reused addresses (exchanges,
+  pools, long-time holders) using aggregate census data, never publishing
+  individual addresses.
+
+Acceptance: no project-run wallet or service reuses addresses by default, and
+the next census shows the reused share falling.
