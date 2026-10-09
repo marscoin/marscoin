@@ -1235,3 +1235,36 @@ Scope:
 
 Acceptance: no project-run wallet or service reuses addresses by default, and
 the next census shows the reused share falling.
+
+Audit, 2026-10-09 (read-only, project wallet and service repositories):
+1. **Martian Republic civic wallet: reuse by design.** The citizen identity is
+   one P2PKH address (`m/44'/2'/0'/0/0`). It is the civic receive address and
+   the change address for citizenship applications and endorsements, so its
+   key is revealed at the first action and the balance stays there. API login
+   signs with the same key.
+   - Fix: send civic change to a fresh internal address, stop showing the
+     identity address for receiving, and in the longer run prove identity by
+     signature rather than by spending from the identity address.
+2. **Fixed donation addresses:** on the website (also used as the docs'
+   example address), the Electrum development fund, and the Mars Society
+   donation address.
+   - Fix: take donations at per-request HD addresses and sweep to fresh ones.
+     Use an obviously fake example address in docs.
+3. **Electrum with imported keys:** change goes back to the first input's
+   address by default (`use_change=False` for imported wallets).
+   `get_receiving_address` falls back to an already-used address.
+   - Fix: sweep imported keys into an HD wallet, or default `use_change` on.
+4. **MarsWallet and ByteWallet change handling:** `getChangeAddressAsync` is
+   unimplemented, with fallbacks to a stale change index or change index 0.
+   Swaps in ByteWallet use a cached address.
+   - Fix: ship the existing change-address fix and port it to ByteWallet.
+5. **Cross-chain key reuse:** the mobile wallets and Electrum's BIP39 option
+   use coin type 2, which is Litecoin's SLIP-44 number. The same seed yields
+   the same keys on Litecoin, so a key revealed there also exposes the
+   matching Marscoin outputs. Relevant to MQ-36/37 and to future wallet
+   defaults.
+- Rescue note: derivation below the account level is not hardened (Electrum
+  `m/0/i`, BIP44 `/0/i`). A rescue must rely on the seed or a hardened-path
+  secret, as the draft spec (PR #70) does.
+- Minor: marscoin-electrumx sets `P2PKH_VERBYTE = 0x30` while the clients use
+  `0x32`. This affects only address-based RPCs.
