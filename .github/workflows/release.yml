@@ -187,14 +187,8 @@ jobs:
             dir="$(dirname "$exe")"; name="$(basename "$exe").exe"
             if [ -f "$dir/.libs/$name" ]; then cp "$dir/.libs/$name" dist/bin/; else cp "$dir/$name" dist/bin/; fi
           done
-          # DLLs built in the source tree, then MinGW runtime and dependency DLLs.
+          # DLLs built in the source tree.
           find src -path '*/.libs/*.dll' -exec cp {} dist/bin/ \;
-          for pass in 1 2; do
-            for f in dist/bin/*.exe dist/bin/*.dll; do
-              [ -f "$f" ] || continue
-              ldd "$f" | awk '$3 ~ /^\/mingw64\/bin\// {print $3}'
-            done | sort -u | while read -r dll; do cp -n "$dll" dist/bin/; done
-          done
           # Qt libraries and plugins for the GUI wallet.
           WINDEPLOYQT="$(command -v windeployqt-qt5 || command -v windeployqt || true)"
           if [ -z "$WINDEPLOYQT" ]; then echo "error: windeployqt not found"; exit 1; fi
@@ -206,6 +200,15 @@ jobs:
             cp /mingw64/share/qt5/plugins/platforms/qwindows.dll dist/bin/platforms/ 2>/dev/null || cp /mingw64/lib/qt5/plugins/platforms/qwindows.dll dist/bin/platforms/
           fi
           test -f dist/bin/platforms/qwindows.dll || { echo "error: Qt platform plugin missing"; exit 1; }
+          # MinGW runtime and dependency DLLs of every packaged executable, DLL and
+          # Qt plugin, repeated to pick up indirect dependencies.
+          for pass in 1 2 3; do
+            find dist/bin -type f \( -name '*.exe' -o -name '*.dll' \) | while read -r f; do
+              ldd "$f" | awk '$3 ~ /^\/mingw64\/bin\// {print $3}'
+            done | sort -u | while read -r dll; do cp -n "$dll" dist/bin/; done
+          done
+          # Drop debug symbols from the executables we built.
+          strip --strip-unneeded dist/bin/marscoind.exe dist/bin/marscoin-cli.exe dist/bin/marscoin-tx.exe dist/bin/marscoin-util.exe dist/bin/marscoin-qt.exe
           # Never ship libtool wrapper stubs.
           if grep -l "temporary wrapper script" dist/bin/*.exe; then
             echo "error: libtool wrapper executables were packaged"; exit 1
