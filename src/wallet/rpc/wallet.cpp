@@ -214,9 +214,8 @@ static RPCHelpMan getquantummigrationstatus()
 static RPCHelpMan getnewpqaddress()
 {
     return RPCHelpMan{"getnewpqaddress",
-                "Generates a new SPHINCS+ post-quantum keypair and returns the corresponding\n"
-                "mars1z... (witness v2) address. The keypair is stored in the wallet.\n"
-                "Requires the OQS backend (--enable-pq-oqs-vendor at build time).\n",
+                "Generates a new SLH-DSA (FIPS 205) post-quantum keypair and returns the corresponding\n"
+                "mars1z... (witness v2) address. The keypair is stored in the wallet.\n",
                 {
                     {"label", RPCArg::Type::STR, RPCArg::Default{""}, "An optional label for the address."},
                 },
@@ -238,12 +237,6 @@ static RPCHelpMan getnewpqaddress()
 {
     std::shared_ptr<CWallet> const pwallet = GetWalletForJSONRPCRequest(request);
     if (!pwallet) return UniValue::VNULL;
-
-    // Check OQS backend availability
-    std::string oqs_error;
-    if (!pq::sphincs::IsOQSBackendAvailable(pq::sphincs::ParameterSet::SLH_DSA_SHA2_128S, oqs_error)) {
-        throw JSONRPCError(RPC_MISC_ERROR, "SPHINCS+ OQS backend not available: " + oqs_error);
-    }
 
     // Generate SPHINCS+ keypair
     std::vector<unsigned char> pubkey;

@@ -117,7 +117,6 @@ BOOST_AUTO_TEST_CASE(p2wpqh_precomputation_detects_spends)
     BOOST_CHECK(v0_txdata.m_bip143_segwit_ready);
 }
 
-#ifdef ENABLE_PQ_OQS_VENDOR
 namespace {
 
 constexpr unsigned int PQ_FLAGS{SCRIPT_VERIFY_P2SH | SCRIPT_VERIFY_WITNESS | SCRIPT_VERIFY_WITNESS_V2};
@@ -185,10 +184,6 @@ Spend MakeSpend(const std::vector<unsigned char>& pubkey)
 BOOST_AUTO_TEST_CASE(p2wpqh_spend_hash_types)
 {
     std::string error;
-    if (!pq::sphincs::IsOQSBackendAvailable(ParameterSet::SLH_DSA_SHA2_128S, error)) {
-        BOOST_TEST_MESSAGE("OQS backend unavailable: " + error);
-        return;
-    }
     std::vector<unsigned char> pubkey, privkey;
     BOOST_REQUIRE(pq::sphincs::GenerateKeypair(ParameterSet::SLH_DSA_SHA2_128S, pubkey, privkey, error));
     const Spend base{MakeSpend(pubkey)};
@@ -234,10 +229,6 @@ BOOST_AUTO_TEST_CASE(p2wpqh_spend_hash_types)
 BOOST_AUTO_TEST_CASE(p2wpqh_payload_rules)
 {
     std::string error;
-    if (!pq::sphincs::IsOQSBackendAvailable(ParameterSet::SLH_DSA_SHA2_128S, error)) {
-        BOOST_TEST_MESSAGE("OQS backend unavailable: " + error);
-        return;
-    }
     std::vector<unsigned char> pubkey, privkey;
     BOOST_REQUIRE(pq::sphincs::GenerateKeypair(ParameterSet::SLH_DSA_SHA2_128S, pubkey, privkey, error));
     const Spend base{MakeSpend(pubkey)};
@@ -314,10 +305,6 @@ BOOST_AUTO_TEST_CASE(p2wpqh_payload_rules)
 BOOST_AUTO_TEST_CASE(p2wpqh_sign_transaction_hash_types)
 {
     std::string error;
-    if (!pq::sphincs::IsOQSBackendAvailable(ParameterSet::SLH_DSA_SHA2_128S, error)) {
-        BOOST_TEST_MESSAGE("OQS backend unavailable: " + error);
-        return;
-    }
     std::vector<unsigned char> pubkey, privkey;
     BOOST_REQUIRE(pq::sphincs::GenerateKeypair(ParameterSet::SLH_DSA_SHA2_128S, pubkey, privkey, error));
     const Spend base{MakeSpend(pubkey)};
@@ -352,6 +339,5 @@ BOOST_AUTO_TEST_CASE(p2wpqh_sign_transaction_hash_types)
     ::SignTransaction(tx, &provider, coins, 0x04, input_errors);
     BOOST_CHECK(tx.vin[0].scriptWitness.IsNull());
 }
-#endif // ENABLE_PQ_OQS_VENDOR
 
 BOOST_AUTO_TEST_SUITE_END()
