@@ -4,6 +4,9 @@
 
 #include <script/descriptor.h>
 
+#include <crypto/pq_hd.h>
+#include <crypto/pq_sphincs.h>
+#include <crypto/sha256.h>
 #include <hash.h>
 #include <key_io.h>
 #include <pubkey.h>
@@ -16,11 +19,13 @@
 
 #include <common/args.h>
 #include <span.h>
+#include <support/cleanse.h>
 #include <util/bip32.h>
 #include <util/check.h>
 #include <util/strencodings.h>
 #include <util/vector.h>
 
+#include <algorithm>
 #include <memory>
 #include <numeric>
 #include <optional>
@@ -1612,6 +1617,10 @@ std::unique_ptr<DescriptorImpl> ParseScript(uint32_t& key_exp_index, Span<const 
         error = "Can only have pkh at top level, in sh(), wsh(), or in tr()";
         return nullptr;
     }
+    if (Func("wpq", expr)) {
+        error = "Can only have wpq() at top level";
+        return nullptr;
+    }
     if (ctx == ParseScriptContext::TOP && Func("combo", expr)) {
         auto pubkey = ParsePubkey(key_exp_index, expr, ctx, out, error);
         if (!pubkey) {
@@ -2030,6 +2039,195 @@ std::unique_ptr<DescriptorImpl> InferScript(const CScript& script, ParseScriptCo
     return std::make_unique<RawDescriptor>(script);
 }
 
+////////////////////////////////////////////////////////////////////////////
+// Post-quantum descriptor                                                //
+////////////////////////////////////////////////////////////////////////////
+
+/** wpq(NODE/path/*h): P2WPQH outputs whose SLH-DSA keys come from a PQ HD node
+ *  (doc/quantum-pq-key-derivation-v1.md).
+ *
+ *  A node has no public form. The descriptor names it by its identifier, and
+ *  expanding it at a new position needs the node itself from the signing
+ *  provider. The derived public keys are cached, so known positions expand
+ *  without the node. */
+class WPQDescriptor final : public Descriptor
+{
+    static constexpr pq::sphincs::ParameterSet PARAMETER_SET{pq::sphincs::ParameterSet::SLH_DSA_SHA2_128S};
+
+    const uint256 m_node_id;
+    const KeyPath m_path;
+    const bool m_range;
+    const bool m_apostrophe;
+
+    std::string Format(const std::string& key, bool apostrophe) const
+    {
+        std::string ret{"wpq(" + key + FormatHDKeypath(m_path, apostrophe)};
+        if (m_range) ret += apostrophe ? "/*'" : "/*h";
+        return AddChecksum(ret + ")");
+    }
+
+    uint32_t CacheIndex(int pos) const { return m_range ? static_cast<uint32_t>(pos) : 0; }
+
+    std::optional<pq::hd::Node> DeriveLeaf(int pos, const SigningProvider& provider) const
+    {
+        if (pos < 0) return std::nullopt;
+        pq::hd::Node node;
+        if (!provider.GetPQNode(m_node_id, node)) return std::nullopt;
+        KeyPath path{m_path};
+        if (m_range) path.push_back(static_cast<uint32_t>(pos) | pq::hd::HARDENED);
+        return pq::hd::DerivePath(node, path);
+    }
+
+    static uint256 Program(const std::vector<unsigned char>& pubkey)
+    {
+        const uint8_t id{static_cast<uint8_t>(PARAMETER_SET)};
+        uint256 program;
+        CSHA256().Write(&id, 1).Write(pubkey.data(), pubkey.size()).Finalize(program.begin());
+        return program;
+    }
+
+    static void AddOutput(const std::vector<unsigned char>& pubkey, std::vector<CScript>& output_scripts, FlatSigningProvider& out)
+    {
+        const uint256 program{Program(pubkey)};
+        output_scripts.push_back(GetScriptForDestination(WitnessV2PQ{program}));
+        // Keep an entry that already has the private key.
+        PQKeyData& entry{out.pq_keys[program]};
+        if (entry.pubkey.empty()) {
+            entry.param_set_id = static_cast<uint8_t>(PARAMETER_SET);
+            entry.pubkey = pubkey;
+        }
+    }
+
+public:
+    WPQDescriptor(const uint256& node_id, KeyPath path, bool range, bool apostrophe)
+        : m_node_id(node_id), m_path(std::move(path)), m_range(range), m_apostrophe(apostrophe) {}
+
+    bool IsRange() const override { return m_range; }
+    bool IsSolvable() const override { return true; }
+    bool IsSingleType() const override { return true; }
+
+    std::string ToString(bool compat_format) const override
+    {
+        return Format(pq::hd::EncodeNodeId(m_node_id), compat_format || m_apostrophe);
+    }
+
+    bool ToPrivateString(const SigningProvider& provider, std::string& out) const override
+    {
+        pq::hd::Node node;
+        if (!provider.GetPQNode(m_node_id, node)) return false;
+        out = Format(pq::hd::EncodeNode(node), m_apostrophe);
+        return true;
+    }
+
+    bool ToNormalizedString(const SigningProvider& provider, std::string& out, const DescriptorCache* cache) const override
+    {
+        out = ToString(/*compat_format=*/false);
+        return true;
+    }
+
+    bool Expand(int pos, const SigningProvider& provider, std::vector<CScript>& output_scripts, FlatSigningProvider& out, DescriptorCache* write_cache) const override
+    {
+        const std::optional<pq::hd::Node> leaf{DeriveLeaf(pos, provider)};
+        if (!leaf) return false;
+        std::vector<unsigned char> pubkey, privkey;
+        std::string error;
+        const bool derived{pq::hd::DeriveKeypair(*leaf, PARAMETER_SET, pubkey, privkey, error)};
+        memory_cleanse(privkey.data(), privkey.size());
+        if (!derived) return false;
+        AddOutput(pubkey, output_scripts, out);
+        if (write_cache) write_cache->CachePQPubKey(CacheIndex(pos), pubkey);
+        return true;
+    }
+
+    bool ExpandFromCache(int pos, const DescriptorCache& read_cache, std::vector<CScript>& output_scripts, FlatSigningProvider& out) const override
+    {
+        std::vector<unsigned char> pubkey;
+        if (pos < 0 || !read_cache.GetCachedPQPubKey(CacheIndex(pos), pubkey)) return false;
+        AddOutput(pubkey, output_scripts, out);
+        return true;
+    }
+
+    void ExpandPrivate(int pos, const SigningProvider& provider, FlatSigningProvider& out) const override
+    {
+        const std::optional<pq::hd::Node> leaf{DeriveLeaf(pos, provider)};
+        if (!leaf) return;
+        PQKeyData key;
+        std::string error;
+        if (!pq::hd::DeriveKeypair(*leaf, PARAMETER_SET, key.pubkey, key.privkey, error)) return;
+        key.param_set_id = static_cast<uint8_t>(PARAMETER_SET);
+        out.pq_keys[Program(key.pubkey)] = std::move(key);
+    }
+
+    std::optional<OutputType> GetOutputType() const override { return OutputType::BECH32_PQ; }
+
+    std::optional<int64_t> ScriptSize() const override { return 1 + 1 + uint256::size(); }
+
+    std::optional<int64_t> MaxSatisfactionWeight(bool) const override
+    {
+        // <payload> <parameter set id> <public key>, where the payload is
+        // [id][signature] plus an optional hash type byte.
+        const int64_t payload{1 + static_cast<int64_t>(pq::sphincs::SignatureSize(PARAMETER_SET)) + 1};
+        const int64_t pubkey{static_cast<int64_t>(pq::sphincs::SPHINCS_PUBLIC_KEY_SIZE_SHA2_128S)};
+        return GetSizeOfCompactSize(payload) + payload + GetSizeOfCompactSize(1) + 1 + GetSizeOfCompactSize(pubkey) + pubkey;
+    }
+
+    std::optional<int64_t> MaxSatisfactionElems() const override { return 3; }
+
+    void GetPubKeys(std::set<CPubKey>& pubkeys, std::set<CExtPubKey>& ext_pubs) const override {}
+};
+
+/** Parse wpq(NODE/path/*h). NODE is an mpqprv node, which is added to out, or
+ *  the mpqid identifier of one. Every step, including the wildcard, must be
+ *  hardened. */
+std::unique_ptr<Descriptor> ParseWPQ(Span<const char>& sp, FlatSigningProvider& out, std::string& error)
+{
+    using namespace script;
+
+    auto expr = Expr(sp);
+    if (!Func("wpq", expr)) {
+        error = "Expected wpq()";
+        return nullptr;
+    }
+    auto split = Split(expr, '/');
+    const std::string key_str(split[0].begin(), split[0].end());
+    std::optional<uint256> node_id;
+    if (const std::optional<pq::hd::Node> node{pq::hd::DecodeNode(key_str)}) {
+        node_id = pq::hd::NodeId(*node);
+        out.pq_nodes.emplace(*node_id, *node);
+    } else {
+        node_id = pq::hd::DecodeNodeId(key_str);
+    }
+    if (!node_id) {
+        // Don't echo the key: it may be a mistyped private node.
+        error = "wpq(): key is neither an mpqprv node nor an mpqid identifier";
+        return nullptr;
+    }
+
+    bool range{false};
+    bool apostrophe{false};
+    if (split.size() > 1) {
+        const std::string last(split.back().begin(), split.back().end());
+        if (last == "*h" || last == "*'") {
+            range = true;
+            apostrophe = last == "*'";
+            split.pop_back();
+        } else if (last == "*") {
+            error = "wpq(): the wildcard must be hardened (*h)";
+            return nullptr;
+        }
+    }
+    KeyPath path;
+    bool path_apostrophe{false};
+    if (!ParseKeyPath(split, path, path_apostrophe, error)) {
+        error = strprintf("wpq(): %s", error);
+        return nullptr;
+    }
+    if (std::any_of(path.begin(), path.end(), [](uint32_t index) { return !(index & pq::hd::HARDENED); })) {
+        error = "wpq(): every derivation step must be hardened";
+        return nullptr;
+    }
+    return std::make_unique<WPQDescriptor>(*node_id, std::move(path), range, apostrophe || path_apostrophe);
+}
 
 } // namespace
 
@@ -2071,6 +2269,11 @@ std::unique_ptr<Descriptor> Parse(const std::string& descriptor, FlatSigningProv
 {
     Span<const char> sp{descriptor};
     if (!CheckChecksum(sp, require_checksum, error)) return nullptr;
+    if (std::string_view{sp.data(), sp.size()}.starts_with("wpq(")) {
+        auto ret = ParseWPQ(sp, out, error);
+        if (sp.size() == 0 && ret) return ret;
+        return nullptr;
+    }
     uint32_t key_exp_index = 0;
     auto ret = ParseScript(key_exp_index, sp, ParseScriptContext::TOP, out, error);
     if (sp.size() == 0 && ret) return std::unique_ptr<Descriptor>(std::move(ret));
@@ -2179,7 +2382,36 @@ DescriptorCache DescriptorCache::MergeAndDiff(const DescriptorCache& other)
         CacheLastHardenedExtPubKey(lh_xpub_pair.first, lh_xpub_pair.second);
         diff.CacheLastHardenedExtPubKey(lh_xpub_pair.first, lh_xpub_pair.second);
     }
+    for (const auto& [der_index, pubkey] : other.GetCachedPQPubKeys()) {
+        std::vector<unsigned char> cached;
+        if (GetCachedPQPubKey(der_index, cached)) {
+            if (cached != pubkey) {
+                throw std::runtime_error(std::string(__func__) + ": New cached PQ public key does not match already cached PQ public key");
+            }
+            continue;
+        }
+        CachePQPubKey(der_index, pubkey);
+        diff.CachePQPubKey(der_index, pubkey);
+    }
     return diff;
+}
+
+void DescriptorCache::CachePQPubKey(uint32_t der_index, const std::vector<unsigned char>& pubkey)
+{
+    m_pq_pubkeys[der_index] = pubkey;
+}
+
+bool DescriptorCache::GetCachedPQPubKey(uint32_t der_index, std::vector<unsigned char>& pubkey) const
+{
+    const auto it = m_pq_pubkeys.find(der_index);
+    if (it == m_pq_pubkeys.end()) return false;
+    pubkey = it->second;
+    return true;
+}
+
+std::unordered_map<uint32_t, std::vector<unsigned char>> DescriptorCache::GetCachedPQPubKeys() const
+{
+    return m_pq_pubkeys;
 }
 
 ExtPubKeyMap DescriptorCache::GetCachedParentExtPubKeys() const

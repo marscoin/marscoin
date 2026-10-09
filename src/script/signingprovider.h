@@ -8,6 +8,7 @@
 
 #include <addresstype.h>
 #include <attributes.h>
+#include <crypto/pq_hd.h>
 #include <key.h>
 #include <pubkey.h>
 #include <script/keyorigin.h>
@@ -161,10 +162,13 @@ public:
     virtual bool GetTaprootBuilder(const XOnlyPubKey& output_key, TaprootBuilder& builder) const { return false; }
 
     /** Get a SPHINCS+ PQ keypair by witness v2 program hash.
-     *  Returns param_set_id, pubkey, and privkey if found. */
+     *  Returns param_set_id, pubkey, and privkey if found. The privkey is
+     *  empty if only the public key is known. */
     virtual bool GetPQKey(const uint256& program, uint8_t& param_set_id,
                           std::vector<unsigned char>& pubkey,
                           std::vector<unsigned char>& privkey) const { return false; }
+    /** Get a PQ HD node (doc/quantum-pq-key-derivation-v1.md) by its identifier. */
+    virtual bool GetPQNode(const uint256& node_id, pq::hd::Node& node) const { return false; }
 
     bool GetKeyByXOnly(const XOnlyPubKey& pubkey, CKey& key) const
     {
@@ -208,6 +212,10 @@ public:
     bool GetKeyOrigin(const CKeyID& keyid, KeyOriginInfo& info) const override;
     bool GetTaprootSpendData(const XOnlyPubKey& output_key, TaprootSpendData& spenddata) const override;
     bool GetTaprootBuilder(const XOnlyPubKey& output_key, TaprootBuilder& builder) const override;
+    bool GetPQKey(const uint256& program, uint8_t& param_set_id,
+                  std::vector<unsigned char>& pubkey,
+                  std::vector<unsigned char>& privkey) const override;
+    bool GetPQNode(const uint256& node_id, pq::hd::Node& node) const override;
 };
 
 /** PQ key data: param_set_id, pubkey, privkey */
@@ -225,6 +233,7 @@ struct FlatSigningProvider final : public SigningProvider
     std::map<CKeyID, CKey> keys;
     std::map<XOnlyPubKey, TaprootBuilder> tr_trees; /** Map from output key to Taproot tree (which can then make the TaprootSpendData */
     std::map<uint256, PQKeyData> pq_keys; /** Map from witness v2 program to SPHINCS+ key data */
+    std::map<uint256, pq::hd::Node> pq_nodes; /** Map from node identifier to PQ HD node */
 
     bool GetCScript(const CScriptID& scriptid, CScript& script) const override;
     bool GetPubKey(const CKeyID& keyid, CPubKey& pubkey) const override;
@@ -235,6 +244,7 @@ struct FlatSigningProvider final : public SigningProvider
     bool GetPQKey(const uint256& program, uint8_t& param_set_id,
                   std::vector<unsigned char>& pubkey,
                   std::vector<unsigned char>& privkey) const override;
+    bool GetPQNode(const uint256& node_id, pq::hd::Node& node) const override;
 
     FlatSigningProvider& Merge(FlatSigningProvider&& b) LIFETIMEBOUND;
 };
