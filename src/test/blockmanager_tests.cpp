@@ -198,4 +198,61 @@ BOOST_AUTO_TEST_CASE(blockmanager_flush_block_file)
     BOOST_CHECK_EQUAL(read_block.nVersion, 2);
 }
 
+BOOST_AUTO_TEST_CASE(abwl_state_persists_outside_block_index_record)
+{
+    CBlockHeader header_abwl;
+    header_abwl.nVersion = 1;
+    header_abwl.nTime = 1;
+    header_abwl.nBits = 0x207fffff;
+    header_abwl.nNonce = 1;
+    CBlockHeader header_legacy{header_abwl};
+    header_legacy.nNonce = 2;
+    const uint256 hash_abwl{header_abwl.GetHash()};
+    const uint256 hash_legacy{header_legacy.GetHash()};
+
+    // A block on an ABWL chain carries state; a mainnet block does not.
+    CBlockIndex abwl_index{header_abwl};
+    abwl_index.phashBlock = &hash_abwl;
+    abwl_index.nHeight = 1;
+    abwl_index.nBlockWeight = 1234;
+    abwl_index.nABWL_epsilon = 2'000'001;
+    abwl_index.nABWL_beta = 2'000'002;
+    CBlockIndex legacy_index{header_legacy};
+    legacy_index.phashBlock = &hash_legacy;
+    legacy_index.nHeight = 1;
+    legacy_index.nBlockWeight = 999;
+
+    // The block index record keeps the upstream format: ABWL fields don't change its bytes.
+    CBlockIndex abwl_index_without_state{header_abwl};
+    abwl_index_without_state.phashBlock = &hash_abwl;
+    abwl_index_without_state.nHeight = 1;
+    DataStream with_state, without_state;
+    with_state << CDiskBlockIndex{&abwl_index};
+    without_state << CDiskBlockIndex{&abwl_index_without_state};
+    BOOST_CHECK(with_state.str() == without_state.str());
+
+    kernel::BlockTreeDB db{DBParams{.path = m_args.GetDataDirNet() / "abwl_index", .cache_bytes = 1 << 20, .memory_only = true}};
+    BOOST_REQUIRE(db.WriteBatchSync({}, 0, {&abwl_index, &legacy_index}));
+
+    std::map<uint256, CBlockIndex> loaded;
+    const auto insert{[&](const uint256& hash) -> CBlockIndex* {
+        if (hash.IsNull()) return nullptr;
+        auto [it, inserted] = loaded.try_emplace(hash);
+        it->second.phashBlock = &it->first;
+        return &it->second;
+    }};
+    LOCK(cs_main);
+    BOOST_REQUIRE(db.LoadBlockIndexGuts(Params().GetConsensus(), insert, m_interrupt));
+    BOOST_REQUIRE_EQUAL(loaded.size(), 2U);
+
+    const CBlockIndex& loaded_abwl{loaded.at(hash_abwl)};
+    BOOST_CHECK_EQUAL(loaded_abwl.nBlockWeight, 1234);
+    BOOST_CHECK_EQUAL(loaded_abwl.nABWL_epsilon, 2'000'001);
+    BOOST_CHECK_EQUAL(loaded_abwl.nABWL_beta, 2'000'002);
+
+    const CBlockIndex& loaded_legacy{loaded.at(hash_legacy)};
+    BOOST_CHECK_EQUAL(loaded_legacy.nABWL_epsilon, 0);
+    BOOST_CHECK_EQUAL(loaded_legacy.nABWL_beta, 0);
+}
+
 BOOST_AUTO_TEST_SUITE_END()

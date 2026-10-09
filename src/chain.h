@@ -422,10 +422,8 @@ public:
         READWRITE(obj.nBits);
         READWRITE(obj.nNonce);
 
-        // ABWL state (appended; older serializations simply won't have these)
-        READWRITE(obj.nBlockWeight);
-        READWRITE(obj.nABWL_epsilon);
-        READWRITE(obj.nABWL_beta);
+        // ABWL state is stored under its own key by BlockTreeDB, so this
+        // record keeps the upstream format.
     }
 
     uint256 ConstructBlockHash() const
