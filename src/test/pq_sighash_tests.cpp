@@ -185,10 +185,6 @@ Spend MakeSpend(const std::vector<unsigned char>& pubkey)
 BOOST_AUTO_TEST_CASE(p2wpqh_spend_hash_types)
 {
     std::string error;
-    if (!pq::sphincs::IsOQSBackendAvailable(ParameterSet::SLH_DSA_SHA2_128S, error)) {
-        BOOST_TEST_MESSAGE("OQS backend unavailable: " + error);
-        return;
-    }
     std::vector<unsigned char> pubkey, privkey;
     BOOST_REQUIRE(pq::sphincs::GenerateKeypair(ParameterSet::SLH_DSA_SHA2_128S, pubkey, privkey, error));
     const Spend base{MakeSpend(pubkey)};
@@ -234,10 +230,6 @@ BOOST_AUTO_TEST_CASE(p2wpqh_spend_hash_types)
 BOOST_AUTO_TEST_CASE(p2wpqh_payload_rules)
 {
     std::string error;
-    if (!pq::sphincs::IsOQSBackendAvailable(ParameterSet::SLH_DSA_SHA2_128S, error)) {
-        BOOST_TEST_MESSAGE("OQS backend unavailable: " + error);
-        return;
-    }
     std::vector<unsigned char> pubkey, privkey;
     BOOST_REQUIRE(pq::sphincs::GenerateKeypair(ParameterSet::SLH_DSA_SHA2_128S, pubkey, privkey, error));
     const Spend base{MakeSpend(pubkey)};
@@ -314,10 +306,6 @@ BOOST_AUTO_TEST_CASE(p2wpqh_payload_rules)
 BOOST_AUTO_TEST_CASE(p2wpqh_sign_transaction_hash_types)
 {
     std::string error;
-    if (!pq::sphincs::IsOQSBackendAvailable(ParameterSet::SLH_DSA_SHA2_128S, error)) {
-        BOOST_TEST_MESSAGE("OQS backend unavailable: " + error);
-        return;
-    }
     std::vector<unsigned char> pubkey, privkey;
     BOOST_REQUIRE(pq::sphincs::GenerateKeypair(ParameterSet::SLH_DSA_SHA2_128S, pubkey, privkey, error));
     const Spend base{MakeSpend(pubkey)};
