@@ -30,6 +30,7 @@ from .descriptors import descsum_create
 from .messages import NODE_P2P_V2
 from .p2p import P2P_SERVICES, P2P_SUBVERSION
 from .util import (
+    CONF_FILENAME,
     MAX_NODES,
     assert_equal,
     append_config,
@@ -84,7 +85,7 @@ class TestNode():
         self.index = i
         self.p2p_conn_index = 1
         self.datadir_path = datadir_path
-        self.bitcoinconf = self.datadir_path / "bitcoin.conf"
+        self.bitcoinconf = self.datadir_path / CONF_FILENAME
         self.stdout_dir = self.datadir_path / "stdout"
         self.stderr_dir = self.datadir_path / "stderr"
         self.chain = chain

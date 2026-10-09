@@ -158,6 +158,17 @@ struct Params {
     /** Adaptive Block Weight Limit activation height. 0 = not activated. */
     int nABWLActivationHeight{0};
 
+    /**
+     * Whether post-quantum witness v2 (P2WPQH) spends are verified by consensus
+     * in a block at the given height. Until PQ has its own deployment this
+     * shares the ABWL activation height. Wallet safety checks use the same
+     * function, so changing the activation rule here updates both.
+     */
+    bool IsPQWitnessActive(int height) const
+    {
+        return nABWLActivationHeight > 0 && height >= nABWLActivationHeight;
+    }
+
     /** Auxpow parameters */
     int32_t nAuxpowChainId;
     int nAuxpowStartHeight;

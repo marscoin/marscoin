@@ -8,10 +8,12 @@
 #include <wallet/walletdb.h>
 
 #include <common/system.h>
+#include <crypto/pq_sphincs.h>
 #include <key_io.h>
 #include <protocol.h>
 #include <script/script.h>
 #include <serialize.h>
+#include <support/cleanse.h>
 #include <sync.h>
 #include <util/bip32.h>
 #include <util/check.h>
@@ -53,6 +55,8 @@ const std::string NAME{"name"};
 const std::string OLD_KEY{"wkey"};
 const std::string ORDERPOSNEXT{"orderposnext"};
 const std::string POOL{"pool"};
+const std::string PQKEY{"pqkey"};
+const std::string CRYPTED_PQKEY{"cpqkey"};
 const std::string PURPOSE{"purpose"};
 const std::string SETTINGS{"settings"};
 const std::string TX{"tx"};
@@ -311,7 +315,9 @@ bool WalletBatch::WritePQKey(const uint256& program, uint8_t param_set_id,
     value.push_back(param_set_id);
     value.insert(value.end(), pubkey.begin(), pubkey.end());
     value.insert(value.end(), privkey.begin(), privkey.end());
-    return WriteIC(std::make_pair(std::string("pqkey"), program), value);
+    const bool ok = WriteIC(std::make_pair(DBKeys::PQKEY, program), value);
+    memory_cleanse(value.data(), value.size());
+    return ok;
 }
 
 bool WalletBatch::ReadPQKey(const uint256& program, uint8_t& param_set_id,
@@ -319,7 +325,7 @@ bool WalletBatch::ReadPQKey(const uint256& program, uint8_t& param_set_id,
                            std::vector<unsigned char>& privkey)
 {
     std::vector<unsigned char> raw_value;
-    if (!m_batch->Read(std::make_pair(std::string("pqkey"), program), raw_value)) {
+    if (!m_batch->Read(std::make_pair(DBKeys::PQKEY, program), raw_value)) {
         return false;
     }
     if (raw_value.size() < 2) return false;
@@ -331,6 +337,66 @@ bool WalletBatch::ReadPQKey(const uint256& program, uint8_t& param_set_id,
     if (raw_value.size() != sk_end) return false;
     pubkey.assign(raw_value.begin() + 1, raw_value.begin() + pk_end);
     privkey.assign(raw_value.begin() + pk_end, raw_value.end());
+    memory_cleanse(raw_value.data(), raw_value.size());
+    return true;
+}
+
+bool WalletBatch::ErasePQKey(const uint256& program)
+{
+    return EraseIC(std::make_pair(DBKeys::PQKEY, program));
+}
+
+bool WalletBatch::WriteCryptedPQKey(const uint256& program, uint8_t param_set_id,
+                                   const std::vector<unsigned char>& pubkey,
+                                   const std::vector<unsigned char>& crypted_secret)
+{
+    std::vector<unsigned char> value;
+    value.push_back(param_set_id);
+    value.insert(value.end(), pubkey.begin(), pubkey.end());
+    value.insert(value.end(), crypted_secret.begin(), crypted_secret.end());
+    return WriteIC(std::make_pair(DBKeys::CRYPTED_PQKEY, program), value);
+}
+
+bool WalletBatch::ReadCryptedPQKey(const uint256& program, uint8_t& param_set_id,
+                                  std::vector<unsigned char>& pubkey,
+                                  std::vector<unsigned char>& crypted_secret)
+{
+    std::vector<unsigned char> raw_value;
+    if (!m_batch->Read(std::make_pair(DBKeys::CRYPTED_PQKEY, program), raw_value)) {
+        return false;
+    }
+    // Layout: param_set_id (1) || pubkey (32) || crypted secret (remaining bytes)
+    const size_t pk_end = 1 + pq::sphincs::SPHINCS_PUBLIC_KEY_SIZE_SHA2_128S;
+    if (raw_value.size() <= pk_end) return false;
+    param_set_id = raw_value[0];
+    pubkey.assign(raw_value.begin() + 1, raw_value.begin() + pk_end);
+    crypted_secret.assign(raw_value.begin() + pk_end, raw_value.end());
+    return true;
+}
+
+bool WalletBatch::HasPQKey(const uint256& program)
+{
+    return m_batch->Exists(std::make_pair(DBKeys::CRYPTED_PQKEY, program)) ||
+           m_batch->Exists(std::make_pair(DBKeys::PQKEY, program));
+}
+
+bool WalletBatch::ListPlaintextPQKeyPrograms(std::vector<uint256>& programs)
+{
+    DataStream prefix;
+    prefix << DBKeys::PQKEY;
+    std::unique_ptr<DatabaseCursor> cursor = m_batch->GetNewPrefixCursor(prefix);
+    if (!cursor) return false;
+    while (true) {
+        DataStream key, value;
+        const DatabaseCursor::Status status = cursor->Next(key, value);
+        if (status == DatabaseCursor::Status::DONE) break;
+        if (status == DatabaseCursor::Status::FAIL) return false;
+        std::string type;
+        uint256 program;
+        key >> type >> program;
+        if (type != DBKeys::PQKEY) continue;
+        programs.push_back(program);
+    }
     return true;
 }
 

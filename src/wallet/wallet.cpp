@@ -9,6 +9,7 @@
 #include <addresstype.h>
 #include <blockfilter.h>
 #include <chain.h>
+#include <chainparams.h>
 #include <coins.h>
 #include <common/args.h>
 #include <common/messages.h>
@@ -589,6 +590,8 @@ bool CWallet::Unlock(const SecureString& strWalletPassphrase)
                 UpgradeKeyMetadata();
                 // Now that we've unlocked, upgrade the descriptor cache
                 UpgradeDescriptorCache();
+                // Now that we've unlocked, encrypt any plaintext post-quantum keys
+                UpgradePlaintextPQKeys();
                 return true;
             }
         }
@@ -839,6 +842,12 @@ bool CWallet::EncryptWallet(const SecureString& strWalletPassphrase)
 
     {
         LOCK2(m_relock_mutex, cs_wallet);
+        // Collect post-quantum keys before the transaction starts; they are not
+        // held by a ScriptPubKeyMan, so they are encrypted separately below.
+        std::vector<std::pair<uint256, PQKeyData>> plaintext_pq_keys;
+        if (!ReadPlaintextPQKeys(plaintext_pq_keys)) {
+            return false;
+        }
         mapMasterKeys[++nMasterKeyMaxID] = kMasterKey;
         WalletBatch* encrypted_batch = new WalletBatch(GetDatabase());
         if (!encrypted_batch->TxnBegin()) {
@@ -858,6 +867,15 @@ bool CWallet::EncryptWallet(const SecureString& strWalletPassphrase)
                 // die and let the user reload the unencrypted wallet.
                 assert(false);
             }
+        }
+
+        if (!EncryptPQKeys(_vMasterKey, plaintext_pq_keys, *encrypted_batch)) {
+            encrypted_batch->TxnAbort();
+            delete encrypted_batch;
+            encrypted_batch = nullptr;
+            // The ScriptPubKeyMans above already encrypted their keys in memory;
+            // die and let the user reload the unencrypted wallet.
+            assert(false);
         }
 
         // Encryption was introduced in version 0.4.0
@@ -1635,12 +1653,7 @@ isminetype CWallet::IsMine(const CScript& script) const
     std::vector<unsigned char> witness_program;
     if (script.IsWitnessProgram(witness_version, witness_program) &&
         witness_version == 2 && witness_program.size() == 32) {
-        uint256 program(witness_program);
-        WalletBatch batch(GetDatabase());
-        uint8_t param_set_id;
-        std::vector<unsigned char> pubkey;
-        std::vector<unsigned char> privkey;
-        if (batch.ReadPQKey(program, param_set_id, pubkey, privkey)) {
+        if (HavePQKey(uint256(witness_program))) {
             return ISMINE_SPENDABLE;
         }
     }
@@ -2201,27 +2214,46 @@ bool CWallet::SignTransaction(CMutableTransaction& tx, const std::map<COutPoint,
     // Build a FlatSigningProvider with PQ keys from the wallet DB
     {
         FlatSigningProvider pq_provider;
-        bool has_pq_inputs = false;
-        for (const auto& coin_pair : coins) {
+        std::map<int, bilingual_str> pq_errors;
+        bool pq_active;
+        {
+            LOCK(cs_wallet);
+            pq_active = IsPQActive();
+        }
+        for (unsigned int i = 0; i < tx.vin.size(); ++i) {
+            const auto coin_it = coins.find(tx.vin[i].prevout);
+            if (coin_it == coins.end()) continue;
             int witness_version;
             std::vector<unsigned char> witness_program;
-            if (coin_pair.second.out.scriptPubKey.IsWitnessProgram(witness_version, witness_program) &&
-                witness_version == 2 && witness_program.size() == 32) {
-                uint256 program(witness_program);
-                WalletBatch batch(GetDatabase());
-                uint8_t param_set_id;
-                std::vector<unsigned char> pubkey;
-                std::vector<unsigned char> privkey;
-                if (batch.ReadPQKey(program, param_set_id, pubkey, privkey)) {
-                    pq_provider.pq_keys[program] = PQKeyData{param_set_id, pubkey, privkey};
-                    has_pq_inputs = true;
-                }
+            if (!coin_it->second.out.scriptPubKey.IsWitnessProgram(witness_version, witness_program) ||
+                witness_version != 2 || witness_program.size() != 32) {
+                continue;
             }
+            const uint256 program(witness_program);
+            if (!HavePQKey(program)) continue;
+            if (!pq_active) {
+                pq_errors[i] = _("Post-quantum signing is disabled: witness v2 spends are not enforced by consensus on this chain yet");
+                continue;
+            }
+            if (IsLocked()) {
+                pq_errors[i] = _("Wallet is locked; unlock it to sign post-quantum inputs");
+                continue;
+            }
+            PQKeyData key;
+            if (!GetPQKey(program, key)) {
+                pq_errors[i] = _("Unable to read or decrypt the post-quantum key for this input");
+                continue;
+            }
+            pq_provider.pq_keys[program] = std::move(key);
         }
-        if (has_pq_inputs) {
-            if (::SignTransaction(tx, &pq_provider, coins, sighash, input_errors)) {
+        if (!pq_provider.pq_keys.empty()) {
+            if (::SignTransaction(tx, &pq_provider, coins, sighash, input_errors) && pq_errors.empty()) {
                 return true;
             }
+        }
+        // Keep the specific reason for PQ inputs that were not signed
+        for (auto& [index, error] : pq_errors) {
+            input_errors[index] = std::move(error);
         }
     }
 
@@ -3724,6 +3756,119 @@ bool CWallet::WithEncryptionKey(std::function<bool (const CKeyingMaterial&)> cb)
 {
     LOCK(cs_wallet);
     return cb(vMasterKey);
+}
+
+bool CWallet::IsPQActive() const
+{
+    AssertLockHeld(cs_wallet);
+    return Params().GetConsensus().IsPQWitnessActive(m_last_block_processed_height + 1);
+}
+
+namespace {
+//! A SPHINCS+/SLH-DSA secret key ends with its public key (PK.seed || PK.root).
+bool PQSecretMatchesPubKey(Span<const unsigned char> secret, const std::vector<unsigned char>& pubkey)
+{
+    return secret.size() == pq::sphincs::SPHINCS_SECRET_KEY_SIZE_SHA2_128S &&
+           pubkey.size() == pq::sphincs::SPHINCS_PUBLIC_KEY_SIZE_SHA2_128S &&
+           std::equal(pubkey.begin(), pubkey.end(), secret.end() - pubkey.size());
+}
+
+//! Encrypt a PQ secret key under the wallet master key. The witness program,
+//! a hash of the parameter set and public key, serves as the IV.
+bool EncryptPQSecret(const CKeyingMaterial& master_key, const uint256& program,
+                     const std::vector<unsigned char>& privkey, std::vector<unsigned char>& crypted)
+{
+    const CKeyingMaterial secret(privkey.begin(), privkey.end());
+    return EncryptSecret(master_key, secret, program, crypted);
+}
+} // namespace
+
+bool CWallet::AddPQKey(const uint256& program, uint8_t param_set_id,
+                       const std::vector<unsigned char>& pubkey,
+                       const std::vector<unsigned char>& privkey)
+{
+    AssertLockHeld(cs_wallet);
+    if (!PQSecretMatchesPubKey(privkey, pubkey)) return false;
+    WalletBatch batch(GetDatabase());
+    if (!IsCrypted()) {
+        return batch.WritePQKey(program, param_set_id, pubkey, privkey);
+    }
+    if (vMasterKey.empty()) return false;
+    std::vector<unsigned char> crypted;
+    if (!EncryptPQSecret(vMasterKey, program, privkey, crypted)) return false;
+    return batch.WriteCryptedPQKey(program, param_set_id, pubkey, crypted);
+}
+
+bool CWallet::HavePQKey(const uint256& program) const
+{
+    WalletBatch batch(GetDatabase());
+    return batch.HasPQKey(program);
+}
+
+bool CWallet::GetPQKey(const uint256& program, PQKeyData& key) const
+{
+    WalletBatch batch(GetDatabase());
+    std::vector<unsigned char> crypted;
+    if (batch.ReadCryptedPQKey(program, key.param_set_id, key.pubkey, crypted)) {
+        LOCK(cs_wallet);
+        if (vMasterKey.empty()) return false;
+        CKeyingMaterial secret;
+        if (!DecryptSecret(vMasterKey, crypted, program, secret)) return false;
+        if (!PQSecretMatchesPubKey(secret, key.pubkey)) return false;
+        key.privkey.assign(secret.begin(), secret.end());
+        return true;
+    }
+    return batch.ReadPQKey(program, key.param_set_id, key.pubkey, key.privkey);
+}
+
+bool CWallet::ReadPlaintextPQKeys(std::vector<std::pair<uint256, PQKeyData>>& keys) const
+{
+    WalletBatch batch(GetDatabase());
+    std::vector<uint256> programs;
+    if (!batch.ListPlaintextPQKeyPrograms(programs)) return false;
+    for (const uint256& program : programs) {
+        PQKeyData key;
+        if (!batch.ReadPQKey(program, key.param_set_id, key.pubkey, key.privkey)) return false;
+        keys.emplace_back(program, std::move(key));
+    }
+    return true;
+}
+
+bool CWallet::EncryptPQKeys(const CKeyingMaterial& master_key,
+                            const std::vector<std::pair<uint256, PQKeyData>>& keys,
+                            WalletBatch& batch) const
+{
+    for (const auto& [program, key] : keys) {
+        std::vector<unsigned char> crypted;
+        if (!EncryptPQSecret(master_key, program, key.privkey, crypted)) return false;
+        if (!batch.WriteCryptedPQKey(program, key.param_set_id, key.pubkey, crypted)) return false;
+        if (!batch.ErasePQKey(program)) return false;
+    }
+    return true;
+}
+
+void CWallet::UpgradePlaintextPQKeys()
+{
+    AssertLockHeld(cs_wallet);
+    if (!IsCrypted() || vMasterKey.empty()) return;
+    std::vector<std::pair<uint256, PQKeyData>> keys;
+    if (!ReadPlaintextPQKeys(keys)) {
+        WalletLogPrintf("Error reading unencrypted post-quantum keys\n");
+        return;
+    }
+    if (keys.empty()) return;
+    WalletBatch batch(GetDatabase());
+    if (!batch.TxnBegin()) return;
+    if (!EncryptPQKeys(vMasterKey, keys, batch)) {
+        batch.TxnAbort();
+        WalletLogPrintf("Error encrypting unencrypted post-quantum keys\n");
+        return;
+    }
+    if (!batch.TxnCommit()) {
+        WalletLogPrintf("Error saving encrypted post-quantum keys\n");
+        return;
+    }
+    WalletLogPrintf("Encrypted %u previously unencrypted post-quantum keys\n", keys.size());
 }
 
 bool CWallet::HasEncryptionKeys() const

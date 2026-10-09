@@ -600,7 +600,7 @@ public:
         consensus.nMinimumChainWork = uint256{};
         consensus.defaultAssumeValid = uint256{};
 
-        consensus.nABWLActivationHeight = 1; // Active from genesis on regtest
+        consensus.nABWLActivationHeight = opts.abwl_activation_height.value_or(1); // Active from genesis on regtest unless overridden
 
         consensus.nAuxpowStartHeight = 0;
         consensus.nAuxpowChainId = opts.randomx_devnet ? 0x4D51 : 0x0001;
