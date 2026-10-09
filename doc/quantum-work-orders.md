@@ -48,7 +48,7 @@ tracked in #32, #34, #36, #37 and #43.
 | [MQ-10](#mq-10--switch-to-fips-205-slh-dsa) | Switch to FIPS 205 SLH-DSA | C · Consensus | PR #61 | — |
 | [MQ-11](#mq-11--complete-pq-signature-hash) | Complete PQ signature hash | C · Consensus | PR #64 (stacked on #61) | MQ-10 |
 | [MQ-12](#mq-12--separate-pq-activation-from-abwl) | Separate PQ activation from ABWL | C · Consensus | PR #69 (stacked on #55) | MQ-01 |
-| [MQ-13](#mq-13--always-compiled-minimal-slh-dsa-verifier) | Always-compiled, minimal SLH-DSA verifier | C · Consensus | Queued | MQ-10 |
+| [MQ-13](#mq-13--always-compiled-minimal-slh-dsa-verifier) | Always-compiled, minimal SLH-DSA verifier | C · Consensus | PR #71 (stacked on #64) | MQ-10 |
 | [MQ-14](#mq-14--parameter-set-agility-and-p2sh-wrapped-v2) | Parameter-set agility and P2SH-wrapped v2 | C · Consensus | Queued | MQ-10 |
 | [MQ-15](#mq-15--randomx-must-fail-closed) | RandomX must fail closed | C · Consensus | PR #56 (merge with MQ-18) | — |
 | [MQ-16](#mq-16--randomx-key-binding-and-auxpow-rules) | RandomX key binding and auxpow rules | C · Consensus | Queued | MQ-15 |
@@ -429,6 +429,19 @@ reproducible builds.
 
 Acceptance: a default `./configure` build verifies PQ spends, and no consensus
 path depends on an optional build flag.
+
+Evidence, 2026-10-09 (PR #71):
+- slhdsa-c (FIPS 205, Apache-2.0 OR ISC OR MIT) is vendored byte-identical to
+  upstream `a0fc1ff2` in `src/crypto/slhdsa/` and built into every node.
+- liboqs is removed (7,042 files, 153 MB). `--enable-pq-oqs-vendor` remains as
+  a no-op.
+- All 30 NIST vectors pass. Interoperability with the old liboqs backend is
+  byte-exact for keygen and deterministic signing, and verification works both
+  ways.
+- A plain `./configure` build signs and verifies P2WPQH spends.
+- Finding: release builds never passed the old flag, so released binaries had
+  no P2WPQH verification. That would have split the chain at activation.
+- The CI check is renamed "Linux PQ SLH-DSA KAT".
 
 ### MQ-14 · Parameter-set agility and P2SH-wrapped v2
 
