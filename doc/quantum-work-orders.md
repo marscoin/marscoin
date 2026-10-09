@@ -45,15 +45,15 @@ tracked in #32, #34, #36, #37 and #43.
 | [MQ-07](#mq-07--monitoring-that-leads-to-action) | Monitoring that leads to action | B · Testnet ops | Waiting: operator applies fix | — |
 | [MQ-08](#mq-08--faucet-and-dashboard-reflect-chain-health) | Faucet and dashboard reflect chain health | B · Testnet ops | Queued | — |
 | [MQ-09](#mq-09--testnet-host-cleanup) | Testnet host cleanup | B · Testnet ops | Queued | — |
-| [MQ-10](#mq-10--switch-to-fips-205-slh-dsa) | Switch to FIPS 205 SLH-DSA | C · Consensus | Queued | — |
+| [MQ-10](#mq-10--switch-to-fips-205-slh-dsa) | Switch to FIPS 205 SLH-DSA | C · Consensus | PR #61 | — |
 | [MQ-11](#mq-11--complete-pq-signature-hash) | Complete PQ signature hash | C · Consensus | Queued | — |
 | [MQ-12](#mq-12--separate-pq-activation-from-abwl) | Separate PQ activation from ABWL | C · Consensus | Queued | — |
 | [MQ-13](#mq-13--always-compiled-minimal-slh-dsa-verifier) | Always-compiled, minimal SLH-DSA verifier | C · Consensus | Queued | MQ-10 |
 | [MQ-14](#mq-14--parameter-set-agility-and-p2sh-wrapped-v2) | Parameter-set agility and P2SH-wrapped v2 | C · Consensus | Queued | MQ-10 |
 | [MQ-15](#mq-15--randomx-must-fail-closed) | RandomX must fail closed | C · Consensus | PR #56 (merge with MQ-18) | — |
 | [MQ-16](#mq-16--randomx-key-binding-and-auxpow-rules) | RandomX key binding and auxpow rules | C · Consensus | Queued | MQ-15 |
-| [MQ-17](#mq-17--marsqnet-difficulty-retargeting) | Marsqnet difficulty retargeting | C · Consensus | Queued | MQ-18 |
-| [MQ-18](#mq-18--marsqnet-as-its-own-chain-type) | Marsqnet as its own chain type | C · Consensus | Queued (owner chose an easier testnet powLimit) | MQ-15 |
+| [MQ-17](#mq-17--marsqnet-difficulty-retargeting) | Marsqnet difficulty retargeting | C · Consensus | Implemented with MQ-18 (ASERT) | MQ-18 |
+| [MQ-18](#mq-18--marsqnet-as-its-own-chain-type) | Marsqnet as its own chain type | C · Consensus | Implemented: `fix/marsqnet-chain-type`, PR after #56 and MQ-46 | MQ-15, MQ-46 |
 | [MQ-19](#mq-19--abwl-persistence-and-block-index-versioning) | ABWL persistence and block-index versioning | C · Consensus | PR #58, build-machine tests pending | — |
 | [MQ-20](#mq-20--abwl-end-to-end-capacity) | ABWL end-to-end capacity | C · Consensus | Queued | MQ-19, MQ-28 |
 | [MQ-21](#mq-21--restore-the-mainnet-context-free-block-bound) | Restore the mainnet context-free block bound | C · Consensus | PR #57 | — |
@@ -81,7 +81,7 @@ tracked in #32, #34, #36, #37 and #43.
 | [MQ-43](#mq-43--randomx-mainnet-track) | RandomX mainnet track | I · Research | Waiting: owner decision | MQ-15–17 |
 | [MQ-44](#mq-44--correct-public-claims-about-marsqnet) | Correct public claims about marsqnet | G · Mainnet | Queued | — |
 | [MQ-45](#mq-45--secret-scanning-in-ci) | Secret scanning in CI | E · Verification | PR #54 | — |
-| [MQ-46](#mq-46--regtest-that-can-mine) | Regtest that can mine (unblocks functional tests) | E · Verification | Queued | — |
+| [MQ-46](#mq-46--regtest-that-can-mine) | Regtest that can mine (unblocks functional tests) | E · Verification | Implemented: `fix/regtest-mining`, build-machine tests pending | — |
 
 ---
 
@@ -330,6 +330,14 @@ tests against NIST ACVP vectors. Retire the round-3 identifier.
 Acceptance: KATs match the NIST ACVP SLH-DSA-SHA2-128s vectors, and marsqnet v2
 launches with FIPS 205 signatures only.
 
+Evidence, 2026-10-08 (PR #61):
+- Parameter-set ID `0x01` = FIPS 205 SLH-DSA-SHA2-128s, pure, signed with the
+  context `marscoin-p2wpqh-v1`. The round-3 ID `0x00` is retired.
+- liboqs is built with only this algorithm.
+- 30 NIST ACVP vectors (keyGen 10, sigVer 14, sigGen 6) pass in unit tests and
+  in the CI KAT script.
+- The full per-case unit sweep shows no result changes against the baseline.
+
 ### MQ-11 · Complete PQ signature hash
 
 **Status:** Queued
@@ -363,6 +371,12 @@ independent of ABWL and RandomX, and report it in `getdeploymentinfo`.
 
 Acceptance: tests show PQ active with ABWL inactive and the reverse, and
 mainnet stays inactive until parameters are chosen in MQ-34.
+
+Design constraint found 2026-10-08: BIP9 versionbits can't be used for
+activation on Marscoin. The auxpow chain ID occupies the upper version bits
+and the auxpow flag is bit 8, so merged-mined blocks can't signal, and nodes
+misread the auxpow flag as an unknown versionbit ("Unknown new rules activated
+(versionbit 8)"). Use a per-chain buried activation height.
 
 ### MQ-13 · Always-compiled, minimal SLH-DSA verifier
 
@@ -507,6 +521,28 @@ Options:
 
 Recommendation: the easier powLimit for marsqnet, with the mainnet value
 decided separately in MQ-43.
+
+Evidence, 2026-10-08 (branch `fix/marsqnet-chain-type`, local, built on #56 and
+MQ-46):
+- `ChainType::MARSQNET` with its own data directory and RPC port 29337.
+  `getblockchaininfo` reports `"marsqnet"`. Regtest is plain regtest again.
+- powLimit `00ffff…`, about 256 RandomX light-mode hashes per block (one CPU
+  measured at 36–37 H/s, so about 7 s per block at the limit).
+- ASERT at every height (`fPowAlwaysAsert`): 2-hour half-life, 123 s spacing.
+- Strict chain ID; mainnet-like subsidy schedule.
+- New genesis mined with the node's own `GetProofOfWorkHash`: nonce 185, nBits
+  `0x2000ffff`, hash `61174bcc…9a08`.
+- Blocks carry chain ID `0x4D51` in the top version bits, so the
+  "unknown versionbit 8" warning no longer appears.
+- The two-node smoke test passes with real RandomX. The full unit sweep matches
+  the baseline except for six previously hanging tests, which now finish.
+
+Open decisions:
+- v2 keeps v1's message start and P2P port, so old v1 nodes would connect but
+  fail to sync. Recommendation: give v2 new message-start bytes.
+- Fresh nodes stay in initial block download until a recent block exists, and
+  `createauxblock` refuses during IBD, so the first v2 blocks must come from
+  the built-in miner.
 
 ### MQ-19 · ABWL persistence and block-index versioning
 
@@ -982,3 +1018,20 @@ CI. Coordinate with MQ-17/18 for marsqnet.
 
 Acceptance: `test_runner.py` builds its cache and runs the PQ functional tests
 end to end, including a confirmed P2WPQH spend.
+
+Progress, 2026-10-08 (branch `fix/regtest-mining`, local, one commit):
+- Plain regtest uses powLimit `7fff…` and a new genesis (nonce 2, nBits
+  `0x207fffff`, hash `6b876256…ab76`, mined and checked in Python against the
+  existing genesis). Its genesis checkpoint was Bitcoin's regtest genesis hash
+  and now uses the real one.
+- `GetNextWorkRequired` honors `fPowNoRetargeting`, which only regtest sets.
+- The block assembler writes the auxpow chain ID into `nVersion`, as
+  `createauxblock` already did. Without it, blocks from `getblocktemplate`,
+  `generateblock` and `generatetoaddress` fail the strict chain-ID check, which
+  likely means non-merged mining via `getblocktemplate` is also broken on
+  mainnet.
+- Marsqnet keeps its current parameters until MQ-18.
+- New unit tests: `pow_tests/regtest_keeps_difficulty` and
+  `validation_tests/block_template_has_auxpow_chain_id`.
+- Verification (build and `test_runner.py` on an integration merge with the
+  #55 framework fixes) is queued on the build machine.
