@@ -1,0 +1,38 @@
+# Reviewed gitleaks findings in existing history, by fingerprint (commit:file:rule:line).
+# All are public test vectors, example values, public keys, checksums or identifiers;
+# none is a credential. New findings are not covered and fail the scan.
+0000ff0d6b2442706a588fd906ebf1adf8ff8226:test/functional/rpc_generate.py:generic-api-key:47
+0000ff0d6b2442706a588fd906ebf1adf8ff8226:test/functional/rpc_generate.py:generic-api-key:55
+0b646aed42d44a3e7f41bff590f00395d6e390c8:src/alert.cpp:generic-api-key:22
+0c3e1019665edb6c456f9640307231863db2835f:doc/systemd.md:generic-api-key:32
+1346e14831489f9c8f53a08f9dfed61d55d53c6f:test/functional/wallet_descriptor.py:generic-api-key:84
+1dec09b341f61836147d87656aea7f7be02aab6d:depends/packages/native_comparisontool.mk:generic-api-key:12
+1dec09b341f61836147d87656aea7f7be02aab6d:depends/packages/native_comparisontool.mk:generic-api-key:13
+223588b1bbc63dc57098bbd0baa48635e0cc0b82:test/functional/wallet_hd.py:generic-api-key:43
+286dbba2d238f523b45f5649345ae89b64cbba2f:src/alert.cpp:generic-api-key:19
+286dbba2d238f523b45f5649345ae89b64cbba2f:src/alert.cpp:generic-api-key:20
+40e6c5b9fce92ffe64e91c2aba38bb2ed57bfbfb:src/crypto/poly1305.h:generic-api-key:48
+5c8ff0d448ffdc6340b195ddfa2128d5f21a839b:src/test/key_tests.cpp:generic-api-key:19
+5c8ff0d448ffdc6340b195ddfa2128d5f21a839b:src/test/key_tests.cpp:generic-api-key:20
+5c8ff0d448ffdc6340b195ddfa2128d5f21a839b:src/test/key_tests.cpp:generic-api-key:21
+5c8ff0d448ffdc6340b195ddfa2128d5f21a839b:src/test/key_tests.cpp:generic-api-key:22
+7524b6479cb20471d827aec5500925c86c62ce1c:test/functional/rpc_generateblock.py:generic-api-key:38
+7524b6479cb20471d827aec5500925c86c62ce1c:test/functional/rpc_generateblock.py:generic-api-key:46
+7db0ecb90c80bd4995bedf8c2982e9a22345ca65:qa/rpc-tests/signmessages.py:generic-api-key:25
+830dc2dd0fccb7f3ec49ff7233a188d92c541e7e:test/functional/rpc_users.py:generic-api-key:51
+869f7ab30aeb4d7fbd563c535b55467a8a0430cf:test/functional/wallet_descriptor.py:generic-api-key:84
+94fe5453c7f8a86136dc9a6e0b370afd32564209:test/functional/rpc_scanblocks.py:generic-api-key:24
+ac3037df1196b1d95ade2dfad4699ad3a6074903:test/functional/feature_taproot.py:coinbase-access-token:1511
+ae714ff0ff2fe65acc114e3968bbc239f37d811e:doc/quantum-signatures-sphincs-v1.md:generic-api-key:88
+b3d6fc654770e3b4d2f82e8d77e531df9e522982:test/functional/signmessages.py:generic-api-key:19
+bc99bbea51528a99ae99080158c8a7c678537398:doc/quantum-signatures-sphincs-v1.md:generic-api-key:88
+c73d871799982ca29c29cef90e1a78814cf34019:test/functional/rpc_users.py:generic-api-key:84
+c73d871799982ca29c29cef90e1a78814cf34019:test/functional/rpc_users.py:generic-api-key:85
+c870027cc261ebe6e0e2030df06619a8f663e80a:contrib/devtools/symbol-check.py:generic-api-key:112
+ca5055a5aa07aba81a87cf12f6f0526a63c423b5:depends/packages/native_cctools.mk:generic-api-key:17
+d52fbf00e32fb0565652c9a62cdaf2bc1e2dddf0:qa/rpc-tests/multi_rpc.py:generic-api-key:49
+d52fbf00e32fb0565652c9a62cdaf2bc1e2dddf0:qa/rpc-tests/multi_rpc.py:generic-api-key:53
+e1e5960e10a9329d9f55a3967d546ffbdd896030:contrib/devtools/previous_release.py:generic-api-key:91
+e263a343d4b6a2622df6bb734cd9d51a0d20a663:test/functional/rpc_users.py:generic-api-key:42
+e3609cdc01cf992800f28b20b0107b7fdc1f880e:test/functional/wallet_descriptor.py:generic-api-key:96
+f8f0d9893d7969bdaa870fadb94ec5d0dfa8334d:src/test/util_tests.cpp:generic-api-key:2035
