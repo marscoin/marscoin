@@ -11,6 +11,7 @@
 #include <core_io.h>
 #include <hash.h>
 #include <net.h>
+#include <node/miner.h>
 #include <signet.h>
 #include <uint256.h>
 #include <util/chaintype.h>
@@ -555,6 +556,13 @@ BOOST_AUTO_TEST_CASE(pq_witness_activation)
     ArgsManager abwl_moved;
     abwl_moved.ForceSetArg("-testactivationheight", "abwl@0");
     BOOST_CHECK(CreateChainParams(abwl_moved, ChainType::REGTEST)->GetConsensus().IsPQWitnessActive(1));
+}
+
+BOOST_AUTO_TEST_CASE(block_template_has_auxpow_chain_id)
+{
+    const auto block_template{node::BlockAssembler{m_node.chainman->ActiveChainstate(), m_node.mempool.get(), {}}.CreateNewBlock()};
+    BOOST_REQUIRE(block_template);
+    BOOST_CHECK_EQUAL(block_template->block.GetChainId(), Params().GetConsensus().nAuxpowChainId);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

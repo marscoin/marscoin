@@ -578,13 +578,16 @@ public:
         consensus.CSVHeight = 1;    // Always active unless overridden
         consensus.SegwitHeight = 0; // Always active unless overridden
         consensus.MinBIP9WarningHeight = 0;
-        consensus.powLimit = uint256{"00000fffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"};
+        // Plain regtest uses a trivial target so tests can mine instantly; marsqnet keeps
+        // its own until it gets dedicated parameters (work order MQ-18).
+        consensus.powLimit = opts.randomx_devnet ? uint256{"00000fffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"}
+                                                 : uint256{"7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"};
         consensus.nPowTargetTimespan = 3.5 * 24 * 60 * 60;
         consensus.nPowTargetSpacing = 2.5 * 60;
         consensus.nASERTHalfLife = 2 * 60 * 60;
         consensus.fPowAllowMinDifficultyBlocks = true;
         consensus.enforce_BIP94 = true;
-        consensus.fPowNoRetargeting = true;
+        consensus.fPowNoRetargeting = !opts.randomx_devnet;
         consensus.fPowUseRandomX = opts.randomx_devnet;
         consensus.nRuleChangeActivationThreshold = 108; // 75% for testchains
         consensus.nMinerConfirmationWindow = 144; // Faster than normal for regtest (144 instead of 2016)
@@ -645,9 +648,15 @@ public:
             consensus.vDeployments[deployment_pos].min_activation_height = version_bits_params.min_activation_height;
         }
 
-        genesis = CreateGenesisBlock(1388590627, 638933, 0x1e0ffff0, 1, 50 * COIN);
-        consensus.hashGenesisBlock = genesis.GetHash();
-        assert(consensus.hashGenesisBlock == uint256{"06e005f86644f15d2e4c62b59a038c798a3b0816ba58dcc8c91e02ce5a685299"});
+        if (opts.randomx_devnet) {
+            genesis = CreateGenesisBlock(1388590627, 638933, 0x1e0ffff0, 1, 50 * COIN);
+            consensus.hashGenesisBlock = genesis.GetHash();
+            assert(consensus.hashGenesisBlock == uint256{"06e005f86644f15d2e4c62b59a038c798a3b0816ba58dcc8c91e02ce5a685299"});
+        } else {
+            genesis = CreateGenesisBlock(1388590627, 2, 0x207fffff, 1, 50 * COIN);
+            consensus.hashGenesisBlock = genesis.GetHash();
+            assert(consensus.hashGenesisBlock == uint256{"6b876256fe9e596a3a5f99ded7f20b4feae145477600e337482e0396f6a5ab76"});
+        }
         assert(genesis.hashMerkleRoot == uint256{"b9594f964ad5d42bd99edbfaaeeec900cd0f7563a14d90982cf6675df98d7863"});
 
         vFixedSeeds.clear(); //!< Regtest mode doesn't have any fixed seeds.
@@ -659,7 +668,7 @@ public:
 
         checkpointData = {
             {
-                {0, uint256{"0f9188f13cb7b2c71f2a335e3a4fc328bf5beb436012afca590b1a11466e2206"}},
+                {0, consensus.hashGenesisBlock},
             }
         };
 
