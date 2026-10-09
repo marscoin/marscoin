@@ -198,7 +198,14 @@ jobs:
           # Qt libraries and plugins for the GUI wallet.
           WINDEPLOYQT="$(command -v windeployqt-qt5 || command -v windeployqt || true)"
           if [ -z "$WINDEPLOYQT" ]; then echo "error: windeployqt not found"; exit 1; fi
-          "$WINDEPLOYQT" --release --no-translations --no-compiler-runtime dist/bin/marscoin-qt.exe
+          # MSYS2 Qt uses desktop OpenGL, so skip ANGLE and the software renderer.
+          "$WINDEPLOYQT" --release --no-translations --no-compiler-runtime --no-angle --no-opengl-sw --no-system-d3d-compiler dist/bin/marscoin-qt.exe
+          # The GUI cannot start without the Windows platform plugin.
+          if [ ! -f dist/bin/platforms/qwindows.dll ]; then
+            mkdir -p dist/bin/platforms
+            cp /mingw64/share/qt5/plugins/platforms/qwindows.dll dist/bin/platforms/ 2>/dev/null || cp /mingw64/lib/qt5/plugins/platforms/qwindows.dll dist/bin/platforms/
+          fi
+          test -f dist/bin/platforms/qwindows.dll || { echo "error: Qt platform plugin missing"; exit 1; }
           # Never ship libtool wrapper stubs.
           if grep -l "temporary wrapper script" dist/bin/*.exe; then
             echo "error: libtool wrapper executables were packaged"; exit 1
