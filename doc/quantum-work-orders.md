@@ -842,6 +842,18 @@ of merged branches.
 Acceptance: CI is green on the feature branch, and every deployed testnet binary
 maps to a tag.
 
+Progress, 2026-10-09:
+- PR #72 adds `test/lint/lint-config-macros.py` as a CI job (stacked on #56).
+  It flags files that test configure-defined macros without including
+  `config/bitcoin-config.h`, and tests of `ENABLE_*` macros that nothing
+  defines.
+- It catches both silent failures from this review: the RandomX include in
+  `pow.cpp` and the stale `ENABLE_PQ_OQS_VENDOR` guard found while verifying
+  #71.
+- Per-case unit sweeps, compared with a baseline, have now caught three
+  silently missing or hanging test groups. Make such sweeps part of release
+  checks.
+
 ### MQ-28 · Performance and stress testing
 
 **Status:** Queued
