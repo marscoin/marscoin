@@ -1729,8 +1729,10 @@ BOOST_AUTO_TEST_CASE(p2wpqh_spend_verifies)
     const CAmount amount{50'000};
     const CMutableTransaction credit{BuildCreditingTransaction(script_pubkey, amount)};
     CMutableTransaction spend{BuildSpendingTransaction(CScript(), CScriptWitness(), CTransaction(credit))};
+    // The input has no witness yet, so force the precomputation the signature
+    // hash needs, as the wallet does when signing.
     PrecomputedTransactionData txdata;
-    txdata.Init(spend, {credit.vout[0]});
+    txdata.Init(spend, {credit.vout[0]}, /*force=*/true);
 
     SignatureData sigdata;
     BOOST_REQUIRE(ProduceSignature(provider, MutableTransactionSignatureCreator(spend, 0, amount, &txdata, SIGHASH_ALL), script_pubkey, sigdata));
