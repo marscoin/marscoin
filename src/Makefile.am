@@ -160,6 +160,7 @@ BITCOIN_CORE_H = \
   consensus/tx_verify.h \
   core_io.h \
   core_memusage.h \
+  crypto/pq_hd.h \
   crypto/pq_sphincs.h \
   cuckoocache.h \
   dbwrapper.h \
@@ -729,6 +730,7 @@ libmarscoin_common_a_SOURCES = \
   common/signmessage.cpp \
   common/system.cpp \
   common/url.cpp \
+  crypto/pq_hd.cpp \
   crypto/pq_sphincs_random.cpp \
   compressor.cpp \
   core_read.cpp \
