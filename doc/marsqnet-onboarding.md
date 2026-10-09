@@ -21,16 +21,15 @@ sudo apt-get install -y \
 
 ## 2) Clone and build
 
-Both vendored libraries are required: RandomX for proof of work and liboqs
-for post-quantum (P2WPQH) signature checks. A node built without either one
-refuses to start on marsqnet or rejects blocks with post-quantum spends.
+RandomX is required for proof of work: a node built without
+`--enable-randomx-vendor` refuses to start on marsqnet. Post-quantum (P2WPQH)
+signature checks need no option; SLH-DSA is built into every node.
 
 ```bash
 git clone --branch feature/quantum-upgrade https://github.com/marscoin/marscoin.git
 cd marscoin
-bash src/crypto/oqs_vendor/build-liboqs-vendor.sh
 ./autogen.sh
-./configure --without-gui --disable-tests --disable-bench --enable-randomx-vendor --enable-pq-oqs-vendor
+./configure --without-gui --disable-tests --disable-bench --enable-randomx-vendor
 make -j"$(nproc)" src/marscoind src/marscoin-cli
 ```
 
