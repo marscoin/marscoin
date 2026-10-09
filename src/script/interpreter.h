@@ -163,7 +163,8 @@ struct PrecomputedTransactionData
     uint256 m_outputs_single_hash;
     uint256 m_spent_amounts_single_hash;
     uint256 m_spent_scripts_single_hash;
-    //! Whether the 5 fields above are initialized.
+    //! Whether the 5 fields above are initialized. Both the BIP341 and the
+    //! P2WPQH signature hashes use them.
     bool m_bip341_taproot_ready = false;
 
     // BIP143 precomputed data (double-SHA256).
@@ -271,9 +272,10 @@ public:
          return false;
     }
 
-    virtual uint256 GetSigHashPQ(ScriptExecutionData& execdata) const
+    /** Verify a P2WPQH (witness v2) signature payload: [param id][signature][optional hash type]. */
+    virtual bool CheckPQSignature(Span<const unsigned char> sig_payload, uint8_t param_set_id, Span<const unsigned char> pubkey, ScriptError* serror = nullptr) const
     {
-        return uint256{};
+        return false;
     }
 
     virtual ~BaseSignatureChecker() = default;
@@ -290,6 +292,16 @@ enum class MissingDataBehavior
 
 template<typename T>
 bool SignatureHashSchnorr(uint256& hash_out, ScriptExecutionData& execdata, const T& tx_to, uint32_t in_pos, uint8_t hash_type, SigVersion sigversion, const PrecomputedTransactionData& cache, MissingDataBehavior mdb);
+
+/** Whether hash_type is a valid P2WPQH signature hash type (the BIP341 set). */
+bool IsValidPQHashType(uint8_t hash_type);
+
+/** Compute the P2WPQH signature hash (doc/quantum-p2wpqh-sighash-v1.md).
+ *  Requires the BIP341 precomputed data and all spent outputs. Returns false for
+ *  an invalid hash type, SIGHASH_SINGLE without a matching output, or missing
+ *  data (subject to mdb). */
+template<typename T>
+bool SignatureHashPQ(uint256& hash_out, const T& tx_to, uint32_t in_pos, uint8_t hash_type, uint8_t param_set_id, Span<const unsigned char> pubkey, const PrecomputedTransactionData& cache, MissingDataBehavior mdb);
 
 template <class T>
 class GenericTransactionSignatureChecker : public BaseSignatureChecker
@@ -312,7 +324,7 @@ public:
     bool CheckSchnorrSignature(Span<const unsigned char> sig, Span<const unsigned char> pubkey, SigVersion sigversion, ScriptExecutionData& execdata, ScriptError* serror = nullptr) const override;
     bool CheckLockTime(const CScriptNum& nLockTime) const override;
     bool CheckSequence(const CScriptNum& nSequence) const override;
-    uint256 GetSigHashPQ(ScriptExecutionData& execdata) const override;
+    bool CheckPQSignature(Span<const unsigned char> sig_payload, uint8_t param_set_id, Span<const unsigned char> pubkey, ScriptError* serror = nullptr) const override;
 };
 
 using TransactionSignatureChecker = GenericTransactionSignatureChecker<CTransaction>;
@@ -343,6 +355,11 @@ public:
     bool CheckSequence(const CScriptNum& nSequence) const override
     {
         return m_checker.CheckSequence(nSequence);
+    }
+
+    bool CheckPQSignature(Span<const unsigned char> sig_payload, uint8_t param_set_id, Span<const unsigned char> pubkey, ScriptError* serror = nullptr) const override
+    {
+        return m_checker.CheckPQSignature(sig_payload, param_set_id, pubkey, serror);
     }
 };
 

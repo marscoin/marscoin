@@ -21,6 +21,7 @@ JSON_TEST_FILES = \
   test/data/blockfilters.json \
   test/data/key_io_valid.json \
   test/data/key_io_invalid.json \
+  test/data/p2wpqh_sighash_vectors.json \
   test/data/script_tests.json \
   test/data/sighash.json \
   test/data/slh_dsa_sha2_128s_acvp.json \
@@ -130,6 +131,7 @@ BITCOIN_TESTS =\
   test/policyestimator_tests.cpp \
   test/pool_tests.cpp \
   test/pow_tests.cpp \
+  test/pq_sighash_tests.cpp \
   test/prevector_tests.cpp \
   test/raii_event_tests.cpp \
   test/random_tests.cpp \

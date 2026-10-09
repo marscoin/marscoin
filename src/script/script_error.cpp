@@ -121,6 +121,8 @@ std::string ScriptErrorString(const ScriptError serror)
             return "SPHINCS+ signature verification failed";
         case SCRIPT_ERR_PQ_PROGRAM_MISMATCH:
             return "Witness v2 program commitment mismatch";
+        case SCRIPT_ERR_PQ_SIG_HASHTYPE:
+            return "Invalid P2WPQH signature hash type";
         case SCRIPT_ERR_OP_CODESEPARATOR:
             return "Using OP_CODESEPARATOR in non-witness script";
         case SCRIPT_ERR_SIG_FINDANDDELETE:
