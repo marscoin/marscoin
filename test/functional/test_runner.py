@@ -325,6 +325,7 @@ BASE_SCRIPTS = [
     'wallet_encryption.py --descriptors',
     'wallet_pq_safety.py --legacy-wallet',
     'wallet_pq_safety.py --descriptors',
+    'wallet_pq_hd.py --descriptors',
     'feature_dersig.py',
     'feature_cltv.py',
     'rpc_uptime.py',

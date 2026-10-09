@@ -17,6 +17,7 @@ test does not mine. It signs spends of PQ outputs supplied through prevtxs.
 """
 from decimal import Decimal
 
+from test_framework.segwit_addr import CHARSET, Encoding, bech32_verify_checksum, convertbits
 from test_framework.test_framework import BitcoinTestFramework, SkipTest
 from test_framework.util import (
     assert_equal,
@@ -77,6 +78,15 @@ class WalletPQSafetyTest(BitcoinTestFramework):
         return data
 
     @staticmethod
+    def pq_node(wallet):
+        """The PQ HD node (key || chaincode) of a descriptor wallet's wpq() descriptors."""
+        desc = next(d["desc"] for d in wallet.listdescriptors(True)["descriptors"] if d["desc"].startswith("wpq("))
+        key = desc[len("wpq("):].split("/")[0]
+        data = [CHARSET.find(c) for c in key[key.rfind("1") + 1:]]
+        assert_equal(bech32_verify_checksum("mpqprv", data), Encoding.BECH32M)
+        return bytes(convertbits(data[:-6], 5, 8, False))
+
+    @staticmethod
     def find_pq_secret(data, pubkey):
         """Return the 32 secret bytes (SK.seed || SK.prf) stored next to pubkey.
 
@@ -126,8 +136,13 @@ class WalletPQSafetyTest(BitcoinTestFramework):
         old_key = wallet.getnewpqaddress()
         pubkey = bytes.fromhex(old_key["pubkey"])
 
-        secret = self.find_pq_secret(self.read_wallet_file(node, "pqenc"), pubkey)
-        assert secret is not None, "plaintext PQ key not found in unencrypted wallet file"
+        if self.options.descriptors:
+            # Descriptor wallets store the PQ HD node their keys are derived from.
+            secret = self.pq_node(wallet)
+            assert secret in self.read_wallet_file(node, "pqenc"), "plaintext PQ HD node not found in unencrypted wallet file"
+        else:
+            secret = self.find_pq_secret(self.read_wallet_file(node, "pqenc"), pubkey)
+            assert secret is not None, "plaintext PQ key not found in unencrypted wallet file"
 
         wallet.encryptwallet(PASSPHRASE)
         data = self.read_wallet_file(node, "pqenc")
@@ -137,6 +152,9 @@ class WalletPQSafetyTest(BitcoinTestFramework):
 
         self.log.info("A locked wallet can neither generate PQ keys nor sign PQ inputs")
         old_prevtx = self.pq_prevtx(old_key, 2)
+        if self.options.descriptors:
+            # It hands out the key derived ahead of time (the test framework sets -keypool=1).
+            wallet.getnewpqaddress()
         assert_raises_rpc_error(-13, "walletpassphrase", wallet.getnewpqaddress)
         assert_raises_rpc_error(-13, "walletpassphrase", wallet.signrawtransactionwithwallet, self.spend_of(wallet, old_prevtx), [old_prevtx])
 
