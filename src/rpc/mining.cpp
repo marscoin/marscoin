@@ -8,6 +8,7 @@
 #include <chain.h>
 #include <chainparams.h>
 #include <chainparamsbase.h>
+#include <common/args.h>
 #include <common/system.h>
 #include <consensus/amount.h>
 #include <consensus/consensus.h>
@@ -934,8 +935,19 @@ static RPCHelpMan getblocktemplate()
         }
     }
 
-    // Enforce legacy blocks only via getblocktemplate
+    // getblocktemplate offers a legacy block version, so that plain (not merge-
+    // mined) miners keep working where the chain accepts it (mainnet, testnet).
+    // Where legacy blocks are rejected (regtest, signet, marsqnet), it offers
+    // the same version with the auxpow chain ID instead.
     block.nVersion = CPureBlockHeader::VERSION_LEGACY;
+    // -regtest only: -blockversion=N sets the version, as in the block assembler.
+    if (chainman.GetParams().MineBlocksOnDemand()) {
+        block.nVersion = gArgs.GetIntArg("-blockversion", block.nVersion);
+        block.SetAuxpowVersion(false);
+    }
+    if (!consensusParams.AllowLegacyBlocks(pindexPrev->nHeight + 1)) {
+        block.SetChainId(consensusParams.nAuxpowChainId);
+    }
 
     result.pushKV("version", block.nVersion);
     result.pushKV("rules", std::move(aRules));

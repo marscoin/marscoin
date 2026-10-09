@@ -131,15 +131,17 @@ std::unique_ptr<CBlockTemplate> BlockAssembler::CreateNewBlock()
     }
 
     pblock->nVersion = m_chainstate.m_chainman.m_versionbitscache.ComputeBlockVersion(pindexPrev, chainparams.GetConsensus());
-    // The auxpow chain ID occupies the upper version bits; blocks without it
-    // fail the strict chain-ID check (auxpow.cpp).
-    pblock->SetChainId(chainparams.GetConsensus().nAuxpowChainId);
-
     // -regtest only: allow overriding block.nVersion with
     // -blockversion=N to test forking scenarios
     if (chainparams.MineBlocksOnDemand()) {
         pblock->nVersion = gArgs.GetIntArg("-blockversion", pblock->nVersion);
+        // The block has no auxpow; an auxpow flag would make serializing it abort.
+        pblock->SetAuxpowVersion(false);
     }
+    // The auxpow chain ID occupies the upper version bits; blocks without it
+    // fail the strict chain-ID check (auxpow.cpp). It is set last, so that
+    // -blockversion only sets the lower bits.
+    pblock->SetChainId(chainparams.GetConsensus().nAuxpowChainId);
 
     pblock->nTime = TicksSinceEpoch<std::chrono::seconds>(NodeClock::now());
     m_lock_time_cutoff = pindexPrev->GetMedianTimePast();
