@@ -63,7 +63,7 @@ tracked in #32, #34, #36, #37 and #43.
 | [MQ-25](#mq-25--script-level-and-unit-tests) | Script-level and unit tests | E · Verification | Queued | — |
 | [MQ-26](#mq-26--functional-tests) | Functional tests | E · Verification | In progress: PR #66 (framework), #65 | — |
 | [MQ-27](#mq-27--ci-and-release-discipline) | CI and release discipline | E · Verification | In progress: secret scanning (MQ-45) | — |
-| [MQ-28](#mq-28--performance-and-stress-testing) | Performance and stress testing | E · Verification | Queued | MQ-25 |
+| [MQ-28](#mq-28--performance-and-stress-testing) | Performance and stress testing | E · Verification | In progress: benchmarks PR #74 | MQ-25 |
 | [MQ-29](#mq-29--documentation-refresh) | Documentation refresh | E · Verification | In progress: sighash spec in #64 | — |
 | [MQ-30](#mq-30--marsqnet-v2-fresh-genesis) | Marsqnet v2 (fresh genesis) | F · Network | Queued | Track C, MQ-22 |
 | [MQ-31](#mq-31--mainnet-exposure-census) | Mainnet exposure census | G · Mainnet | PR #73 | — |
@@ -868,6 +868,19 @@ campaign with full blocks of PQ spends, initial sync time, mempool behavior,
 signing time for wallets with many inputs, and fee estimation.
 
 Acceptance: published numbers, used to set the MQ-20 ceiling and DoS limits.
+
+Measurements, 2026-10-09 (PR #74, Apple Silicon, one thread):
+- SLH-DSA-SHA2-128s keygen 28.3 ms, signing 216.8 ms, verification 224.6 µs.
+  The existing ECDSA P2WPKH script verification takes 12.4 µs.
+- Per byte, P2WPQH verification (about 28 µs/KB) is no more expensive than
+  ECDSA (about 115 µs/KB), so validation cost tracks block size.
+- A 4M-weight block holds about 500 P2WPQH inputs (about 0.11 s on one
+  thread). The 128M ABWL ceiling allows about 16,000 inputs (about 3.6 s on
+  one thread, less in parallel).
+- Signing about 0.2 s per input makes large consolidations slow (100 inputs
+  takes about 22 s); wallets need progress feedback.
+- Still to do: a full-block PQ stress run and initial-sync timing on marsqnet
+  v2.
 
 ### MQ-29 · Documentation refresh
 
