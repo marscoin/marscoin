@@ -749,6 +749,13 @@ def scrypt_1024_1_1_256(data):
 # Merged mining (auxpow): this nVersion bit means an auxpow follows the header.
 VERSION_AUXPOW = 1 << 8
 
+# The auxpow chain ID occupies the upper 16 bits of nVersion, and with a strict
+# chain-ID check, blocks without it are rejected. Plain versions 1-4 count as
+# legacy blocks, which regtest rejects from height 0 ("late-legacy-block").
+VERSION_CHAIN_START = 1 << 16
+REGTEST_AUXPOW_CHAIN_ID = 0x0001
+DEFAULT_BLOCK_VERSION = 4 | (REGTEST_AUXPOW_CHAIN_ID * VERSION_CHAIN_START)
+
 
 class CAuxPow:
     """Merge-mining proof attached to a block header (src/auxpow.h)."""
@@ -808,7 +815,7 @@ class CBlockHeader:
             self.calc_sha256()
 
     def set_null(self):
-        self.nVersion = 4
+        self.nVersion = DEFAULT_BLOCK_VERSION
         self.hashPrevBlock = 0
         self.hashMerkleRoot = 0
         self.nTime = 0
