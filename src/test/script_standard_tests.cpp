@@ -4,6 +4,9 @@
 
 #include <test/data/bip341_wallet_vectors.json.h>
 
+#include <bech32.h>
+#include <chainparams.h>
+
 #include <key.h>
 #include <key_io.h>
 #include <script/script.h>
@@ -18,6 +21,18 @@
 
 
 BOOST_FIXTURE_TEST_SUITE(script_standard_tests, BasicTestingSetup)
+
+namespace {
+//! The BIP341 vectors and the Taproot example use Bitcoin's "bc" prefix.
+//! Return the same witness program encoded with this chain's prefix.
+std::string OnThisChain(const std::string& bitcoin_address)
+{
+    const bech32::DecodeResult decoded{bech32::Decode(bitcoin_address)};
+    BOOST_REQUIRE(decoded.encoding != bech32::Encoding::INVALID);
+    BOOST_REQUIRE_EQUAL(decoded.hrp, "bc");
+    return bech32::Encode(decoded.encoding, Params().Bech32HRP(), decoded.data);
+}
+} // namespace
 
 BOOST_AUTO_TEST_CASE(dest_default_is_no_dest)
 {
@@ -405,7 +420,7 @@ BOOST_AUTO_TEST_CASE(script_standard_taproot_builder)
     BOOST_CHECK(builder.IsValid() && builder.IsComplete());
     builder.Finalize(key_inner);
     BOOST_CHECK(builder.IsValid() && builder.IsComplete());
-    BOOST_CHECK_EQUAL(EncodeDestination(builder.GetOutput()), "bc1pj6gaw944fy0xpmzzu45ugqde4rz7mqj5kj0tg8kmr5f0pjq8vnaqgynnge");
+    BOOST_CHECK_EQUAL(EncodeDestination(builder.GetOutput()), OnThisChain("bc1pj6gaw944fy0xpmzzu45ugqde4rz7mqj5kj0tg8kmr5f0pjq8vnaqgynnge"));
 }
 
 BOOST_AUTO_TEST_CASE(bip341_spk_test_vectors)
@@ -436,7 +451,7 @@ BOOST_AUTO_TEST_CASE(bip341_spk_test_vectors)
         parse_tree(vec["given"]["scriptTree"], 0);
         spktest.Finalize(XOnlyPubKey(ParseHex(vec["given"]["internalPubkey"].get_str())));
         BOOST_CHECK_EQUAL(HexStr(GetScriptForDestination(spktest.GetOutput())), vec["expected"]["scriptPubKey"].get_str());
-        BOOST_CHECK_EQUAL(EncodeDestination(spktest.GetOutput()), vec["expected"]["bip350Address"].get_str());
+        BOOST_CHECK_EQUAL(EncodeDestination(spktest.GetOutput()), OnThisChain(vec["expected"]["bip350Address"].get_str()));
         auto spend_data = spktest.GetSpendData();
         BOOST_CHECK_EQUAL(vec["intermediary"]["merkleRoot"].isNull(), spend_data.merkle_root.IsNull());
         if (!spend_data.merkle_root.IsNull()) {
