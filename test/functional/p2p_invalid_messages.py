@@ -8,6 +8,7 @@ import random
 import time
 
 from test_framework.messages import (
+    uint256_from_compact,
     CBlockHeader,
     CInv,
     MAX_HEADERS_RESULTS,
@@ -289,9 +290,10 @@ class InvalidMessagesTest(BitcoinTestFramework):
         blockheader.nTime = int(time.time())
         blockheader.nBits = blockheader_tip.nBits
         blockheader.rehash()
-        while not blockheader.hash.startswith('0'):
+        # Marscoin checks the scrypt proof-of-work hash, not the block hash.
+        while blockheader.calc_pow_hash() > uint256_from_compact(blockheader.nBits):
             blockheader.nNonce += 1
-            blockheader.rehash()
+        blockheader.rehash()
         peer = self.nodes[0].add_p2p_connection(P2PInterface())
         peer.send_and_ping(msg_headers([blockheader]))
         assert_equal(self.nodes[0].getblockchaininfo()['headers'], 1)
