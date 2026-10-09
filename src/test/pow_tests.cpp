@@ -246,20 +246,85 @@ BOOST_AUTO_TEST_CASE(regtest_keeps_difficulty)
     BOOST_CHECK_EQUAL(GetNextWorkRequired(&prev, &next, consensus), 0x207fffffU);
 }
 
-BOOST_AUTO_TEST_CASE(ChainParams_MARSQNET_regtest_randomx_toggle)
+BOOST_AUTO_TEST_CASE(ChainParams_MARSQNET_params)
 {
-    ArgsManager args;
-    args.ForceSetArg("-chain", "marsqnet");
-    const auto params = CreateChainParams(args, ChainType::REGTEST);
-    BOOST_CHECK(params->GetConsensus().fPowUseRandomX);
+    const auto params = CreateChainParams(*m_node.args, ChainType::MARSQNET);
+    const auto& consensus = params->GetConsensus();
+    BOOST_CHECK(params->GetChainType() == ChainType::MARSQNET);
+    BOOST_CHECK_EQUAL(params->GetChainTypeString(), "marsqnet");
+    BOOST_CHECK(consensus.fPowUseRandomX);
+    BOOST_CHECK(consensus.fPowAlwaysAsert);
+    BOOST_CHECK(!consensus.fPowNoRetargeting);
+    BOOST_CHECK(!consensus.fPowAllowMinDifficultyBlocks);
+    BOOST_CHECK(consensus.fStrictChainId);
+    BOOST_CHECK_EQUAL(consensus.nAuxpowChainId, 0x4D51);
+    BOOST_CHECK_EQUAL(consensus.nABWLActivationHeight, 1);
+    BOOST_CHECK(consensus.IsPQWitnessActive(1));
+    BOOST_CHECK_EQUAL(consensus.nSubsidyHalvingInterval, 395699);
     BOOST_CHECK_EQUAL(params->GetDefaultPort(), 29338);
+    BOOST_CHECK_EQUAL(params->Bech32HRP(), "mqt");
+    BOOST_CHECK_EQUAL(params->GenesisBlock().nBits, UintToArith256(consensus.powLimit).GetCompact());
+    BOOST_CHECK(params->GetAvailableSnapshotHeights().empty());
+
+    // Plain regtest no longer uses RandomX.
+    BOOST_CHECK(!CreateChainParams(*m_node.args, ChainType::REGTEST)->GetConsensus().fPowUseRandomX);
+
+    // -chain=marsqnet, -marsqnet and the deprecated qdevnet spellings select marsqnet.
+    BOOST_CHECK(ChainTypeFromString("marsqnet") == ChainType::MARSQNET);
+    for (const auto& [arg, value] : std::vector<std::pair<std::string, std::string>>{{"-chain", "marsqnet"}, {"-chain", "qdevnet"}, {"-marsqnet", "1"}, {"-qdevnet", "1"}}) {
+        ArgsManager args;
+        args.ForceSetArg(arg, value);
+        BOOST_CHECK(args.GetChainType() == ChainType::MARSQNET);
+    }
 }
+
+BOOST_AUTO_TEST_CASE(marsqnet_asert_retargets)
+{
+    const auto params = CreateChainParams(*m_node.args, ChainType::MARSQNET);
+    const auto& consensus = params->GetConsensus();
+    const arith_uint256 pow_limit{UintToArith256(consensus.powLimit)};
+    const uint32_t limit_bits{pow_limit.GetCompact()};
+
+    // Block 1, the ASERT anchor, is mined at the proof-of-work limit.
+    std::vector<CBlockIndex> blocks(102);
+    blocks[0].nHeight = 0;
+    blocks[0].nTime = params->GenesisBlock().nTime;
+    blocks[0].nBits = limit_bits;
+    CBlockHeader next;
+    next.nTime = blocks[0].nTime + 1;
+    BOOST_CHECK_EQUAL(GetNextWorkRequired(&blocks[0], &next, consensus), limit_bits);
+
+    const auto build_chain = [&](int64_t spacing) {
+        for (size_t i = 1; i < blocks.size(); ++i) {
+            blocks[i].pprev = &blocks[i - 1];
+            blocks[i].nHeight = i;
+            blocks[i].nTime = blocks[0].nTime + 1000 + (i - 1) * spacing;
+            blocks[i].nBits = limit_bits;
+        }
+        next.nTime = blocks.back().nTime + spacing;
+        arith_uint256 target;
+        target.SetCompact(GetNextWorkRequired(&blocks.back(), &next, consensus));
+        return target;
+    };
+
+    // Blocks far faster than the 123-second target make the next block harder.
+    BOOST_CHECK(build_chain(1) < pow_limit / 2);
+    // Slow blocks never go easier than the limit.
+    BOOST_CHECK(build_chain(1000) == arith_uint256().SetCompact(limit_bits));
+}
+
+#ifdef ENABLE_RANDOMX_VENDOR
+BOOST_AUTO_TEST_CASE(marsqnet_genesis_randomx_pow)
+{
+    const auto params = CreateChainParams(*m_node.args, ChainType::MARSQNET);
+    const CBlockHeader header = params->GenesisBlock().GetBlockHeader();
+    BOOST_CHECK(CheckProofOfWork(header, header.nBits, params->GetConsensus()));
+}
+#endif
 
 BOOST_AUTO_TEST_CASE(RandomX_pow_fails_closed)
 {
-    ArgsManager args;
-    args.ForceSetArg("-chain", "marsqnet");
-    const auto params = CreateChainParams(args, ChainType::REGTEST);
+    const auto params = CreateChainParams(*m_node.args, ChainType::MARSQNET);
     const auto& consensus = params->GetConsensus();
     const CBlockHeader header = params->GenesisBlock().GetBlockHeader();
     const unsigned int easiest_bits = UintToArith256(consensus.powLimit).GetCompact();

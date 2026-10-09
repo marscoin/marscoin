@@ -578,17 +578,13 @@ public:
         consensus.CSVHeight = 1;    // Always active unless overridden
         consensus.SegwitHeight = 0; // Always active unless overridden
         consensus.MinBIP9WarningHeight = 0;
-        // Plain regtest uses a trivial target so tests can mine instantly; marsqnet keeps
-        // its own until it gets dedicated parameters (work order MQ-18).
-        consensus.powLimit = opts.randomx_devnet ? uint256{"00000fffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"}
-                                                 : uint256{"7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"};
+        consensus.powLimit = uint256{"7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"};
         consensus.nPowTargetTimespan = 3.5 * 24 * 60 * 60;
         consensus.nPowTargetSpacing = 2.5 * 60;
         consensus.nASERTHalfLife = 2 * 60 * 60;
         consensus.fPowAllowMinDifficultyBlocks = true;
         consensus.enforce_BIP94 = true;
-        consensus.fPowNoRetargeting = !opts.randomx_devnet;
-        consensus.fPowUseRandomX = opts.randomx_devnet;
+        consensus.fPowNoRetargeting = true;
         consensus.nRuleChangeActivationThreshold = 108; // 75% for testchains
         consensus.nMinerConfirmationWindow = 144; // Faster than normal for regtest (144 instead of 2016)
 
@@ -609,15 +605,15 @@ public:
         consensus.nPQWitnessActivationHeight = opts.pqwitness_activation_height.value_or(1); // Active from genesis on regtest unless overridden
 
         consensus.nAuxpowStartHeight = 0;
-        consensus.nAuxpowChainId = opts.randomx_devnet ? 0x4D51 : 0x0001;
-        consensus.fStrictChainId = opts.randomx_devnet ? false : true;
+        consensus.nAuxpowChainId = 0x0001;
+        consensus.fStrictChainId = true;
         consensus.nLegacyBlocksBefore = 0;
 
-        pchMessageStart[0] = opts.randomx_devnet ? 0x4d : 0xfa;
-        pchMessageStart[1] = opts.randomx_devnet ? 0x71 : 0xbf;
-        pchMessageStart[2] = opts.randomx_devnet ? 0xa7 : 0xb5;
-        pchMessageStart[3] = opts.randomx_devnet ? 0xfa : 0xda;
-        nDefaultPort = opts.randomx_devnet ? 29338 : 18444;
+        pchMessageStart[0] = 0xfa;
+        pchMessageStart[1] = 0xbf;
+        pchMessageStart[2] = 0xb5;
+        pchMessageStart[3] = 0xda;
+        nDefaultPort = 18444;
         nPruneAfterHeight = opts.fastprune ? 100 : 1000;
         m_assumed_blockchain_size = 0;
         m_assumed_chain_state_size = 0;
@@ -648,15 +644,9 @@ public:
             consensus.vDeployments[deployment_pos].min_activation_height = version_bits_params.min_activation_height;
         }
 
-        if (opts.randomx_devnet) {
-            genesis = CreateGenesisBlock(1388590627, 638933, 0x1e0ffff0, 1, 50 * COIN);
-            consensus.hashGenesisBlock = genesis.GetHash();
-            assert(consensus.hashGenesisBlock == uint256{"06e005f86644f15d2e4c62b59a038c798a3b0816ba58dcc8c91e02ce5a685299"});
-        } else {
-            genesis = CreateGenesisBlock(1388590627, 2, 0x207fffff, 1, 50 * COIN);
-            consensus.hashGenesisBlock = genesis.GetHash();
-            assert(consensus.hashGenesisBlock == uint256{"6b876256fe9e596a3a5f99ded7f20b4feae145477600e337482e0396f6a5ab76"});
-        }
+        genesis = CreateGenesisBlock(1388590627, 2, 0x207fffff, 1, 50 * COIN);
+        consensus.hashGenesisBlock = genesis.GetHash();
+        assert(consensus.hashGenesisBlock == uint256{"6b876256fe9e596a3a5f99ded7f20b4feae145477600e337482e0396f6a5ab76"});
         assert(genesis.hashMerkleRoot == uint256{"b9594f964ad5d42bd99edbfaaeeec900cd0f7563a14d90982cf6675df98d7863"});
 
         vFixedSeeds.clear(); //!< Regtest mode doesn't have any fixed seeds.
@@ -707,7 +697,115 @@ public:
         base58Prefixes[EXT_PUBLIC_KEY] = {0x04, 0x35, 0x87, 0xCF};
         base58Prefixes[EXT_SECRET_KEY] = {0x04, 0x35, 0x83, 0x94};
 
-        bech32_hrp = opts.randomx_devnet ? "mqt" : "bcrt";
+        bech32_hrp = "bcrt";
+    }
+};
+
+/**
+ * Marsqnet: the public post-quantum test network. RandomX proof of work with
+ * ASERT difficulty from the first block, and ABWL and witness v2 (P2WPQH)
+ * active from height 1.
+ */
+class CMarsqnetParams : public CChainParams
+{
+public:
+    CMarsqnetParams()
+    {
+        m_chain_type = ChainType::MARSQNET;
+        consensus.signet_blocks = false;
+        consensus.signet_challenge.clear();
+        consensus.nSubsidyHalvingInterval = 395699; // Same schedule as mainnet
+        consensus.BIP34Height = 1;
+        consensus.BIP34Hash = uint256();
+        consensus.BIP65Height = 1;
+        consensus.BIP66Height = 1;
+        consensus.CSVHeight = 1;
+        consensus.SegwitHeight = 0;
+        consensus.MinBIP9WarningHeight = 0;
+        // One CPU hashing RandomX in light mode (about 36 H/s measured) finds a
+        // block at this limit in seconds; ASERT raises difficulty as miners join.
+        consensus.powLimit = uint256{"00ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"};
+        consensus.nPowTargetTimespan = 3.5 * 24 * 60 * 60;
+        consensus.nPowTargetSpacing = 123;
+        // ASERT at every height, anchored at the first mined block so the
+        // genesis timestamp doesn't skew the schedule.
+        consensus.fPowAlwaysAsert = true;
+        consensus.nASERTAnchor = 1;
+        consensus.nASERTHalfLife = 2 * 60 * 60;
+        consensus.nASERTSpacing = 123;
+        consensus.fPowAllowMinDifficultyBlocks = false;
+        consensus.nMinDifficultySince = 0;
+        consensus.enforce_BIP94 = false;
+        consensus.fPowNoRetargeting = false;
+        consensus.fPowUseRandomX = true;
+        consensus.nRuleChangeActivationThreshold = 1512; // 75% for testchains
+        consensus.nMinerConfirmationWindow = 2016;
+
+        consensus.vDeployments[Consensus::DEPLOYMENT_TESTDUMMY].bit = 28;
+        consensus.vDeployments[Consensus::DEPLOYMENT_TESTDUMMY].nStartTime = Consensus::BIP9Deployment::NEVER_ACTIVE;
+        consensus.vDeployments[Consensus::DEPLOYMENT_TESTDUMMY].nTimeout = Consensus::BIP9Deployment::NO_TIMEOUT;
+        consensus.vDeployments[Consensus::DEPLOYMENT_TESTDUMMY].min_activation_height = 0;
+
+        consensus.vDeployments[Consensus::DEPLOYMENT_TAPROOT].bit = 2;
+        consensus.vDeployments[Consensus::DEPLOYMENT_TAPROOT].nStartTime = Consensus::BIP9Deployment::ALWAYS_ACTIVE;
+        consensus.vDeployments[Consensus::DEPLOYMENT_TAPROOT].nTimeout = Consensus::BIP9Deployment::NO_TIMEOUT;
+        consensus.vDeployments[Consensus::DEPLOYMENT_TAPROOT].min_activation_height = 0;
+
+        consensus.nMinimumChainWork = uint256{};
+        consensus.defaultAssumeValid = uint256{};
+
+        consensus.nABWLActivationHeight = 1; // ABWL active from height 1
+        consensus.nPQWitnessActivationHeight = 1; // P2WPQH (witness v2) enforced from height 1
+
+        consensus.nAuxpowStartHeight = 0;
+        consensus.nAuxpowChainId = 0x4D51;
+        consensus.fStrictChainId = true;
+        consensus.nLegacyBlocksBefore = 0;
+
+        pchMessageStart[0] = 0x4d;
+        pchMessageStart[1] = 0x71;
+        pchMessageStart[2] = 0xa7;
+        pchMessageStart[3] = 0xfa;
+        nDefaultPort = 29338;
+        nPruneAfterHeight = 1000;
+        m_assumed_blockchain_size = 1;
+        m_assumed_chain_state_size = 1;
+
+        const CScript genesis_output_script = CScript() << ParseHex("0x") << OP_CHECKSIG;
+        genesis = CreateGenesisBlock("marsqnet v2 2026-10-09: hash-based signatures, RandomX proof of work",
+                                     genesis_output_script, 1791504000, 185, 0x2000ffff, 1, 50 * COIN);
+        consensus.hashGenesisBlock = genesis.GetHash();
+        assert(genesis.nBits == UintToArith256(consensus.powLimit).GetCompact());
+        assert(consensus.hashGenesisBlock == uint256{"61174bcc4b3b9face187ef053b97aad26a07ab227a6647cc6ef38f21d0249a08"});
+        assert(genesis.hashMerkleRoot == uint256{"c0c1cb3af2c652eaf8a284ad95f4de32d0cd1e1444fe8afb70d49b3194d653ab"});
+
+        vFixedSeeds.clear();
+        vSeeds.clear();
+
+        fDefaultConsistencyChecks = false;
+        m_is_mockable_chain = false;
+
+        checkpointData = {
+            {
+                {0, consensus.hashGenesisBlock},
+            }
+        };
+
+        m_assumeutxo_data = {};
+
+        chainTxData = ChainTxData{
+            0,
+            0,
+            0
+        };
+
+        base58Prefixes[PUBKEY_ADDRESS] = std::vector<unsigned char>(1,111);
+        base58Prefixes[SCRIPT_ADDRESS] = std::vector<unsigned char>(1,196);
+        base58Prefixes[SECRET_KEY] =     std::vector<unsigned char>(1,239);
+        base58Prefixes[EXT_PUBLIC_KEY] = {0x04, 0x35, 0x87, 0xCF};
+        base58Prefixes[EXT_SECRET_KEY] = {0x04, 0x35, 0x83, 0x94};
+
+        bech32_hrp = "mqt";
     }
 };
 
@@ -736,6 +834,11 @@ std::unique_ptr<const CChainParams> CChainParams::TestNet4()
     return std::make_unique<const CTestNet4Params>();
 }
 
+std::unique_ptr<const CChainParams> CChainParams::Marsqnet()
+{
+    return std::make_unique<const CMarsqnetParams>();
+}
+
 std::vector<int> CChainParams::GetAvailableSnapshotHeights() const
 {
     std::vector<int> heights;
@@ -754,6 +857,7 @@ std::optional<ChainType> GetNetworkForMagic(const MessageStartChars& message)
     const auto testnet4_msg = CChainParams::TestNet4()->MessageStart();
     const auto regtest_msg = CChainParams::RegTest({})->MessageStart();
     const auto signet_msg = CChainParams::SigNet({})->MessageStart();
+    const auto marsqnet_msg = CChainParams::Marsqnet()->MessageStart();
 
     if (std::equal(message.begin(), message.end(), mainnet_msg.data())) {
         return ChainType::MAIN;
@@ -765,6 +869,8 @@ std::optional<ChainType> GetNetworkForMagic(const MessageStartChars& message)
         return ChainType::REGTEST;
     } else if (std::equal(message.begin(), message.end(), signet_msg.data())) {
         return ChainType::SIGNET;
+    } else if (std::equal(message.begin(), message.end(), marsqnet_msg.data())) {
+        return ChainType::MARSQNET;
     }
     return std::nullopt;
 }
