@@ -88,6 +88,7 @@ tracked in #32, #34, #36, #37 and #43.
 | [MQ-50](#mq-50--end-address-reuse-in-marscoin-wallets-and-services) | End address reuse in Marscoin wallets and services | G · Mainnet | Queued | MQ-31 |
 | [MQ-51](#mq-51--asert-anchor-lookup-is-linear) | ASERT anchor lookup is linear | B · Network ops | Fixed: PRs #84 and #85 (28.x), awaiting merge | — |
 | [MQ-52](#mq-52--floating-point-in-dark-gravity-wave-v2) | Floating point in Dark Gravity Wave v2 | I · Research | Research | — |
+| [MQ-53](#mq-53--bip30-and-bip34-are-not-enforced) | BIP30 and BIP34 are not enforced | C · Consensus | Research: mainnet scan, then a soft fork | — |
 
 ---
 
@@ -1464,6 +1465,11 @@ compiler, architecture or floating-point mode would split nodes on historical
 blocks. `long double` in particular has different widths on x86 and ARM.
 Height 125999 falls through to the legacy rule.
 
+A related spot: for heights up to 126000, `ContextualCheckBlockHeader`
+compares difficulties with `abs(n1-n2)` on doubles. Depending on which
+overload a compiler's headers make visible, plain `abs` can be the `int`
+version, which truncates.
+
 Evidence so far: full syncs agree with the chain on x86-64 Linux (80-bit
 `long double`) and on arm64 macOS (64-bit `long double`; the census node of
 2026-10-08). arm64 Linux, where `long double` is 128 bits, is untested.
@@ -1472,4 +1478,30 @@ Scope: replay those heights on the release platforms, arm64 Linux in
 particular, and compare with the chain's `nBits`. If any differ, replace the
 computation with an exact one that reproduces mainnet's values, checked
 against the chain.
+
+### MQ-53 · BIP30 and BIP34 are not enforced
+
+**Status:** Research
+
+Finding, 2026-10-09: since db5c033f96 ("auxpow: entirely remove bip30/34
+section & checks", January 2025), consensus enforces neither BIP30 nor BIP34.
+- BIP30: `fEnforceBIP30` is hard-wired to false (`src/validation.cpp`,
+  "FIXME: Enable strict check after appropriate fork").
+- BIP34: the coinbase-height check is commented out.
+
+So a block may contain a transaction whose txid matches an earlier, unspent
+one, overwriting it. This is the CVE-2012-1909 class that BIP30 and BIP34
+closed in Bitcoin. Exploiting it needs a miner, and it mostly allows griefing
+(the first instance of a duplicated coin can no longer be spent).
+
+Evidence: sampled mainnet coinbases from height 1000 to the tip all start with
+the BIP34 height push, so miners follow BIP34 voluntarily.
+`feature_block.py` skips its BIP30 and BIP34 cases until the rules are back.
+
+Scope:
+1. Scan mainnet for duplicate txids and coinbases without the height push.
+   Any found become exceptions, as in Bitcoin.
+2. Re-enable BIP34 at a future height (a soft fork that current miners
+   already satisfy).
+3. Enforce BIP30 before that height and skip it after, as Bitcoin does.
 
