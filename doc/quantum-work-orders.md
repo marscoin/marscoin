@@ -82,8 +82,8 @@ tracked in #32, #34, #36, #37 and #43.
 | [MQ-44](#mq-44--correct-public-claims-about-marsqnet) | Correct public claims about marsqnet | G · Mainnet | Queued | — |
 | [MQ-45](#mq-45--secret-scanning-in-ci) | Secret scanning in CI | E · Verification | PR #54 | — |
 | [MQ-46](#mq-46--regtest-that-can-mine) | Regtest that can mine (unblocks functional tests) | E · Verification | PR #62 | — |
-| [MQ-47](#mq-47--fresh-mainnet-nodes-dont-bootstrap) | Fresh mainnet nodes don't bootstrap | B · Network ops | Queued | — |
-| [MQ-48](#mq-48--backport-the-generatetoaddress-fix-to-28x) | Backport the generatetoaddress fix to 28.x | B · Network ops | Queued | #65 |
+| [MQ-47](#mq-47--fresh-mainnet-nodes-dont-bootstrap) | Fresh mainnet nodes don't bootstrap | B · Network ops | PR #67, backport #68 | — |
+| [MQ-48](#mq-48--backport-the-generatetoaddress-fix-to-28x) | Backport the generatetoaddress fix to 28.x | B · Network ops | PR #68 (with #67) | #65 |
 | [MQ-49](#mq-49--signet-cant-start) | Signet can't start | E · Verification | Queued | — |
 
 ---
@@ -1108,6 +1108,18 @@ Finding, 2026-10-08:
 
 Acceptance: a fresh release node syncs with default settings, and a regression
 test or documented procedure covers it.
+
+Root cause and fix, 2026-10-08:
+- `SeedsServiceFlags()` had `NODE_WITNESS` commented out (`7de89800ad`), so
+  seeded addresses carried `NODE_NETWORK` only.
+- Regular outbound connections require every desirable flag, which includes
+  `NODE_WITNESS`. Feelers start only once outbound slots are full. So a node
+  holding only seed addresses never connects.
+- All 9 live peers checked advertise `NODE_WITNESS`.
+- The fix restores the upstream value. Run side by side for 3 minutes from
+  empty data directories: unpatched v28.1.2 got 0 peers and 0 attempts;
+  patched got 7 peers, 354,000 headers and 49 attempts.
+- PR #67 (feature branch) and backport PR #68 (`28.x`, together with #65).
 
 ### MQ-48 · Backport the generatetoaddress fix to 28.x
 
