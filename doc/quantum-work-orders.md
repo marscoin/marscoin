@@ -66,7 +66,7 @@ tracked in #32, #34, #36, #37 and #43.
 | [MQ-28](#mq-28--performance-and-stress-testing) | Performance and stress testing | E · Verification | Queued | MQ-25 |
 | [MQ-29](#mq-29--documentation-refresh) | Documentation refresh | E · Verification | In progress: sighash spec in #64 | — |
 | [MQ-30](#mq-30--marsqnet-v2-fresh-genesis) | Marsqnet v2 (fresh genesis) | F · Network | Queued | Track C, MQ-22 |
-| [MQ-31](#mq-31--mainnet-exposure-census) | Mainnet exposure census | G · Mainnet | Queued | — |
+| [MQ-31](#mq-31--mainnet-exposure-census) | Mainnet exposure census | G · Mainnet | PR #73 (part 1; address reuse pending) | — |
 | [MQ-32](#mq-32--unbundled-roadmap-and-crypto-policy) | Unbundled roadmap and crypto policy | G · Mainnet | Waiting: owner decision | MQ-31 helps |
 | [MQ-33](#mq-33--external-security-review) | External security review | G · Mainnet | Queued | Tracks C, D |
 | [MQ-34](#mq-34--mainnet-pq-soft-fork-activation) | Mainnet PQ soft-fork activation | G · Mainnet | Queued | MQ-30, MQ-33 |
@@ -908,6 +908,16 @@ Taproot outputs (confirm whether Taproot is active on mainnet), multisig with
 revealed keys, and unexposed hashed outputs. Break down by dormancy.
 
 Acceptance: a repeatable script and a published aggregate report.
+
+Result, 2026-10-09 (PR #73), mainnet at height 3,576,274, totals matching
+`gettxoutsetinfo`:
+- 2.25% of the supply (887,459.50 MARS) is exposed at rest, almost all in P2PK
+  outputs over ten years old.
+- 97.75% is hashed: P2PKH 97.67%, P2SH 0.08%.
+- There are no SegWit, Taproot or P2WPQH outputs.
+- About 85% of the supply hasn't moved in five years or more.
+- Part 2 (open): count P2PKH addresses whose key an earlier spend revealed,
+  which needs a scan of spent inputs.
 
 ### MQ-32 · Unbundled roadmap and crypto policy
 
