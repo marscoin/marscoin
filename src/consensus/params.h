@@ -116,6 +116,8 @@ struct Params {
     bool enforce_BIP94;
     bool fPowNoRetargeting;
     bool fPowUseRandomX{false};
+    /** Use ASERT (anchored at nASERTAnchor) at every height instead of mainnet's height schedule. */
+    bool fPowAlwaysAsert{false};
     int64_t nPowTargetSpacing;
     int64_t nPowTargetTimespan;
     int64_t nASERTAnchor;

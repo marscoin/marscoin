@@ -155,9 +155,9 @@ public:
         std::unordered_map<Consensus::DeploymentPos, VersionBitsParameters> version_bits_parameters{};
         std::unordered_map<Consensus::BuriedDeployment, int> activation_heights{};
         bool fastprune{false};
-        bool randomx_devnet{false};
-        //! Overrides nABWLActivationHeight (which also gates PQ witness v2). 0 disables.
+        //! Override nABWLActivationHeight. 0 disables.
         std::optional<int> abwl_activation_height{};
+        //! Override nPQWitnessActivationHeight. 0 disables.
         std::optional<int> pqwitness_activation_height{};
     };
 
@@ -166,6 +166,7 @@ public:
     static std::unique_ptr<const CChainParams> Main();
     static std::unique_ptr<const CChainParams> TestNet();
     static std::unique_ptr<const CChainParams> TestNet4();
+    static std::unique_ptr<const CChainParams> Marsqnet();
 
 protected:
     CChainParams() = default;

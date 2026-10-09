@@ -53,6 +53,7 @@ static const int TOOLTIP_WRAP_THRESHOLD = 80;
 #define QAPP_APP_NAME_TESTNET4 "Marscoin-Qt-testnet4"
 #define QAPP_APP_NAME_SIGNET "Marscoin-Qt-signet"
 #define QAPP_APP_NAME_REGTEST "Marscoin-Qt-regtest"
+#define QAPP_APP_NAME_MARSQNET "Marscoin-Qt-marsqnet"
 
 /* One gigabyte (GB) in bytes */
 static constexpr uint64_t GB_BYTES{1000000000};

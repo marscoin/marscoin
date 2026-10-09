@@ -1,7 +1,13 @@
 # Marsqnet Operator Onboarding
 
-This guide is for developers/operators who want to join the Marscoin RandomX
-development network (`marsqnet`).
+This guide is for developers/operators who want to join `marsqnet`, the
+Marscoin post-quantum test network: RandomX proof of work, P2WPQH
+(SPHINCS+) outputs and the adaptive block weight limit.
+
+Marsqnet restarted from a new genesis block on 2026-10-09 ("marsqnet v2").
+Nodes and data from the earlier marsqnet don't sync with it. Its data lives in
+the `marsqnet` subdirectory of the data directory. Default ports: P2P 29338,
+RPC 29337.
 
 ## 1) Build requirements (Ubuntu/Debian)
 
@@ -10,13 +16,17 @@ sudo apt-get update
 sudo apt-get install -y \
   build-essential automake libtool autotools-dev pkg-config python3 \
   libevent-dev libboost-dev libsqlite3-dev libssl-dev \
-  libminiupnpc-dev libnatpmp-dev git
+  libminiupnpc-dev libnatpmp-dev git cmake
 ```
 
 ## 2) Clone and build
 
+RandomX is required for proof of work: a node built without
+`--enable-randomx-vendor` refuses to start on marsqnet. Post-quantum (P2WPQH)
+signature checks need no option; SLH-DSA is built into every node.
+
 ```bash
-git clone --branch feat/pow-randomx https://github.com/marscoin/marscoin.git
+git clone --branch feature/quantum-upgrade https://github.com/marscoin/marscoin.git
 cd marscoin
 ./autogen.sh
 ./configure --without-gui --disable-tests --disable-bench --enable-randomx-vendor
@@ -57,9 +67,8 @@ addnode=104.236.58.205:49338
 ./src/marscoin-cli -chain=marsqnet -datadir=/path/to/marsqnet-data getconnectioncount
 ```
 
-Current known reference best hash (initial rollout):
-
-`5a03638e8bee12da16975369afd379520a5621172fc87b955a6aaaef41a65bf5`
+Genesis block (marsqnet v2): `61174bcc4b3b9face187ef053b97aad26a07ab227a6647cc6ef38f21d0249a08`
+(`getblockhash 0`).
 
 ## 6) Optional local mining smoke
 
