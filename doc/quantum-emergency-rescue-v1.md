@@ -189,6 +189,15 @@ types).
 - Wallets from the Marscoin 1.x era used random, non-HD keys. Those outputs can
   only use a key secret, and only while the key is unrevealed.
 
+**Post-quantum keys from the same seed.** Wallets derive their P2WPQH keys from
+the seed too (`doc/quantum-pq-key-derivation-v1.md`, PR #80), on a separate
+tree that no BIP32 node leads to.
+- A type `0x02` reveal leaves them safe.
+- A type `0x03` reveal exposes them. A rescue that reveals a seed must not pay
+  to P2WPQH addresses derived from that seed, or anyone could take the rescued
+  coins. Wallets should reveal a coin-level node instead, or rescue into a
+  wallet with a different seed.
+
 ### 3.2 Commitment contents
 
 Tagged hashes are BIP340-style: `TaggedHash(tag, m) = SHA256(SHA256(tag) ‖ SHA256(tag) ‖ m)`.
