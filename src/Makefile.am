@@ -64,6 +64,8 @@ if ENABLE_ARM_SHANI
 LIBBITCOIN_CRYPTO_ARM_SHANI = crypto/libmarscoin_crypto_arm_shani.la
 LIBBITCOIN_CRYPTO += $(LIBBITCOIN_CRYPTO_ARM_SHANI)
 endif
+LIBBITCOIN_CRYPTO_SLHDSA = crypto/libmarscoin_crypto_slhdsa.la
+LIBBITCOIN_CRYPTO += $(LIBBITCOIN_CRYPTO_SLHDSA)
 noinst_LTLIBRARIES += $(LIBBITCOIN_CRYPTO)
 
 $(LIBSECP256K1): $(wildcard secp256k1/src/*.h) $(wildcard secp256k1/src/*.c) $(wildcard secp256k1/include/*)
@@ -644,6 +646,25 @@ crypto_libmarscoin_crypto_arm_shani_la_CPPFLAGS = $(AM_CPPFLAGS)
 crypto_libmarscoin_crypto_arm_shani_la_CXXFLAGS += $(ARM_SHANI_CXXFLAGS)
 crypto_libmarscoin_crypto_arm_shani_la_CPPFLAGS += -DENABLE_ARM_SHANI
 crypto_libmarscoin_crypto_arm_shani_la_SOURCES = crypto/sha256_arm_shani.cpp
+
+# FIPS 205 SLH-DSA (vendored slhdsa-c, see crypto/slhdsa/README.md), used for
+# P2WPQH signatures. Always built.
+crypto_libmarscoin_crypto_slhdsa_la_LDFLAGS = $(AM_LDFLAGS) -static
+crypto_libmarscoin_crypto_slhdsa_la_CFLAGS = $(PIE_FLAGS)
+crypto_libmarscoin_crypto_slhdsa_la_CPPFLAGS = $(AM_CPPFLAGS)
+crypto_libmarscoin_crypto_slhdsa_la_SOURCES = \
+  crypto/slhdsa/cbmc.h \
+  crypto/slhdsa/plat_local.h \
+  crypto/slhdsa/sha2_256.c \
+  crypto/slhdsa/sha2_512.c \
+  crypto/slhdsa/sha2_api.h \
+  crypto/slhdsa/slh_adrs.h \
+  crypto/slhdsa/slh_dsa.c \
+  crypto/slhdsa/slh_dsa.h \
+  crypto/slhdsa/slh_param.h \
+  crypto/slhdsa/slh_sha2.c \
+  crypto/slhdsa/slh_sys.h \
+  crypto/slhdsa/slh_var.h
 #
 
 # consensus #
@@ -708,7 +729,7 @@ libmarscoin_common_a_SOURCES = \
   common/signmessage.cpp \
   common/system.cpp \
   common/url.cpp \
-  crypto/pq_sphincs.cpp \
+  crypto/pq_sphincs_random.cpp \
   compressor.cpp \
   core_read.cpp \
   core_write.cpp \
@@ -1007,6 +1028,7 @@ libmarscoinkernel_la_SOURCES = \
   consensus/tx_check.cpp \
   consensus/tx_verify.cpp \
   core_read.cpp \
+  crypto/pq_sphincs.cpp \
   dbwrapper.cpp \
   deploymentinfo.cpp \
   deploymentstatus.cpp \
@@ -1104,6 +1126,7 @@ CLEANFILES += zmq/*.gcda zmq/*.gcno
 CLEANFILES += obj/build.h
 
 EXTRA_DIST = $(CTAES_DIST)
+EXTRA_DIST += crypto/slhdsa/LICENSE crypto/slhdsa/README.md
 
 
 config/bitcoin-config.h: config/stamp-h1

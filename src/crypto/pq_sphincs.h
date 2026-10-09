@@ -29,6 +29,8 @@ enum class ParameterSet : uint8_t {
 static constexpr size_t SPHINCS_SIGNATURE_SIZE_SHA2_128S = 7856;
 static constexpr size_t SPHINCS_PUBLIC_KEY_SIZE_SHA2_128S = 32;
 static constexpr size_t SPHINCS_SECRET_KEY_SIZE_SHA2_128S = 64;
+//! Security parameter n: the size of each key-generation seed and of the signing randomness.
+static constexpr size_t SPHINCS_SEED_SIZE_SHA2_128S = 16;
 
 /**
  * FIPS 205 context string for every P2WPQH signature. It domain-separates these
@@ -86,12 +88,45 @@ inline std::string ValidateSignatureEncoding(const Span<const unsigned char> pay
     return {};
 }
 
-bool IsOQSBackendAvailable(ParameterSet parameter_set, std::string& error);
-bool GenerateKeypair(ParameterSet parameter_set, std::vector<unsigned char>& public_key, std::vector<unsigned char>& private_key, std::string& error);
-//! Sign with P2WPQH_SIGNING_CONTEXT and return the payload [id || signature].
-bool SignMessage(ParameterSet parameter_set, Span<const unsigned char> private_key, Span<const unsigned char> message, std::vector<unsigned char>& payload_out, std::string& error);
+/*
+ * SLH-DSA is provided by the vendored slhdsa-c implementation
+ * (src/crypto/slhdsa/), which is part of every build.
+ *
+ * The functions below are deterministic and need no random number generator;
+ * they are part of the consensus library.
+ */
+
 //! Verify a payload [id || signature] against P2WPQH_SIGNING_CONTEXT.
 bool VerifyMessage(ParameterSet parameter_set, Span<const unsigned char> public_key, Span<const unsigned char> message, Span<const unsigned char> payload, std::string& error);
+
+/**
+ * FIPS 205 slh_keygen_internal (Algorithm 18): derive a key pair from the
+ * three n-byte seeds SK.seed, SK.prf and PK.seed. The same seeds always give
+ * the same key pair.
+ */
+bool GenerateKeypairFromSeeds(ParameterSet parameter_set, Span<const unsigned char> sk_seed, Span<const unsigned char> sk_prf,
+                              Span<const unsigned char> pk_seed, std::vector<unsigned char>& public_key,
+                              std::vector<unsigned char>& private_key, std::string& error);
+
+/**
+ * Sign with P2WPQH_SIGNING_CONTEXT and return the payload [id || signature].
+ * additional_randomness is FIPS 205's opt_rand: n fresh random bytes for the
+ * hedged variant, or empty for the deterministic variant. Prefer SignMessage,
+ * which supplies fresh randomness.
+ */
+bool SignMessageWithRandomness(ParameterSet parameter_set, Span<const unsigned char> private_key, Span<const unsigned char> message,
+                               Span<const unsigned char> additional_randomness, std::vector<unsigned char>& payload_out,
+                               std::string& error);
+
+/*
+ * The functions below draw randomness from GetStrongRandBytes; they are part of
+ * the common library (src/crypto/pq_sphincs_random.cpp).
+ */
+
+//! Generate a key pair from fresh random seeds.
+bool GenerateKeypair(ParameterSet parameter_set, std::vector<unsigned char>& public_key, std::vector<unsigned char>& private_key, std::string& error);
+//! Sign with P2WPQH_SIGNING_CONTEXT (hedged, with fresh randomness) and return the payload [id || signature].
+bool SignMessage(ParameterSet parameter_set, Span<const unsigned char> private_key, Span<const unsigned char> message, std::vector<unsigned char>& payload_out, std::string& error);
 
 } // namespace pq::sphincs
 
