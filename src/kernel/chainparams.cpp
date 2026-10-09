@@ -123,6 +123,7 @@ public:
         consensus.defaultAssumeValid = uint256{"633d6ddcddb33dfd8392a3650e04c2c3e353be575fe923615476ad603055e147"}; //block 3100000
 
         consensus.nABWLActivationHeight = 0; // Not activated on mainnet yet
+        consensus.nPQWitnessActivationHeight = 0; // Not activated on mainnet yet
 
         consensus.nAuxpowChainId = 0x029c;
         consensus.nAuxpowStartHeight = 3145555;
@@ -280,6 +281,7 @@ public:
         consensus.defaultAssumeValid = uint256{"0000000000000000000000000000000000000000000000000000000000000000"};
 
         consensus.nABWLActivationHeight = 1; // Active from genesis on testnet/marsqnet
+        consensus.nPQWitnessActivationHeight = 1; // Active from genesis on testnet/marsqnet
 
         consensus.nAuxpowChainId = 0x029d;
         consensus.nAuxpowStartHeight = std::numeric_limits<int>::max();
@@ -601,6 +603,7 @@ public:
         consensus.defaultAssumeValid = uint256{};
 
         consensus.nABWLActivationHeight = opts.abwl_activation_height.value_or(1); // Active from genesis on regtest unless overridden
+        consensus.nPQWitnessActivationHeight = opts.pqwitness_activation_height.value_or(1); // Active from genesis on regtest unless overridden
 
         consensus.nAuxpowStartHeight = 0;
         consensus.nAuxpowChainId = opts.randomx_devnet ? 0x4D51 : 0x0001;
