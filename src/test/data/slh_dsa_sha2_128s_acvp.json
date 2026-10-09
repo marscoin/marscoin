@@ -1,5 +1,5 @@
 [
- "SLH-DSA-SHA2-128s (FIPS 205) known-answer vectors from NIST ACVP, as vendored in liboqs tests/ACVP_Vectors: keyGen tgId 1 (all), sigVer tgId 19 external/pure (all), sigGen tgIds 19 (deterministic) and 55 (randomized) external/pure, three shortest messages each.",
+ "SLH-DSA-SHA2-128s (FIPS 205) known-answer vectors from NIST ACVP, taken from the copy in liboqs 0.15.0 tests/ACVP_Vectors: keyGen tgId 1 (all), sigVer tgId 19 external/pure (all), sigGen tgIds 19 (deterministic) and 55 (randomized) external/pure, three shortest messages each.",
  {
   "type": "keyGen",
   "tcId": 1,

@@ -883,7 +883,6 @@ marscoin_bin_ldadd = \
   $(LIBSECP256K1)
 
 marscoin_bin_ldadd += $(BDB_LIBS) $(CRYPTO_LIBS) $(MINIUPNPC_LIBS) $(NATPMP_LIBS) $(EVENT_PTHREADS_LIBS) $(EVENT_LIBS) $(ZMQ_LIBS) $(SQLITE_LIBS)
-marscoin_bin_ldadd += $(OQS_VENDOR_LIBS)
 
 marscoind_SOURCES = $(marscoin_daemon_sources) init/bitcoind.cpp
 marscoind_CPPFLAGS = $(marscoin_bin_cppflags)
@@ -915,7 +914,6 @@ marscoin_cli_LDADD = \
   $(LIBBITCOIN_CRYPTO)
 
 marscoin_cli_LDADD += $(EVENT_LIBS)
-marscoin_cli_LDADD += $(OQS_VENDOR_LIBS)
 #
 
 # marscoin-tx binary #
@@ -936,7 +934,6 @@ marscoin_tx_LDADD = \
   $(LIBBITCOIN_CRYPTO) \
   $(CRYPTO_LIBS) \
   $(LIBSECP256K1)
-marscoin_tx_LDADD += $(OQS_VENDOR_LIBS)
 #
 
 # marscoin-wallet binary #
@@ -957,7 +954,6 @@ marscoin_wallet_LDADD = \
   $(BDB_LIBS) \
   $(CRYPTO_LIBS) \
   $(SQLITE_LIBS)
-marscoin_wallet_LDADD += $(OQS_VENDOR_LIBS)
 
 if TARGET_WINDOWS
 marscoin_wallet_SOURCES += bitcoin-wallet-res.rc
@@ -982,7 +978,6 @@ marscoin_util_LDADD = \
   $(LIBBITCOIN_CRYPTO) \
   $(CRYPTO_LIBS) \
   $(LIBSECP256K1)
-marscoin_util_LDADD += $(OQS_VENDOR_LIBS)
 #
 
 # marscoin-chainstate binary #

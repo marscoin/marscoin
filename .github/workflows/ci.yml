@@ -138,10 +138,10 @@ jobs:
           ./src/marscoind --version
           ./src/marscoin-cli --version
 
-  linux-pq-oqs-signature-kat:
-    name: Linux PQ OQS Signature KAT
+  linux-pq-slh-dsa-kat:
+    name: Linux PQ SLH-DSA KAT
     runs-on: ubuntu-24.04
-    timeout-minutes: 75
+    timeout-minutes: 15
 
     steps:
       - name: Checkout
@@ -150,37 +150,11 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y \
-            build-essential \
-            automake \
-            libtool \
-            autotools-dev \
-            pkg-config \
-            python3 \
-            cmake \
-            libevent-dev \
-            libboost-dev \
-            libsqlite3-dev \
-            libssl-dev \
-            libminiupnpc-dev \
-            libnatpmp-dev
+          sudo apt-get install -y build-essential python3
 
-      - name: Build vendored liboqs
+      - name: Run SLH-DSA KAT against the vendored implementation
         run: |
-          OQS_BUILD_PARALLEL=2 ./src/crypto/oqs_vendor/build-liboqs-vendor.sh
-
-      - name: Configure
-        run: |
-          ./autogen.sh
-          ./configure --without-gui --disable-tests --disable-bench --enable-pq-oqs-vendor
-
-      - name: Build CLI
-        run: |
-          make -j"$(nproc)" src/marscoin-cli
-
-      - name: Run SLH-DSA OQS KAT
-        run: |
-          ./contrib/devtools/oqs-sphincs-kat.sh
+          ./contrib/devtools/slh-dsa-kat.sh
 
   linux-pq-boost-tests:
     name: Linux PQ Boost Unit Tests
@@ -201,7 +175,6 @@ jobs:
             autotools-dev \
             pkg-config \
             python3 \
-            cmake \
             libevent-dev \
             libboost-dev \
             libboost-test-dev \
@@ -210,19 +183,16 @@ jobs:
             libminiupnpc-dev \
             libnatpmp-dev
 
-      - name: Build vendored liboqs
-        run: |
-          OQS_BUILD_PARALLEL=2 ./src/crypto/oqs_vendor/build-liboqs-vendor.sh
-
       - name: Configure
         run: |
           ./autogen.sh
-          ./configure --without-gui --disable-bench --enable-pq-oqs-vendor
+          ./configure --without-gui --disable-bench
 
       - name: Build
         run: |
           make -j"$(nproc)"
 
-      - name: Run PQ crypto tests
+      - name: Run PQ tests
         run: |
           ./src/test/test_marscoin --run_test='crypto_tests/pq_*'
+          ./src/test/test_marscoin --run_test=script_tests/p2wpqh_spend_verifies

@@ -11,17 +11,17 @@ signature handling in Marscoin Core.
 
 ## Backend decision
 
-Marscoin will use a pinned, vendored backend strategy for SPHINCS/SLH-DSA,
-following the same determinism model used for RandomX integration.
+SLH-DSA comes from a pinned, vendored copy of slhdsa-c, compiled into every
+build. Consensus can't depend on an optional component: a node built without
+signature verification would reject blocks that spend witness v2 outputs.
 
-- Selected integration library: `open-quantum-safe/liboqs`
-- Upstream tag: `0.15.0`
-- Upstream commit: `97f6b86b1b6d109cfd43cf276ae39c2e776aed80`
-- Build gate: `--enable-pq-oqs-vendor`
-- Default state: disabled (non-activating)
-- Vendored snapshot path: `src/crypto/oqs_vendor/liboqs`
-- Vendor build helper: `src/crypto/oqs_vendor/build-liboqs-vendor.sh`
-- Minimal build target: `SIG_slh_dsa_pure_sha2_128s` (FIPS 205 SLH-DSA)
+- Implementation: `pq-code-package/slhdsa-c` (the FIPS 205 code liboqs wraps)
+- Upstream commit: `a0fc1ff253930060d0246aebca06c2538eb92b88`
+- Vendored path: `src/crypto/slhdsa/` (byte-identical to upstream; provenance
+  and file hashes in its README)
+- Build: always, as `crypto/libmarscoin_crypto_slhdsa.la`; no configure flag.
+  `--enable-pq-oqs-vendor` is obsolete and ignored.
+- Parameter set used: SLH-DSA-SHA2-128s, pure interface
 
 Rationale:
 
@@ -61,40 +61,29 @@ Deterministic error strings:
 - `Unsupported SPHINCS+ parameter set`
 - `Invalid SPHINCS+ payload length`
 
-When the OQS backend is enabled (`--enable-pq-oqs-vendor`), full
-cryptographic operations are available:
+Cryptographic operations (`src/crypto/pq_sphincs.h`), all with the context
+string `marscoin-p2wpqh-v1`:
 
-- **`GenerateKeypair`**: produces a SPHINCS+ keypair via OQS.
-- **`SignMessage`**: signs a message and produces a scaffold payload
-  (`[param_set_id][raw_signature]`), then self-validates the output
-  format before returning.
-- **`VerifyMessage`**: validates format, checks parameter set match,
-  validates key length, and performs cryptographic verification via OQS.
+- **`VerifyMessage`**: validates format, checks the parameter set and key
+  length, and verifies the signature (FIPS 205 `slh_verify`).
+- **`GenerateKeypairFromSeeds`**: FIPS 205 `slh_keygen_internal` from
+  SK.seed, SK.prf and PK.seed; deterministic.
+- **`SignMessageWithRandomness`**: FIPS 205 `slh_sign` with caller-supplied
+  `opt_rand` (or the deterministic variant), producing `[param_set_id][signature]`.
+- **`GenerateKeypair`** and **`SignMessage`**: the same with fresh randomness
+  from `GetStrongRandBytes` (hedged signing).
 
-When the backend is not enabled, these functions return descriptive
-errors and the scaffold operates in format-validation-only mode.
+## Known-answer tests
 
-## Deterministic Known Answer Test (KAT)
+NIST ACVP vectors for SLH-DSA-SHA2-128s (`src/test/data/slh_dsa_sha2_128s_acvp.json`:
+10 keyGen, 14 sigVer, 6 sigGen) are checked by:
 
-A deterministic RNG (xorshift64, Marsaglia constants 13/7/17) is used
-to produce reproducible test vectors for regression detection.
-
-Seeds:
-
-- Keygen: `0x4d415253514e4554` (ASCII: `MARSQNET`)
-- Signing: `0x5349474e41545552` (ASCII: `SIGNATUR`)
-- Message: `marsqnet-sign-test`
-
-Expected values:
-
-- Public key: `8a69a3c0db2ef0d7c439fff27bab906d2b8bcb8c7048556e30bc3bb8ffc8403b`
-- Payload SHA-256: `6b2f4f0a998f29de8919c170a8dad69a44c735e37deb3168c2a0b95d87c2fd23`
-
-These values are validated by:
-
-1. Boost unit test: `crypto_tests/pq_sphincs_signature_scaffold` (tests the Marscoin wrapper layer)
-2. Standalone KAT script: `contrib/devtools/oqs-sphincs-kat.sh` (tests liboqs directly)
-3. CI job: `linux-pq-boost-tests` (runs Boost test with OQS backend enabled)
+1. Boost unit test `crypto_tests/pq_slh_dsa_acvp_vectors`, with
+   `crypto_tests/pq_slh_dsa_signing_context` covering the Marscoin context.
+2. Standalone script `contrib/devtools/slh-dsa-kat.sh`, which compiles only the
+   vendored sources (CI job `linux-pq-slh-dsa-kat`).
+3. CI job `linux-pq-boost-tests`, which also runs
+   `script_tests/p2wpqh_spend_verifies` in a default build.
 
 ## Explicit Non-Goals (v1 Scaffold)
 
