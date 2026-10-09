@@ -661,7 +661,7 @@ public:
     bool ShouldResend() const;
     void ResubmitWalletTransactions(bool relay, bool force);
 
-    OutputType TransactionChangeType(const std::optional<OutputType>& change_type, const std::vector<CRecipient>& vecSend) const;
+    OutputType TransactionChangeType(const std::optional<OutputType>& change_type, const std::vector<CRecipient>& vecSend) const EXCLUSIVE_LOCKS_REQUIRED(cs_wallet);
 
     /** Fetch the inputs and sign with SIGHASH_ALL. */
     bool SignTransaction(CMutableTransaction& tx) const EXCLUSIVE_LOCKS_REQUIRED(cs_wallet);
@@ -1046,6 +1046,13 @@ public:
     //! Create new DescriptorScriptPubKeyMans and add them to the wallet
     void SetupDescriptorScriptPubKeyMans(const CExtKey& master_key) EXCLUSIVE_LOCKS_REQUIRED(cs_wallet);
     void SetupDescriptorScriptPubKeyMans() EXCLUSIVE_LOCKS_REQUIRED(cs_wallet);
+
+    //! Set up active wpq() descriptors for receiving and change, below the root
+    //! of a fresh random seed (doc/quantum-pq-key-derivation-v1.md, section 5.1).
+    void SetupPQDescriptorScriptPubKeyMans(WalletBatch& batch) EXCLUSIVE_LOCKS_REQUIRED(cs_wallet);
+    //! Set up wpq() descriptors in a wallet created before it had them. Does
+    //! nothing if the wallet already has an active one.
+    util::Result<void> SetupMissingPQDescriptors() EXCLUSIVE_LOCKS_REQUIRED(cs_wallet);
 
     //! Return the DescriptorScriptPubKeyMan for a WalletDescriptor if it is already in the wallet
     DescriptorScriptPubKeyMan* GetDescriptorScriptPubKeyMan(const WalletDescriptor& desc) const;

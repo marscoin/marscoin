@@ -215,8 +215,11 @@ static RPCHelpMan getquantummigrationstatus()
 static RPCHelpMan getnewpqaddress()
 {
     return RPCHelpMan{"getnewpqaddress",
-                "Generates a new SLH-DSA (FIPS 205) post-quantum keypair and returns the corresponding\n"
-                "mars1z... (witness v2) address. The keypair is stored in the wallet.\n"
+                "Returns a new mars1z... (witness v2) address with an SLH-DSA (FIPS 205) post-quantum key.\n"
+                "Descriptor wallets derive the key from their wpq() descriptor (doc/quantum-pq-key-derivation-v1.md),\n"
+                "so a backup of the descriptors restores it. A wallet created before it had wpq() descriptors\n"
+                "gets them on the first call, which needs the wallet unlocked; back it up again afterwards.\n"
+                "A locked wallet hands out keys derived earlier but can't derive more.\n"
                 "Only available on chains where consensus verifies witness v2 spends; elsewhere\n"
                 "coins sent to such an address could be spent by anyone.\n"
                 + HELP_REQUIRING_PASSPHRASE,
@@ -230,6 +233,7 @@ static RPCHelpMan getnewpqaddress()
                         {RPCResult::Type::STR_HEX, "pubkey", "the SPHINCS+ public key (hex)"},
                         {RPCResult::Type::STR, "parameter_set", "the SPHINCS+ parameter set name"},
                         {RPCResult::Type::STR_HEX, "program", "the witness v2 program (SHA256 commitment)"},
+                        {RPCResult::Type::STR, "warning", /*optional=*/true, "set when this call added the wallet's wpq() descriptors: earlier backups don't contain them"},
                     }
                 },
                 RPCExamples{
@@ -245,11 +249,48 @@ static RPCHelpMan getnewpqaddress()
     // Make sure the activation check below sees the current tip
     pwallet->BlockUntilSyncedToCurrentChain();
 
+    const std::string label{LabelFromValue(request.params[0])};
     {
         LOCK(pwallet->cs_wallet);
         if (!pwallet->IsPQActive()) {
             throw JSONRPCError(RPC_WALLET_ERROR, "Post-quantum addresses are disabled: witness v2 spends are not enforced by consensus on this chain yet, so coins sent to them could be spent by anyone");
         }
+        if (pwallet->IsWalletFlagSet(WALLET_FLAG_DESCRIPTORS)) {
+            bool added_descriptors{false};
+            if (!pwallet->GetScriptPubKeyMan(OutputType::BECH32_PQ, /*internal=*/false)) {
+                EnsureWalletIsUnlocked(*pwallet);
+                if (const auto res{pwallet->SetupMissingPQDescriptors()}; !res) {
+                    throw JSONRPCError(RPC_WALLET_ERROR, util::ErrorString(res).original);
+                }
+                added_descriptors = true;
+            }
+            const auto op_dest{pwallet->GetNewDestination(OutputType::BECH32_PQ, label)};
+            if (!op_dest) {
+                // The keys derived ahead are used up, and deriving more needs the PQ HD node.
+                if (pwallet->IsLocked()) EnsureWalletIsUnlocked(*pwallet);
+                throw JSONRPCError(RPC_WALLET_KEYPOOL_RAN_OUT, util::ErrorString(op_dest).original);
+            }
+            const WitnessV2PQ* pq_dest{std::get_if<WitnessV2PQ>(&*op_dest)};
+            CHECK_NONFATAL(pq_dest);
+            uint256 program;
+            std::copy(pq_dest->begin(), pq_dest->end(), program.begin());
+            uint8_t param_set_id;
+            std::vector<unsigned char> pubkey, privkey;
+            const auto provider{pwallet->GetSolvingProvider(GetScriptForDestination(*op_dest))};
+            CHECK_NONFATAL(provider && provider->GetPQKey(program, param_set_id, pubkey, privkey));
+            CHECK_NONFATAL(pq::sphincs::IsSupportedParameterSet(param_set_id));
+
+            UniValue result(UniValue::VOBJ);
+            result.pushKV("address", EncodeDestination(*op_dest));
+            result.pushKV("pubkey", HexStr(pubkey));
+            result.pushKV("parameter_set", pq::sphincs::ParameterSetName(static_cast<pq::sphincs::ParameterSet>(param_set_id)));
+            result.pushKV("program", HexStr(program));
+            if (added_descriptors) {
+                result.pushKV("warning", "Post-quantum keys were added to this wallet. Back it up again: earlier backups don't contain them.");
+            }
+            return result;
+        }
+        // Legacy wallets have no descriptors: generate a random key pair.
         EnsureWalletIsUnlocked(*pwallet);
     }
 
@@ -286,7 +327,6 @@ static RPCHelpMan getnewpqaddress()
         }
 
         // Add to address book with label
-        const std::string label{LabelFromValue(request.params[0])};
         pwallet->SetAddressBook(dest, label, wallet::AddressPurpose::RECEIVE);
     }
 
