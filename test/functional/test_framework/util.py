@@ -422,6 +422,9 @@ def write_config(config_path, *, n, chain, extra_config="", disable_autoconnect=
         f.write("rpcservertimeout=99000\n")
         f.write("rpcdoccheck=1\n")
         f.write("fallbackfee=0.0002\n")
+        # Marscoin's wallet defaults to legacy addresses; the inherited tests
+        # assume upstream's bech32 default.
+        f.write("addresstype=bech32\n")
         f.write("server=1\n")
         f.write("keypool=1\n")
         f.write("discover=0\n")
