@@ -332,6 +332,9 @@ unsigned int GetNextWorkRequired_V1(const CBlockIndex* pindexLast, const CBlockH
 }
 
 unsigned int GetNextWorkRequired(const CBlockIndex* pindexLast, const CBlockHeader *pblock, const Consensus::Params& params) {
+    // Chains without retargeting (regtest) keep the previous block's difficulty.
+    if (params.fPowNoRetargeting) return pindexLast->nBits;
+
     int nHeight = pindexLast->nHeight+1;
     if (nHeight >= 120000 && nHeight < 125999) {
         return DarkGravityWave2(pindexLast, pblock, params);

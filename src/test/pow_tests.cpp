@@ -229,6 +229,23 @@ BOOST_AUTO_TEST_CASE(RandomX_consensus_profile_scaffold)
         "RandomX v2 flag is required by consensus profile");
 }
 
+BOOST_AUTO_TEST_CASE(regtest_keeps_difficulty)
+{
+    const auto chain_params = CreateChainParams(*m_node.args, ChainType::REGTEST);
+    const auto& consensus = chain_params->GetConsensus();
+    BOOST_CHECK(consensus.fPowNoRetargeting);
+    BOOST_CHECK_EQUAL(chain_params->GenesisBlock().nBits, UintToArith256(consensus.powLimit).GetCompact());
+
+    // Even at a retarget boundary, regtest keeps the previous block's difficulty.
+    CBlockIndex prev;
+    prev.nHeight = 2015;
+    prev.nTime = 1388590627;
+    prev.nBits = 0x207fffff;
+    CBlockHeader next;
+    next.nTime = prev.nTime + 1;
+    BOOST_CHECK_EQUAL(GetNextWorkRequired(&prev, &next, consensus), 0x207fffffU);
+}
+
 BOOST_AUTO_TEST_CASE(ChainParams_MARSQNET_regtest_randomx_toggle)
 {
     ArgsManager args;

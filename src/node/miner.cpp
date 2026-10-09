@@ -131,6 +131,9 @@ std::unique_ptr<CBlockTemplate> BlockAssembler::CreateNewBlock()
     }
 
     pblock->nVersion = m_chainstate.m_chainman.m_versionbitscache.ComputeBlockVersion(pindexPrev, chainparams.GetConsensus());
+    // The auxpow chain ID occupies the upper version bits; blocks without it
+    // fail the strict chain-ID check (auxpow.cpp).
+    pblock->SetChainId(chainparams.GetConsensus().nAuxpowChainId);
 
     // -regtest only: allow overriding block.nVersion with
     // -blockversion=N to test forking scenarios
