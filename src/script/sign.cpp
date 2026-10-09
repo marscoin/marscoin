@@ -108,7 +108,10 @@ bool MutableTransactionSignatureCreator::CreatePQSig(const SigningProvider& prov
     uint256 sighash = checker.GetSigHashPQ(execdata);
     if (sighash.IsNull()) return false;
 
-    // Sign with SPHINCS+
+    // Keys with a retired or unknown parameter set (such as round-3 SPHINCS+, 0x00) can't sign.
+    if (!pq::sphincs::IsSupportedParameterSet(param_set_id)) return false;
+
+    // Sign with SLH-DSA
     const auto param_set = static_cast<pq::sphincs::ParameterSet>(param_set_id);
     std::string sign_error;
     if (!pq::sphincs::SignMessage(param_set,

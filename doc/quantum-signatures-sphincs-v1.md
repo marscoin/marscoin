@@ -21,7 +21,7 @@ following the same determinism model used for RandomX integration.
 - Default state: disabled (non-activating)
 - Vendored snapshot path: `src/crypto/oqs_vendor/liboqs`
 - Vendor build helper: `src/crypto/oqs_vendor/build-liboqs-vendor.sh`
-- Minimal build target: `SIG_sphincs_sha2_128s_simple`
+- Minimal build target: `SIG_slh_dsa_pure_sha2_128s` (FIPS 205 SLH-DSA)
 
 Rationale:
 
@@ -37,7 +37,9 @@ For test-only parsing, the payload format is:
 
 Currently recognized parameter set id:
 
-- `0x00`: `SLH-DSA-SHA2-128s`
+- `0x01`: FIPS 205 `SLH-DSA-SHA2-128s`, pure interface, signed with the context
+  string `marscoin-p2wpqh-v1`
+- `0x00` (round-3 SPHINCS+-SHA2-128s-simple) is retired and rejected
 
 Current size constants for this scaffold:
 
