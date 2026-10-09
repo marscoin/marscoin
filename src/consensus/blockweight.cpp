@@ -91,3 +91,8 @@ int64_t GetAdaptiveBlockWeightLimit(const CBlockIndex* pindexPrev, const Consens
     const int64_t limit = pindexPrev->nABWL_epsilon + pindexPrev->nABWL_beta;
     return std::clamp(limit, ABWL_WEIGHT_FLOOR, ABWL_TEMPORARY_MAX);
 }
+
+int64_t GetContextFreeMaxBlockWeight(const Consensus::Params& params)
+{
+    return params.nABWLActivationHeight == 0 ? int64_t{MAX_BLOCK_WEIGHT} : ABWL_TEMPORARY_MAX;
+}

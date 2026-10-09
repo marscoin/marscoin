@@ -486,4 +486,32 @@ BOOST_AUTO_TEST_CASE(abwl_not_activated_returns_fixed)
     BOOST_CHECK_EQUAL(GetAdaptiveBlockWeightLimit(&prev, params), MAX_BLOCK_WEIGHT);
 }
 
+BOOST_AUTO_TEST_CASE(abwl_context_free_bound_per_chain)
+{
+    const auto main_params = CreateChainParams(*m_node.args, ChainType::MAIN);
+    const auto regtest_params = CreateChainParams(*m_node.args, ChainType::REGTEST);
+    BOOST_CHECK_EQUAL(GetContextFreeMaxBlockWeight(main_params->GetConsensus()), MAX_BLOCK_WEIGHT);
+    BOOST_CHECK_EQUAL(GetContextFreeMaxBlockWeight(regtest_params->GetConsensus()), ABWL_TEMPORARY_MAX);
+
+    // A block just over the legacy limit fails the context-free size check on
+    // mainnet, but passes it where ABWL is configured.
+    CMutableTransaction coinbase;
+    coinbase.vin.resize(1);
+    coinbase.vin[0].prevout.SetNull();
+    coinbase.vout.resize(1);
+    const std::vector<unsigned char> filler(MAX_BLOCK_WEIGHT / WITNESS_SCALE_FACTOR, OP_RETURN);
+    coinbase.vout[0].scriptPubKey = CScript(filler.begin(), filler.end());
+    CBlock block;
+    block.vtx.push_back(MakeTransactionRef(std::move(coinbase)));
+    BOOST_REQUIRE_GT(::GetSerializeSize(TX_NO_WITNESS(block)) * WITNESS_SCALE_FACTOR, MAX_BLOCK_WEIGHT);
+
+    BlockValidationState main_state;
+    BOOST_CHECK(!CheckBlock(block, main_state, main_params->GetConsensus(), /*fCheckPOW=*/false, /*fCheckMerkleRoot=*/false));
+    BOOST_CHECK_EQUAL(main_state.GetRejectReason(), "bad-blk-length");
+
+    BlockValidationState regtest_state;
+    CheckBlock(block, regtest_state, regtest_params->GetConsensus(), /*fCheckPOW=*/false, /*fCheckMerkleRoot=*/false);
+    BOOST_CHECK(regtest_state.GetRejectReason() != "bad-blk-length");
+}
+
 BOOST_AUTO_TEST_SUITE_END()
