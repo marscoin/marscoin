@@ -7,6 +7,8 @@
 
 #include <common/system.h>
 #include <core_io.h>
+#include <crypto/pq_sphincs.h>
+#include <crypto/sha256.h>
 #include <key.h>
 #include <rpc/util.h>
 #include <script/script.h>
@@ -1706,6 +1708,49 @@ BOOST_AUTO_TEST_CASE(compute_tapleaf)
 
     BOOST_CHECK_EQUAL(ComputeTapleafHash(0xc0, Span(script)), tlc0);
     BOOST_CHECK_EQUAL(ComputeTapleafHash(0xc2, Span(script)), tlc2);
+}
+
+BOOST_AUTO_TEST_CASE(p2wpqh_spend_verifies)
+{
+    // SLH-DSA is part of every build, so a P2WPQH spend verifies without any
+    // configure option.
+    using pq::sphincs::ParameterSet;
+    std::vector<unsigned char> pubkey, privkey;
+    std::string error;
+    BOOST_REQUIRE(pq::sphincs::GenerateKeypair(ParameterSet::SLH_DSA_SHA2_128S, pubkey, privkey, error));
+    const uint8_t param_set_id{static_cast<uint8_t>(ParameterSet::SLH_DSA_SHA2_128S)};
+    uint256 program;
+    CSHA256().Write(&param_set_id, 1).Write(pubkey.data(), pubkey.size()).Finalize(program.begin());
+    const CScript script_pubkey{CScript() << OP_2 << ToByteVector(program)};
+
+    FlatSigningProvider provider;
+    provider.pq_keys[program] = PQKeyData{param_set_id, pubkey, privkey};
+
+    const CAmount amount{50'000};
+    const CMutableTransaction credit{BuildCreditingTransaction(script_pubkey, amount)};
+    CMutableTransaction spend{BuildSpendingTransaction(CScript(), CScriptWitness(), CTransaction(credit))};
+    PrecomputedTransactionData txdata;
+    txdata.Init(spend, {credit.vout[0]});
+
+    SignatureData sigdata;
+    BOOST_REQUIRE(ProduceSignature(provider, MutableTransactionSignatureCreator(spend, 0, amount, &txdata, SIGHASH_ALL), script_pubkey, sigdata));
+    UpdateInput(spend.vin[0], sigdata);
+    BOOST_REQUIRE_EQUAL(spend.vin[0].scriptWitness.stack.size(), 3U);
+
+    const unsigned int flags{SCRIPT_VERIFY_P2SH | SCRIPT_VERIFY_WITNESS | SCRIPT_VERIFY_WITNESS_V2};
+    ScriptError serror;
+    BOOST_CHECK(VerifyScript(spend.vin[0].scriptSig, script_pubkey, &spend.vin[0].scriptWitness, flags,
+                             MutableTransactionSignatureChecker(&spend, 0, amount, txdata, MissingDataBehavior::FAIL), &serror));
+    BOOST_CHECK_EQUAL(serror, SCRIPT_ERR_OK);
+
+    // Changing an output invalidates the signature.
+    CMutableTransaction tampered{spend};
+    tampered.vout[0].nValue -= 1;
+    PrecomputedTransactionData tampered_txdata;
+    tampered_txdata.Init(tampered, {credit.vout[0]});
+    BOOST_CHECK(!VerifyScript(tampered.vin[0].scriptSig, script_pubkey, &tampered.vin[0].scriptWitness, flags,
+                              MutableTransactionSignatureChecker(&tampered, 0, amount, tampered_txdata, MissingDataBehavior::FAIL), &serror));
+    BOOST_CHECK_EQUAL(serror, SCRIPT_ERR_PQ_SIG_VERIFY);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
