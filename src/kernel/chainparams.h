@@ -158,6 +158,7 @@ public:
         bool randomx_devnet{false};
         //! Overrides nABWLActivationHeight (which also gates PQ witness v2). 0 disables.
         std::optional<int> abwl_activation_height{};
+        std::optional<int> pqwitness_activation_height{};
     };
 
     static std::unique_ptr<const CChainParams> RegTest(const RegTestOptions& options);

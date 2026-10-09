@@ -518,13 +518,20 @@ BOOST_AUTO_TEST_CASE(abwl_context_free_bound_per_chain)
 BOOST_AUTO_TEST_CASE(pq_witness_activation)
 {
     Consensus::Params params;
-    params.nABWLActivationHeight = 0; // never
+    params.nPQWitnessActivationHeight = 0; // never
     BOOST_CHECK(!params.IsPQWitnessActive(0));
     BOOST_CHECK(!params.IsPQWitnessActive(10'000'000));
-    params.nABWLActivationHeight = 1000;
+    params.nPQWitnessActivationHeight = 1000;
     BOOST_CHECK(!params.IsPQWitnessActive(999));
     BOOST_CHECK(params.IsPQWitnessActive(1000));
     BOOST_CHECK(params.IsPQWitnessActive(1001));
+
+    // PQ activation no longer follows ABWL.
+    params.nABWLActivationHeight = 0;
+    BOOST_CHECK(params.IsPQWitnessActive(1000));
+    params.nABWLActivationHeight = 1;
+    params.nPQWitnessActivationHeight = 0;
+    BOOST_CHECK(!params.IsPQWitnessActive(10'000'000));
 
     // Mainnet does not enforce witness v2; regtest does from height 1
     const ArgsManager no_args;
@@ -533,15 +540,21 @@ BOOST_AUTO_TEST_CASE(pq_witness_activation)
     BOOST_CHECK(!regtest->GetConsensus().IsPQWitnessActive(0));
     BOOST_CHECK(regtest->GetConsensus().IsPQWitnessActive(1));
 
-    // -testactivationheight=abwl@<height> moves (or with 0 disables) the activation on regtest
+    // -testactivationheight=pqwitness@<height> moves (or with 0 disables) the activation on regtest
     ArgsManager moved;
-    moved.ForceSetArg("-testactivationheight", "abwl@500");
+    moved.ForceSetArg("-testactivationheight", "pqwitness@500");
     const auto moved_params{CreateChainParams(moved, ChainType::REGTEST)};
     BOOST_CHECK(!moved_params->GetConsensus().IsPQWitnessActive(499));
     BOOST_CHECK(moved_params->GetConsensus().IsPQWitnessActive(500));
+    BOOST_CHECK_EQUAL(moved_params->GetConsensus().nABWLActivationHeight, 1);
     ArgsManager disabled;
-    disabled.ForceSetArg("-testactivationheight", "abwl@0");
+    disabled.ForceSetArg("-testactivationheight", "pqwitness@0");
     BOOST_CHECK(!CreateChainParams(disabled, ChainType::REGTEST)->GetConsensus().IsPQWitnessActive(10'000'000));
+
+    // Moving ABWL leaves PQ activation alone.
+    ArgsManager abwl_moved;
+    abwl_moved.ForceSetArg("-testactivationheight", "abwl@0");
+    BOOST_CHECK(CreateChainParams(abwl_moved, ChainType::REGTEST)->GetConsensus().IsPQWitnessActive(1));
 }
 
 BOOST_AUTO_TEST_SUITE_END()

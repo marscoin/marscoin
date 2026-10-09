@@ -42,7 +42,7 @@ class WalletPQSafetyTest(BitcoinTestFramework):
         self.num_nodes = 2
         # node0: regtest default, PQ active from height 1
         # node1: PQ (and ABWL) activate at PQ_ACTIVATION_HEIGHT
-        self.extra_args = [[], [f"-testactivationheight=abwl@{PQ_ACTIVATION_HEIGHT}"]]
+        self.extra_args = [[], [f"-testactivationheight=pqwitness@{PQ_ACTIVATION_HEIGHT}"]]
 
     def skip_test_if_missing_module(self):
         self.skip_if_no_wallet()

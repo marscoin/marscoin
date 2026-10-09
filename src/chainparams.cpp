@@ -63,6 +63,8 @@ void ReadRegTestArgs(const ArgsManager& args, CChainParams::RegTestOptions& opti
         const auto deployment_name{arg.substr(0, found)};
         if (deployment_name == "abwl") {
             options.abwl_activation_height = height;
+        } else if (deployment_name == "pqwitness") {
+            options.pqwitness_activation_height = height;
         } else if (const auto buried_deployment = GetBuriedDeployment(deployment_name)) {
             options.activation_heights[*buried_deployment] = height;
         } else {
