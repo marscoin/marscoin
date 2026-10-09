@@ -71,9 +71,9 @@ tracked in #32, #34, #36, #37 and #43.
 | [MQ-33](#mq-33--external-security-review) | External security review | G · Mainnet | Queued | Tracks C, D |
 | [MQ-34](#mq-34--mainnet-pq-soft-fork-activation) | Mainnet PQ soft-fork activation | G · Mainnet | Queued | MQ-30, MQ-33 |
 | [MQ-35](#mq-35--ecosystem-migration) | Ecosystem migration | G · Mainnet | Queued | MQ-34 |
-| [MQ-36](#mq-36--commitdelayreveal-rescue-path) | Commit–delay–reveal rescue path | H · Emergency | Queued | MQ-12 |
-| [MQ-37](#mq-37--seed-knowledge-proof-rescue) | Seed-knowledge proof rescue | H · Emergency | Research | — |
-| [MQ-38](#mq-38--break-glass-emergency-soft-fork) | Break-glass emergency soft fork | H · Emergency | Queued | MQ-36 |
+| [MQ-36](#mq-36--commitdelayreveal-rescue-path) | Commit–delay–reveal rescue path | H · Emergency | Draft spec PR #70 | MQ-12 |
+| [MQ-37](#mq-37--seed-knowledge-proof-rescue) | Seed-knowledge proof rescue | H · Emergency | Draft spec PR #70 | — |
+| [MQ-38](#mq-38--break-glass-emergency-soft-fork) | Break-glass emergency soft fork | H · Emergency | Draft spec PR #70 | MQ-36 |
 | [MQ-39](#mq-39--sunset-and-utxo-recycling-spec) | Sunset and UTXO recycling spec | H · Emergency | Queued | MQ-31, MQ-36 |
 | [MQ-40](#mq-40--smaller-hash-based-parameter-set) | Smaller hash-based parameter set | I · Research | Research | MQ-14 |
 | [MQ-41](#mq-41--non-signature-public-key-crypto-threat-model) | Non-signature public-key crypto threat model | I · Research | Research | — |
@@ -949,6 +949,14 @@ verification cost. Prior art: Vitalik Buterin, "How to hard-fork to save most
 users' funds in a quantum emergency" (ethresear.ch, 2024).
 
 Acceptance: a feasibility study with prototype numbers.
+
+Progress, 2026-10-09 (draft spec, PR #70, covering MQ-36 to MQ-38):
+- Main finding: revealing a BIP32 extended private key with at least one
+  hardened step stays sound after a curve break, because forging the parent is
+  an HMAC-SHA512 preimage problem. HD-wallet owners can therefore rescue even
+  exposed-key outputs without a STARK in consensus.
+- The STARK route is deferred: rough estimates are 100 KB–1 MB proofs,
+  10–100 ms verification, and a large frozen verifier.
 
 ### MQ-38 · Break-glass emergency soft fork
 
