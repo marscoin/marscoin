@@ -46,7 +46,7 @@ tracked in #32, #34, #36, #37 and #43.
 | [MQ-08](#mq-08--faucet-and-dashboard-reflect-chain-health) | Faucet and dashboard reflect chain health | B · Testnet ops | Queued | — |
 | [MQ-09](#mq-09--testnet-host-cleanup) | Testnet host cleanup | B · Testnet ops | Queued | — |
 | [MQ-10](#mq-10--switch-to-fips-205-slh-dsa) | Switch to FIPS 205 SLH-DSA | C · Consensus | PR #61 | — |
-| [MQ-11](#mq-11--complete-pq-signature-hash) | Complete PQ signature hash | C · Consensus | Queued | — |
+| [MQ-11](#mq-11--complete-pq-signature-hash) | Complete PQ signature hash | C · Consensus | PR #64 (stacked on #61) | MQ-10 |
 | [MQ-12](#mq-12--separate-pq-activation-from-abwl) | Separate PQ activation from ABWL | C · Consensus | Queued | — |
 | [MQ-13](#mq-13--always-compiled-minimal-slh-dsa-verifier) | Always-compiled, minimal SLH-DSA verifier | C · Consensus | Queued | MQ-10 |
 | [MQ-14](#mq-14--parameter-set-agility-and-p2sh-wrapped-v2) | Parameter-set agility and P2SH-wrapped v2 | C · Consensus | Queued | MQ-10 |
@@ -64,7 +64,7 @@ tracked in #32, #34, #36, #37 and #43.
 | [MQ-26](#mq-26--functional-tests) | Functional tests | E · Verification | Queued | — |
 | [MQ-27](#mq-27--ci-and-release-discipline) | CI and release discipline | E · Verification | In progress: secret scanning (MQ-45) | — |
 | [MQ-28](#mq-28--performance-and-stress-testing) | Performance and stress testing | E · Verification | Queued | MQ-25 |
-| [MQ-29](#mq-29--documentation-refresh) | Documentation refresh | E · Verification | Queued | — |
+| [MQ-29](#mq-29--documentation-refresh) | Documentation refresh | E · Verification | In progress: sighash spec in #64 | — |
 | [MQ-30](#mq-30--marsqnet-v2-fresh-genesis) | Marsqnet v2 (fresh genesis) | F · Network | Queued | Track C, MQ-22 |
 | [MQ-31](#mq-31--mainnet-exposure-census) | Mainnet exposure census | G · Mainnet | Queued | — |
 | [MQ-32](#mq-32--unbundled-roadmap-and-crypto-policy) | Unbundled roadmap and crypto policy | G · Mainnet | Waiting: owner decision | MQ-31 helps |
@@ -358,6 +358,22 @@ vectors.
 
 Acceptance: a spec with test vectors exists, unit tests pass, and an offline
 signer can compute the fee from the data it signs.
+
+Evidence, 2026-10-08 (PR #64):
+- BIP341-style message under tag `Marscoin/P2WPQH/sighash`, committing to
+  spent amounts and scriptPubKeys, with BIP341's hash types and a final
+  binding to the parameter-set ID and public key.
+- Payload is `[id][sig]` (DEFAULT) or `[id][sig][type]`.
+- Spec: `doc/quantum-p2wpqh-sighash-v1.md`.
+- 13 vectors, from an independent Python implementation whose shared logic
+  reproduces Bitcoin's BIP341 vectors.
+- 5 test cases (201 assertions) pass, including real FIPS 205 spends for every
+  hash type under mutation.
+- Also fixed: the deferring checker didn't forward the PQ sighash, and the
+  P2WPQH size estimate was one weight unit short.
+
+Follow-up: PSBT signing of P2WPQH inputs is not supported yet; needed for
+hardware and offline signers before mainnet.
 
 ### MQ-12 · Separate PQ activation from ABWL
 
