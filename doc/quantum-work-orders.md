@@ -36,37 +36,37 @@ tracked in #32, #34, #36, #37 and #43.
 
 | ID | Work order | Track | Status | Depends on |
 | --- | --- | --- | --- | --- |
-| [MQ-01](#mq-01--guard-pq-wallet-functions-to-chains-that-enforce-pq) | Guard PQ wallet functions to chains that enforce PQ | A · Safety | PR #55, build-machine tests pending | — |
-| [MQ-02](#mq-02--encrypt-pq-private-keys-and-enforce-wallet-lock) | Encrypt PQ private keys and enforce wallet lock | A · Safety | PR #55, build-machine tests pending | — |
-| [MQ-03](#mq-03--fix-mars1pq-taproot-decode-regression) | Fix `mars1pq` Taproot decode regression | A · Safety | PR #55, build-machine tests pending | — |
+| [MQ-01](#mq-01--guard-pq-wallet-functions-to-chains-that-enforce-pq) | Guard PQ wallet functions to chains that enforce PQ | A · Safety | Complete: PR #55 merged | — |
+| [MQ-02](#mq-02--encrypt-pq-private-keys-and-enforce-wallet-lock) | Encrypt PQ private keys and enforce wallet lock | A · Safety | Complete: PR #55 merged | — |
+| [MQ-03](#mq-03--fix-mars1pq-taproot-decode-regression) | Fix `mars1pq` Taproot decode regression | A · Safety | Complete: PR #55 merged | — |
 | [MQ-04](#mq-04--restore-marsqnet-block-production) | Restore marsqnet block production | B · Testnet ops | In progress: 24 h check | — |
 | [MQ-05](#mq-05--redundant-block-producers) | Redundant block producers | B · Testnet ops | Queued | MQ-04 |
 | [MQ-06](#mq-06--uniform-identifiable-testnet-builds) | Uniform, identifiable testnet builds | B · Testnet ops | Queued | MQ-04 |
 | [MQ-07](#mq-07--monitoring-that-leads-to-action) | Monitoring that leads to action | B · Testnet ops | Waiting: operator applies fix | — |
 | [MQ-08](#mq-08--faucet-and-dashboard-reflect-chain-health) | Faucet and dashboard reflect chain health | B · Testnet ops | Queued | — |
 | [MQ-09](#mq-09--testnet-host-cleanup) | Testnet host cleanup | B · Testnet ops | Queued | — |
-| [MQ-10](#mq-10--switch-to-fips-205-slh-dsa) | Switch to FIPS 205 SLH-DSA | C · Consensus | PR #61 | — |
-| [MQ-11](#mq-11--complete-pq-signature-hash) | Complete PQ signature hash | C · Consensus | PR #64 (stacked on #61) | MQ-10 |
-| [MQ-12](#mq-12--separate-pq-activation-from-abwl) | Separate PQ activation from ABWL | C · Consensus | PR #69 (stacked on #55) | MQ-01 |
-| [MQ-13](#mq-13--always-compiled-minimal-slh-dsa-verifier) | Always-compiled, minimal SLH-DSA verifier | C · Consensus | PR #71 (stacked on #64) | MQ-10 |
+| [MQ-10](#mq-10--switch-to-fips-205-slh-dsa) | Switch to FIPS 205 SLH-DSA | C · Consensus | Complete: PR #61 merged | — |
+| [MQ-11](#mq-11--complete-pq-signature-hash) | Complete PQ signature hash | C · Consensus | Complete: PR #64 merged | MQ-10 |
+| [MQ-12](#mq-12--separate-pq-activation-from-abwl) | Separate PQ activation from ABWL | C · Consensus | Complete: PR #69 merged | MQ-01 |
+| [MQ-13](#mq-13--always-compiled-minimal-slh-dsa-verifier) | Always-compiled, minimal SLH-DSA verifier | C · Consensus | Complete: PR #71 merged | MQ-10 |
 | [MQ-14](#mq-14--parameter-set-agility-and-p2sh-wrapped-v2) | Parameter-set agility and P2SH-wrapped v2 | C · Consensus | Queued | MQ-10 |
-| [MQ-15](#mq-15--randomx-must-fail-closed) | RandomX must fail closed | C · Consensus | PR #56 (merge with MQ-18) | — |
+| [MQ-15](#mq-15--randomx-must-fail-closed) | RandomX must fail closed | C · Consensus | Complete: PR #56 merged | — |
 | [MQ-16](#mq-16--randomx-key-binding-and-auxpow-rules) | RandomX key binding and auxpow rules | C · Consensus | Queued | MQ-15 |
-| [MQ-17](#mq-17--marsqnet-difficulty-retargeting) | Marsqnet difficulty retargeting | C · Consensus | Draft PR #63 (ASERT) | MQ-18 |
-| [MQ-18](#mq-18--marsqnet-as-its-own-chain-type) | Marsqnet as its own chain type | C · Consensus | Draft PR #63 (after #56 and #62) | MQ-15, MQ-46 |
-| [MQ-19](#mq-19--abwl-persistence-and-block-index-versioning) | ABWL persistence and block-index versioning | C · Consensus | PR #58, build-machine tests pending | — |
+| [MQ-17](#mq-17--marsqnet-difficulty-retargeting) | Marsqnet difficulty retargeting | C · Consensus | Complete: PR #63 merged | MQ-18 |
+| [MQ-18](#mq-18--marsqnet-as-its-own-chain-type) | Marsqnet as its own chain type | C · Consensus | Complete: PR #63 merged (network bytes still to decide before launch) | MQ-15, MQ-46 |
+| [MQ-19](#mq-19--abwl-persistence-and-block-index-versioning) | ABWL persistence and block-index versioning | C · Consensus | Complete: PR #58 merged | — |
 | [MQ-20](#mq-20--abwl-end-to-end-capacity) | ABWL end-to-end capacity | C · Consensus | Queued | MQ-19, MQ-28 |
-| [MQ-21](#mq-21--restore-the-mainnet-context-free-block-bound) | Restore the mainnet context-free block bound | C · Consensus | PR #57 | — |
+| [MQ-21](#mq-21--restore-the-mainnet-context-free-block-bound) | Restore the mainnet context-free block bound | C · Consensus | Complete: PR #57 merged | — |
 | [MQ-22](#mq-22--seed-derived-pq-keys-and-backup) | Seed-derived PQ keys and backup | D · Wallet | Queued | MQ-10 |
 | [MQ-23](#mq-23--pq-keys-in-the-key-manager) | PQ keys in the key manager | D · Wallet | Queued | MQ-22 |
 | [MQ-24](#mq-24--migration-tooling) | Migration tooling | D · Wallet | Queued | MQ-23 |
 | [MQ-25](#mq-25--script-level-and-unit-tests) | Script-level and unit tests | E · Verification | Queued | — |
-| [MQ-26](#mq-26--functional-tests) | Functional tests | E · Verification | In progress: PR #66 (framework), #65 | — |
-| [MQ-27](#mq-27--ci-and-release-discipline) | CI and release discipline | E · Verification | In progress: secret scanning (MQ-45) | — |
-| [MQ-28](#mq-28--performance-and-stress-testing) | Performance and stress testing | E · Verification | In progress: benchmarks PR #74 | MQ-25 |
-| [MQ-29](#mq-29--documentation-refresh) | Documentation refresh | E · Verification | In progress: sighash spec in #64 | — |
+| [MQ-26](#mq-26--functional-tests) | Functional tests | E · Verification | In progress: PRs #65 and #66 merged; inherited test failures remain | — |
+| [MQ-27](#mq-27--ci-and-release-discipline) | CI and release discipline | E · Verification | In progress: secret scanning (#54) and config lint (#72) merged | — |
+| [MQ-28](#mq-28--performance-and-stress-testing) | Performance and stress testing | E · Verification | In progress: benchmarks merged (PR #74); stress run pending | MQ-25 |
+| [MQ-29](#mq-29--documentation-refresh) | Documentation refresh | E · Verification | In progress: sighash spec merged (#64) | — |
 | [MQ-30](#mq-30--marsqnet-v2-fresh-genesis) | Marsqnet v2 (fresh genesis) | F · Network | Queued | Track C, MQ-22 |
-| [MQ-31](#mq-31--mainnet-exposure-census) | Mainnet exposure census | G · Mainnet | PR #73 | — |
+| [MQ-31](#mq-31--mainnet-exposure-census) | Mainnet exposure census | G · Mainnet | Part 1 and 2 complete: PR #73 merged | — |
 | [MQ-32](#mq-32--unbundled-roadmap-and-crypto-policy) | Unbundled roadmap and crypto policy | G · Mainnet | Waiting: owner decision | MQ-31 helps |
 | [MQ-33](#mq-33--external-security-review) | External security review | G · Mainnet | Queued | Tracks C, D |
 | [MQ-34](#mq-34--mainnet-pq-soft-fork-activation) | Mainnet PQ soft-fork activation | G · Mainnet | Queued | MQ-30, MQ-33 |
@@ -80,10 +80,10 @@ tracked in #32, #34, #36, #37 and #43.
 | [MQ-42](#mq-42--ecosystem-public-key-and-identity-review) | Ecosystem public-key and identity review | I · Research | Research | — |
 | [MQ-43](#mq-43--randomx-mainnet-track) | RandomX mainnet track | I · Research | Waiting: owner decision | MQ-15–17 |
 | [MQ-44](#mq-44--correct-public-claims-about-marsqnet) | Correct public claims about marsqnet | G · Mainnet | Queued | — |
-| [MQ-45](#mq-45--secret-scanning-in-ci) | Secret scanning in CI | E · Verification | PR #54 | — |
-| [MQ-46](#mq-46--regtest-that-can-mine) | Regtest that can mine (unblocks functional tests) | E · Verification | PR #62 | — |
-| [MQ-47](#mq-47--fresh-mainnet-nodes-dont-bootstrap) | Fresh mainnet nodes don't bootstrap | B · Network ops | PR #67, backport #68 | — |
-| [MQ-48](#mq-48--backport-the-generatetoaddress-fix-to-28x) | Backport the generatetoaddress fix to 28.x | B · Network ops | PR #68 (with #67) | #65 |
+| [MQ-45](#mq-45--secret-scanning-in-ci) | Secret scanning in CI | E · Verification | Complete: PR #54 merged | — |
+| [MQ-46](#mq-46--regtest-that-can-mine) | Regtest that can mine (unblocks functional tests) | E · Verification | Complete: PR #62 merged | — |
+| [MQ-47](#mq-47--fresh-mainnet-nodes-dont-bootstrap) | Fresh mainnet nodes don't bootstrap | B · Network ops | Complete: PRs #67 and #68 merged (28.x) | — |
+| [MQ-48](#mq-48--backport-the-generatetoaddress-fix-to-28x) | Backport the generatetoaddress fix to 28.x | B · Network ops | Complete: PR #68 merged (28.x) | #65 |
 | [MQ-49](#mq-49--signet-cant-start) | Signet can't start | E · Verification | Queued | — |
 | [MQ-50](#mq-50--end-address-reuse-in-marscoin-wallets-and-services) | End address reuse in Marscoin wallets and services | G · Mainnet | Queued | MQ-31 |
 
@@ -977,6 +977,15 @@ mobile), explorers display `mars1z`, the pool pays out to PQ, exchanges accept P
 deposits, and the Martian Republic adopts PQ. Run a migration campaign with
 public progress based on MQ-31.
 
+Deliverables (owner direction, 2026-10-09):
+- Electrum-Mars: a one-click "migrate to quantum-safe" action that sweeps all
+  legacy coins to fresh P2WPQH addresses. It needs SLH-DSA signing in Python;
+  bind the same slhdsa-c code the node vendors (pure Python is about 100x too
+  slow). ElectrumX indexes by script hash, so the server needs no change.
+- MarsWallet (Martian Republic): the same action through a native module or
+  WASM build of slhdsa-c, released together with the civic-address reuse fix
+  (MQ-50).
+
 Acceptance: the share of supply migrated is tracked publicly.
 
 ## Track H · Emergency and rescue
@@ -1030,8 +1039,44 @@ Acceptance: code on a branch with tests, a runbook, and a marsqnet dry run.
 Finding: UTXO recycling has no code or spec in this repo (tracked in #36).
 Nothing restricts or sunsets legacy ECDSA spends.
 
-Scope: a governance framework running from migration window to rescue window to
-freeze or recycle, covering legal and community process, and a written spec.
+Owner's proposal (April 2026, marscoin.org/academy/quantum-upgrade,
+"Monetary Policy: UTXO Recycling"). Recycling, not inflation; the fixed supply
+cap (about 39.57M) is preserved:
+- A 24-month migration window with progressive surcharges on legacy
+  transactions.
+- A hard cutoff: unmigrated UTXOs become unspendable.
+- Recycling: the burned coins are redistributed as supplementary block rewards
+  over 4–8 years.
+- 10–20% of recycled coins go to a Martian Republic governance treasury.
+- Rationale: block rewards are approaching zero and fees can't secure the
+  chain; a significant share of coins is lost; recycling funds the transition
+  and reveals the true circulating supply.
+
+Census input (MQ-31, 2026-10-09): 47.37% of supply has an exposed key, and
+about 85% has been dormant for 5+ years. The cutoff therefore also removes the
+largest theft target, and the recycling pool could be large.
+
+Suggested refinement for discussion: separate the freeze from the recycling.
+- Freeze at the cutoff, for security.
+- Recycle only after a further reclaim period (e.g. 2–4 years). During it,
+  owners can reclaim only through proofs that stay safe after a curve break:
+  commit–delay–reveal for outputs whose key was never revealed, and the
+  derivation-secret path for exposed keys from HD wallets (PR #70).
+- Only exposed keys from non-HD wallets would have no reclaim path.
+- Make the treasury share fully on-chain, time-locked and governed by vote.
+- Make migration one click in every wallet before the surcharges start, since
+  every mainnet output is legacy today.
+
+Owner decisions, 2026-10-09:
+- Treasury: 10% of recycled coins, held on chain, released in time-locked
+  tranches, with every payout approved by an on-chain vote. Framed as a
+  project treasury that pays public bounties for specific deliverables
+  (audits, wallet migration, exchange integrations, outreach).
+- One-click migration will be built into the wallets the project controls:
+  Electrum-Mars and the Martian Republic wallet (MarsWallet). See MQ-35.
+
+Scope: a written spec and the governance and community process, starting from
+the owner's proposal above.
 
 Acceptance: a published spec and a defined community process.
 
