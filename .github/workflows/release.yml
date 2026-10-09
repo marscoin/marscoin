@@ -179,12 +179,31 @@ jobs:
         shell: msys2 {0}
         run: |
           SAFE_REF_NAME="${GITHUB_REF_NAME//\//-}"
+          export PATH="/mingw64/qt5/bin:/mingw64/lib/qt5/bin:/mingw64/bin:$PATH"
           mkdir -p dist/bin
-          cp src/marscoind.exe dist/bin/
-          cp src/marscoin-cli.exe dist/bin/
-          cp src/marscoin-tx.exe dist/bin/
-          cp src/marscoin-util.exe dist/bin/
-          cp src/qt/marscoin-qt.exe dist/bin/
+          # With --disable-static, src/*.exe are libtool wrapper stubs; the real
+          # executables are in .libs/.
+          for exe in src/marscoind src/marscoin-cli src/marscoin-tx src/marscoin-util src/qt/marscoin-qt; do
+            dir="$(dirname "$exe")"; name="$(basename "$exe").exe"
+            if [ -f "$dir/.libs/$name" ]; then cp "$dir/.libs/$name" dist/bin/; else cp "$dir/$name" dist/bin/; fi
+          done
+          # DLLs built in the source tree, then MinGW runtime and dependency DLLs.
+          find src -path '*/.libs/*.dll' -exec cp {} dist/bin/ \;
+          for pass in 1 2; do
+            for f in dist/bin/*.exe dist/bin/*.dll; do
+              [ -f "$f" ] || continue
+              ldd "$f" | awk '$3 ~ /^\/mingw64\/bin\// {print $3}'
+            done | sort -u | while read -r dll; do cp -n "$dll" dist/bin/; done
+          done
+          # Qt libraries and plugins for the GUI wallet.
+          WINDEPLOYQT="$(command -v windeployqt-qt5 || command -v windeployqt || true)"
+          if [ -z "$WINDEPLOYQT" ]; then echo "error: windeployqt not found"; exit 1; fi
+          "$WINDEPLOYQT" --release --no-translations --no-compiler-runtime dist/bin/marscoin-qt.exe
+          # Never ship libtool wrapper stubs.
+          if grep -l "temporary wrapper script" dist/bin/*.exe; then
+            echo "error: libtool wrapper executables were packaged"; exit 1
+          fi
+          ls -la dist/bin
           tar -czf "marscoin-${SAFE_REF_NAME}-windows-x86_64.tar.gz" -C dist bin
 
       - name: Upload build artifact
