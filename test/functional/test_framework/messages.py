@@ -681,8 +681,50 @@ class CTransaction:
             % (self.version, repr(self.vin), repr(self.vout), repr(self.wit), self.nLockTime)
 
 
+# Merged mining (auxpow): this nVersion bit means an auxpow follows the header.
+VERSION_AUXPOW = 1 << 8
+
+
+class CAuxPow:
+    """Merge-mining proof attached to a block header (src/auxpow.h)."""
+    __slots__ = ("coinbaseTx", "hashBlock", "vMerkleBranch", "nIndex",
+                 "vChainMerkleBranch", "nChainIndex", "parentBlock")
+
+    def __init__(self):
+        self.coinbaseTx = CTransaction()
+        self.hashBlock = 0
+        self.vMerkleBranch = []
+        self.nIndex = 0
+        self.vChainMerkleBranch = []
+        self.nChainIndex = 0
+        self.parentBlock = CBlockHeader()
+
+    def deserialize(self, f):
+        self.coinbaseTx.deserialize(f)
+        self.hashBlock = deser_uint256(f)
+        self.vMerkleBranch = deser_uint256_vector(f)
+        self.nIndex = int.from_bytes(f.read(4), "little", signed=True)
+        self.vChainMerkleBranch = deser_uint256_vector(f)
+        self.nChainIndex = int.from_bytes(f.read(4), "little", signed=True)
+        self.parentBlock.deserialize(f)
+
+    def serialize(self):
+        r = b""
+        r += self.coinbaseTx.serialize_with_witness()
+        r += ser_uint256(self.hashBlock)
+        r += ser_uint256_vector(self.vMerkleBranch)
+        r += self.nIndex.to_bytes(4, "little", signed=True)
+        r += ser_uint256_vector(self.vChainMerkleBranch)
+        r += self.nChainIndex.to_bytes(4, "little", signed=True)
+        r += self.parentBlock.serialize()
+        return r
+
+    def __repr__(self):
+        return "CAuxPow(parentBlock=%s nChainIndex=%i)" % (repr(self.parentBlock), self.nChainIndex)
+
+
 class CBlockHeader:
-    __slots__ = ("hash", "hashMerkleRoot", "hashPrevBlock", "nBits", "nNonce",
+    __slots__ = ("auxpow", "hash", "hashMerkleRoot", "hashPrevBlock", "nBits", "nNonce",
                  "nTime", "nVersion", "sha256")
 
     def __init__(self, header=None):
@@ -695,6 +737,7 @@ class CBlockHeader:
             self.nTime = header.nTime
             self.nBits = header.nBits
             self.nNonce = header.nNonce
+            self.auxpow = header.auxpow
             self.sha256 = header.sha256
             self.hash = header.hash
             self.calc_sha256()
@@ -706,6 +749,7 @@ class CBlockHeader:
         self.nTime = 0
         self.nBits = 0
         self.nNonce = 0
+        self.auxpow = None
         self.sha256 = None
         self.hash = None
 
@@ -716,10 +760,15 @@ class CBlockHeader:
         self.nTime = int.from_bytes(f.read(4), "little")
         self.nBits = int.from_bytes(f.read(4), "little")
         self.nNonce = int.from_bytes(f.read(4), "little")
+        self.auxpow = None
+        if self.nVersion & VERSION_AUXPOW:
+            self.auxpow = CAuxPow()
+            self.auxpow.deserialize(f)
         self.sha256 = None
         self.hash = None
 
-    def serialize(self):
+    def serialize_header(self):
+        """The 80-byte header, without any auxpow."""
         r = b""
         r += self.nVersion.to_bytes(4, "little", signed=True)
         r += ser_uint256(self.hashPrevBlock)
@@ -729,15 +778,16 @@ class CBlockHeader:
         r += self.nNonce.to_bytes(4, "little")
         return r
 
+    def serialize(self):
+        r = self.serialize_header()
+        if self.nVersion & VERSION_AUXPOW:
+            assert self.auxpow is not None, "auxpow version bit set without an auxpow"
+            r += self.auxpow.serialize()
+        return r
+
     def calc_sha256(self):
         if self.sha256 is None:
-            r = b""
-            r += self.nVersion.to_bytes(4, "little", signed=True)
-            r += ser_uint256(self.hashPrevBlock)
-            r += ser_uint256(self.hashMerkleRoot)
-            r += self.nTime.to_bytes(4, "little")
-            r += self.nBits.to_bytes(4, "little")
-            r += self.nNonce.to_bytes(4, "little")
+            r = self.serialize_header()
             self.sha256 = uint256_from_str(hash256(r))
             self.hash = hash256(r)[::-1].hex()
 
@@ -749,7 +799,7 @@ class CBlockHeader:
     def calc_pow_hash(self):
         """Marscoin proof-of-work hash: scrypt(N=1024, r=1, p=1) over the 80-byte
         header. The block id (sha256/hash) stays double-SHA256."""
-        header = CBlockHeader.serialize(self)
+        header = self.serialize_header()
         return uint256_from_str(hashlib.scrypt(header, salt=header, n=1024, r=1, p=1, dklen=32))
 
     def __repr__(self):
@@ -757,7 +807,7 @@ class CBlockHeader:
             % (self.nVersion, self.hashPrevBlock, self.hashMerkleRoot,
                time.ctime(self.nTime), self.nBits, self.nNonce)
 
-BLOCK_HEADER_SIZE = len(CBlockHeader().serialize())
+BLOCK_HEADER_SIZE = len(CBlockHeader().serialize_header())
 assert_equal(BLOCK_HEADER_SIZE, 80)
 
 class CBlock(CBlockHeader):
@@ -812,7 +862,8 @@ class CBlock(CBlockHeader):
     def is_valid(self):
         self.calc_sha256()
         target = uint256_from_compact(self.nBits)
-        if self.calc_pow_hash() > target:
+        pow_header = self.auxpow.parentBlock if self.auxpow is not None else self
+        if pow_header.calc_pow_hash() > target:
             return False
         for tx in self.vtx:
             if not tx.is_valid():
@@ -822,6 +873,9 @@ class CBlock(CBlockHeader):
         return True
 
     def solve(self):
+        # Mine the header itself: a merge-mining proof would no longer match.
+        self.nVersion &= ~VERSION_AUXPOW
+        self.auxpow = None
         self.rehash()
         target = uint256_from_compact(self.nBits)
         while self.calc_pow_hash() > target:
