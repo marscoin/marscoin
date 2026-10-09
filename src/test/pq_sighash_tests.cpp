@@ -117,7 +117,6 @@ BOOST_AUTO_TEST_CASE(p2wpqh_precomputation_detects_spends)
     BOOST_CHECK(v0_txdata.m_bip143_segwit_ready);
 }
 
-#ifdef ENABLE_PQ_OQS_VENDOR
 namespace {
 
 constexpr unsigned int PQ_FLAGS{SCRIPT_VERIFY_P2SH | SCRIPT_VERIFY_WITNESS | SCRIPT_VERIFY_WITNESS_V2};
@@ -340,6 +339,5 @@ BOOST_AUTO_TEST_CASE(p2wpqh_sign_transaction_hash_types)
     ::SignTransaction(tx, &provider, coins, 0x04, input_errors);
     BOOST_CHECK(tx.vin[0].scriptWitness.IsNull());
 }
-#endif // ENABLE_PQ_OQS_VENDOR
 
 BOOST_AUTO_TEST_SUITE_END()
