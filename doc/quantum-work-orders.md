@@ -47,7 +47,7 @@ tracked in #32, #34, #36, #37 and #43.
 | [MQ-09](#mq-09--testnet-host-cleanup) | Testnet host cleanup | B · Testnet ops | Queued | — |
 | [MQ-10](#mq-10--switch-to-fips-205-slh-dsa) | Switch to FIPS 205 SLH-DSA | C · Consensus | PR #61 | — |
 | [MQ-11](#mq-11--complete-pq-signature-hash) | Complete PQ signature hash | C · Consensus | PR #64 (stacked on #61) | MQ-10 |
-| [MQ-12](#mq-12--separate-pq-activation-from-abwl) | Separate PQ activation from ABWL | C · Consensus | Queued | — |
+| [MQ-12](#mq-12--separate-pq-activation-from-abwl) | Separate PQ activation from ABWL | C · Consensus | PR #69 (stacked on #55) | MQ-01 |
 | [MQ-13](#mq-13--always-compiled-minimal-slh-dsa-verifier) | Always-compiled, minimal SLH-DSA verifier | C · Consensus | Queued | MQ-10 |
 | [MQ-14](#mq-14--parameter-set-agility-and-p2sh-wrapped-v2) | Parameter-set agility and P2SH-wrapped v2 | C · Consensus | Queued | MQ-10 |
 | [MQ-15](#mq-15--randomx-must-fail-closed) | RandomX must fail closed | C · Consensus | PR #56 (merge with MQ-18) | — |
@@ -235,6 +235,13 @@ outside participants and the pool.
 Acceptance: stopping either producer does not stop the chain, verified by
 actually stopping one.
 
+Evidence, 2026-10-09: after the restart, only the `generateblock` loop
+produces blocks (about one per 10 minutes). The heartbeat timer's
+`generatetoaddress` call fails on every run with "Could not connect to the
+server 127.0.0.1:18443": its CLI doesn't use the node's RPC settings, so it
+falls back to the regtest default port. It would mine empty blocks anyway
+until PR #65 lands. In effect there is one producer, on one host.
+
 ### MQ-06 · Uniform, identifiable testnet builds
 
 **Status:** Queued
@@ -396,6 +403,14 @@ activation on Marscoin. The auxpow chain ID occupies the upper version bits
 and the auxpow flag is bit 8, so merged-mined blocks can't signal, and nodes
 misread the auxpow flag as an unknown versionbit ("Unknown new rules activated
 (versionbit 8)"). Use a per-chain buried activation height.
+
+Evidence, 2026-10-09 (PR #69):
+- `nPQWitnessActivationHeight` (mainnet 0, testnet 1, regtest 1), read by
+  `IsPQWitnessActive`.
+- New regtest option `-testactivationheight=pqwitness@<h>`.
+- Unit and functional tests pass, including independence from ABWL in both
+  directions.
+- Integration with #63: marsqnet must also set this height.
 
 ### MQ-13 · Always-compiled, minimal SLH-DSA verifier
 
