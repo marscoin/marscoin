@@ -61,7 +61,7 @@ tracked in #32, #34, #36, #37 and #43.
 | [MQ-23](#mq-23--pq-keys-in-the-key-manager) | PQ keys in the key manager | D · Wallet | Queued | MQ-22 |
 | [MQ-24](#mq-24--migration-tooling) | Migration tooling | D · Wallet | Queued | MQ-23 |
 | [MQ-25](#mq-25--script-level-and-unit-tests) | Script-level and unit tests | E · Verification | Queued | — |
-| [MQ-26](#mq-26--functional-tests) | Functional tests | E · Verification | Queued | — |
+| [MQ-26](#mq-26--functional-tests) | Functional tests | E · Verification | In progress: PR #66 (framework), #65 | — |
 | [MQ-27](#mq-27--ci-and-release-discipline) | CI and release discipline | E · Verification | In progress: secret scanning (MQ-45) | — |
 | [MQ-28](#mq-28--performance-and-stress-testing) | Performance and stress testing | E · Verification | Queued | MQ-25 |
 | [MQ-29](#mq-29--documentation-refresh) | Documentation refresh | E · Verification | In progress: sighash spec in #64 | — |
@@ -83,6 +83,8 @@ tracked in #32, #34, #36, #37 and #43.
 | [MQ-45](#mq-45--secret-scanning-in-ci) | Secret scanning in CI | E · Verification | PR #54 | — |
 | [MQ-46](#mq-46--regtest-that-can-mine) | Regtest that can mine (unblocks functional tests) | E · Verification | PR #62 | — |
 | [MQ-47](#mq-47--fresh-mainnet-nodes-dont-bootstrap) | Fresh mainnet nodes don't bootstrap | B · Network ops | Queued | — |
+| [MQ-48](#mq-48--backport-the-generatetoaddress-fix-to-28x) | Backport the generatetoaddress fix to 28.x | B · Network ops | Queued | #65 |
+| [MQ-49](#mq-49--signet-cant-start) | Signet can't start | E · Verification | Queued | — |
 
 ---
 
@@ -748,6 +750,27 @@ Findings, 2026-10-08:
     this, so it is the most important to fix next.
   - `wallet_basic`: Bitcoin subsidy and maturity assumptions.
 
+Progress, 2026-10-08:
+- PR #66 adapts the framework:
+  - config file and binary names
+  - P2P version 70060
+  - scrypt proof of work and the chain ID for Python-built blocks
+  - the Marscoin genesis time, which was the cause of `time-too-new`
+  - AuxPoW header parsing and a pure-Python scrypt fallback
+  - config paths in five tests, and bech32 test nodes
+
+  The suite went from 71 to about 118 passing out of 312 runs; 68 skip
+  without BDB.
+- Node bug found: `generatetoaddress` mined empty blocks (PR #65).
+- Remaining failures by cause:
+  - RBF is disabled by design ("core: never allow rbf to occur").
+  - Bitcoin constants and vectors: addresses, message magic, legacy
+    activations, versionbits, assumeutxo hashes.
+  - Signet can't start (MQ-49).
+  - Several P2P tests, `feature_block` and `feature_maxuploadtarget` are not
+    yet diagnosed.
+- Minor: the `-mempoolfullrbf` help text still advertises replace-by-fee.
+
 Acceptance: all are in `test_runner.py` and pass in CI.
 
 ### MQ-27 · CI and release discipline
@@ -1085,3 +1108,30 @@ Finding, 2026-10-08:
 
 Acceptance: a fresh release node syncs with default settings, and a regression
 test or documented procedure covers it.
+
+### MQ-48 · Backport the generatetoaddress fix to 28.x
+
+**Status:** Queued
+
+Finding, 2026-10-08:
+- `generatetoaddress` and `generatetodescriptor` mine empty blocks, because
+  `generateBlocks` passes `.use_mempool = false`. That shipped in v28.1.0
+  through v28.1.2 (commit `6d7e42f6a8`).
+- Pool mining and `getblocktemplate` are unaffected, but anyone mining with
+  these RPCs never confirms mempool transactions.
+- Fixed in PR #65 and verified on regtest: `nTx` went from 1 to 2, and the
+  test transaction went from 0 to 1 confirmation.
+
+Scope: cherry-pick #65 to `28.x` for the next point release.
+
+### MQ-49 · Signet can't start
+
+**Status:** Queued
+
+Finding, 2026-10-08: Marscoin's signet uses Bitcoin's signet genesis
+(`1598918400, 52613770, 0x1e0377ae`), mined for SHA256d. It fails Marscoin's
+scrypt proof-of-work check, so a signet node won't start, and `feature_signet`
+and `tool_signet_miner` fail.
+
+Scope: give signet a Marscoin genesis, or remove signet support if it isn't
+wanted.
