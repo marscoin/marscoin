@@ -762,11 +762,13 @@ public:
         consensus.fStrictChainId = true;
         consensus.nLegacyBlocksBefore = 0;
 
+        // "MQ2": marsqnet v2 has its own message start and port, so it never
+        // connects to nodes of the first marsqnet (4d71a7fa, port 29338).
         pchMessageStart[0] = 0x4d;
-        pchMessageStart[1] = 0x71;
-        pchMessageStart[2] = 0xa7;
+        pchMessageStart[1] = 0x51;
+        pchMessageStart[2] = 0x32;
         pchMessageStart[3] = 0xfa;
-        nDefaultPort = 29338;
+        nDefaultPort = 29348;
         nPruneAfterHeight = 1000;
         m_assumed_blockchain_size = 1;
         m_assumed_chain_state_size = 1;

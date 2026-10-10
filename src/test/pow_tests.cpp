@@ -6,6 +6,7 @@
 
 #include <chain.h>
 #include <chainparams.h>
+#include <chainparamsbase.h>
 #include <pow.h>
 #include <randomx_profile.h>
 #ifdef ENABLE_RANDOMX_VENDOR
@@ -340,7 +341,13 @@ BOOST_AUTO_TEST_CASE(ChainParams_MARSQNET_params)
     BOOST_CHECK_EQUAL(consensus.nABWLActivationHeight, 1);
     BOOST_CHECK(consensus.IsPQWitnessActive(1));
     BOOST_CHECK_EQUAL(consensus.nSubsidyHalvingInterval, 395699);
-    BOOST_CHECK_EQUAL(params->GetDefaultPort(), 29338);
+    // Marsqnet v2's network identity, distinct from the first marsqnet
+    // (message start 4d71a7fa, port 29338).
+    BOOST_CHECK_EQUAL(params->GetDefaultPort(), 29348);
+    BOOST_CHECK_EQUAL(HexStr(params->MessageStart()), "4d5132fa");
+    BOOST_CHECK(GetNetworkForMagic(params->MessageStart()) == ChainType::MARSQNET);
+    BOOST_CHECK_EQUAL(CreateBaseChainParams(ChainType::MARSQNET)->RPCPort(), 29347);
+    BOOST_CHECK_EQUAL(CreateBaseChainParams(ChainType::MARSQNET)->DataDir(), "marsqnet");
     BOOST_CHECK_EQUAL(params->Bech32HRP(), "mqt");
     BOOST_CHECK_EQUAL(params->GenesisBlock().nBits, UintToArith256(consensus.powLimit).GetCompact());
     BOOST_CHECK(params->GetAvailableSnapshotHeights().empty());

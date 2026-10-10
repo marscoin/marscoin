@@ -2,12 +2,13 @@
 
 This guide is for developers/operators who want to join `marsqnet`, the
 Marscoin post-quantum test network: RandomX proof of work, P2WPQH
-(SPHINCS+) outputs and the adaptive block weight limit.
+(SLH-DSA, FIPS 205) outputs and the adaptive block weight limit.
 
-Marsqnet restarted from a new genesis block on 2026-10-09 ("marsqnet v2").
-Nodes and data from the earlier marsqnet don't sync with it. Its data lives in
-the `marsqnet` subdirectory of the data directory. Default ports: P2P 29338,
-RPC 29337.
+Marsqnet v2 starts from a new genesis block (dated 2026-10-09) and uses its
+own message start and ports. Nodes and data from the earlier marsqnet don't
+connect or sync with it. Its data lives in
+the `marsqnet` subdirectory of the data directory. Default ports: P2P 29348,
+RPC 29347.
 
 ## 1) Build requirements (Ubuntu/Debian)
 
@@ -47,9 +48,9 @@ fixedseeds=0
 discover=0
 fallbackfee=0.0002
 
-addnode=161.35.136.251:29338
-addnode=137.184.66.189:29338
-addnode=159.203.79.101:29338
+addnode=161.35.136.251:29348
+addnode=137.184.66.189:29348
+addnode=159.203.79.101:29348
 addnode=104.236.58.205:49338
 ```
 
