@@ -18,6 +18,7 @@
 #include <common/system.h>
 #include <consensus/amount.h>
 #include <consensus/consensus.h>
+#include <crypto/pq_hd.h>
 #include <crypto/pq_sphincs.h>
 #include <consensus/validation.h>
 #include <external_signer.h>
@@ -49,6 +50,7 @@
 #include <support/allocators/secure.h>
 #include <support/allocators/zeroafterfree.h>
 #include <support/cleanse.h>
+#include <util/chaintype.h>
 #include <sync.h>
 #include <tinyformat.h>
 #include <uint256.h>
@@ -2201,13 +2203,38 @@ bool CWallet::SignTransaction(CMutableTransaction& tx) const
 
 bool CWallet::SignTransaction(CMutableTransaction& tx, const std::map<COutPoint, Coin>& coins, int sighash, std::map<int, bilingual_str>& input_errors) const
 {
+    bool pq_active;
+    {
+        LOCK(cs_wallet);
+        pq_active = IsPQActive();
+    }
+    // Where consensus doesn't enforce witness v2, a signature would not protect
+    // the coin, so no ScriptPubKeyMan gets to sign one.
+    std::map<COutPoint, Coin> spk_man_coins{coins};
+    std::set<unsigned int> inactive_pq_inputs;
+    if (!pq_active) {
+        for (unsigned int i = 0; i < tx.vin.size(); ++i) {
+            const auto coin_it = spk_man_coins.find(tx.vin[i].prevout);
+            if (coin_it == spk_man_coins.end()) continue;
+            int witness_version;
+            std::vector<unsigned char> witness_program;
+            if (coin_it->second.out.scriptPubKey.IsWitnessProgram(witness_version, witness_program) && witness_version == 2) {
+                spk_man_coins.erase(coin_it);
+                inactive_pq_inputs.insert(i);
+            }
+        }
+    }
+
     // Try to sign with all ScriptPubKeyMans
     for (ScriptPubKeyMan* spk_man : GetAllScriptPubKeyMans()) {
         // spk_man->SignTransaction will return true if the transaction is complete,
         // so we can exit early and return true if that happens
-        if (spk_man->SignTransaction(tx, coins, sighash, input_errors)) {
+        if (spk_man->SignTransaction(tx, spk_man_coins, sighash, input_errors) && inactive_pq_inputs.empty()) {
             return true;
         }
+    }
+    for (unsigned int i : inactive_pq_inputs) {
+        input_errors[i] = _("Post-quantum signing is disabled: witness v2 spends are not enforced by consensus on this chain yet");
     }
 
     // Try PQ key signing for any witness v2 inputs
@@ -2215,11 +2242,6 @@ bool CWallet::SignTransaction(CMutableTransaction& tx, const std::map<COutPoint,
     {
         FlatSigningProvider pq_provider;
         std::map<int, bilingual_str> pq_errors;
-        bool pq_active;
-        {
-            LOCK(cs_wallet);
-            pq_active = IsPQActive();
-        }
         for (unsigned int i = 0; i < tx.vin.size(); ++i) {
             const auto coin_it = coins.find(tx.vin[i].prevout);
             if (coin_it == coins.end()) continue;
@@ -2330,6 +2352,7 @@ SigningResult CWallet::SignMessage(const std::string& message, const PKHash& pkh
 
 OutputType CWallet::TransactionChangeType(const std::optional<OutputType>& change_type, const std::vector<CRecipient>& vecSend) const
 {
+    AssertLockHeld(cs_wallet);
     // If -changetype is specified, always use that change type.
     if (change_type) {
         return *change_type;
@@ -2344,9 +2367,12 @@ OutputType CWallet::TransactionChangeType(const std::optional<OutputType>& chang
     bool any_wpkh{false};
     bool any_sh{false};
     bool any_pkh{false};
+    bool any_pq{false};
 
     for (const auto& recipient : vecSend) {
-        if (std::get_if<WitnessV1Taproot>(&recipient.dest)) {
+        if (std::get_if<WitnessV2PQ>(&recipient.dest)) {
+            any_pq = true;
+        } else if (std::get_if<WitnessV1Taproot>(&recipient.dest)) {
             any_tr = true;
         } else if (std::get_if<WitnessV0KeyHash>(&recipient.dest)) {
             any_wpkh = true;
@@ -2357,6 +2383,12 @@ OutputType CWallet::TransactionChangeType(const std::optional<OutputType>& chang
         }
     }
 
+    // Post-quantum change only where consensus enforces witness v2: elsewhere
+    // anyone could spend it.
+    const bool has_pq_spkman{GetScriptPubKeyMan(OutputType::BECH32_PQ, /*internal=*/true) != nullptr && IsPQActive()};
+    if (has_pq_spkman && any_pq) {
+        return OutputType::BECH32_PQ;
+    }
     const bool has_bech32m_spkman(GetScriptPubKeyMan(OutputType::BECH32M, /*internal=*/true));
     if (has_bech32m_spkman && any_tr) {
         // Currently tr is the only type supported by the BECH32M spkman
@@ -2384,6 +2416,10 @@ OutputType CWallet::TransactionChangeType(const std::optional<OutputType>& chang
     }
     if (has_bech32_spkman) {
         return OutputType::BECH32;
+    }
+    // A wallet with only post-quantum keys, such as one restored from its wpq() descriptors
+    if (has_pq_spkman) {
+        return OutputType::BECH32_PQ;
     }
     // else use m_default_address_type for change
     return m_default_address_type;
@@ -3588,7 +3624,7 @@ std::set<ScriptPubKeyMan*> CWallet::GetActiveScriptPubKeyMans() const
 {
     std::set<ScriptPubKeyMan*> spk_mans;
     for (bool internal : {false, true}) {
-        for (OutputType t : OUTPUT_TYPES) {
+        for (OutputType t : OUTPUT_TYPES_WITH_PQ) {
             auto spk_man = GetScriptPubKeyMan(t, internal);
             if (spk_man) {
                 spk_mans.insert(spk_man);
@@ -3931,8 +3967,62 @@ void CWallet::SetupDescriptorScriptPubKeyMans(const CExtKey& master_key)
         }
     }
 
+    // Post-quantum keys, on chains where P2WPQH is or will be enforced
+    if (Params().GetConsensus().nPQWitnessActivationHeight > 0) {
+        SetupPQDescriptorScriptPubKeyMans(batch);
+    }
+
     // Ensure information is committed to disk
     if (!batch.TxnCommit()) throw std::runtime_error("Error: cannot commit db transaction for descriptors setup");
+}
+
+void CWallet::SetupPQDescriptorScriptPubKeyMans(WalletBatch& batch)
+{
+    AssertLockHeld(cs_wallet);
+
+    // Only the root of the seed is kept; the wpq() descriptors are its backup.
+    std::array<unsigned char, 32> seed;
+    GetStrongRandBytes(seed);
+    const std::optional<pq::hd::Node> root{pq::hd::RootFromSeed(seed)};
+    memory_cleanse(seed.data(), seed.size());
+    assert(root);
+    const uint32_t coin_type{Params().GetChainType() == ChainType::MAIN ? pq::hd::COIN_TYPE_MAINNET : pq::hd::COIN_TYPE_TEST};
+
+    for (bool internal : {false, true}) {
+        auto spk_manager = std::unique_ptr<DescriptorScriptPubKeyMan>(new DescriptorScriptPubKeyMan(*this, m_keypool_size));
+        if (IsCrypted()) {
+            if (IsLocked()) {
+                throw std::runtime_error(std::string(__func__) + ": Wallet is locked, cannot setup new descriptors");
+            }
+            if (!spk_manager->CheckDecryptionKey(vMasterKey) && !spk_manager->Encrypt(vMasterKey, &batch)) {
+                throw std::runtime_error(std::string(__func__) + ": Could not encrypt new descriptors");
+            }
+        }
+        spk_manager->SetupPQDescriptorGeneration(batch, *root, coin_type, internal);
+        uint256 id = spk_manager->GetID();
+        AddScriptPubKeyMan(id, std::move(spk_manager));
+        AddActiveScriptPubKeyManWithDb(batch, id, OutputType::BECH32_PQ, internal);
+    }
+}
+
+util::Result<void> CWallet::SetupMissingPQDescriptors()
+{
+    AssertLockHeld(cs_wallet);
+
+    if (GetScriptPubKeyMan(OutputType::BECH32_PQ, /*internal=*/false)) return {};
+    if (!IsWalletFlagSet(WALLET_FLAG_DESCRIPTORS) || IsWalletFlagSet(WALLET_FLAG_DISABLE_PRIVATE_KEYS) || IsWalletFlagSet(WALLET_FLAG_EXTERNAL_SIGNER)) {
+        return util::Error{_("This wallet cannot hold post-quantum keys")};
+    }
+    if (IsLocked()) {
+        return util::Error{_("Error: Please enter the wallet passphrase with walletpassphrase first.")};
+    }
+
+    WalletBatch batch(GetDatabase());
+    if (!batch.TxnBegin()) return util::Error{_("Error: cannot create db transaction for descriptors setup")};
+    SetupPQDescriptorScriptPubKeyMans(batch);
+    if (!batch.TxnCommit()) throw std::runtime_error("Error: cannot commit db transaction for descriptors setup");
+    WalletLogPrintf("Added post-quantum descriptors. Back up the wallet again: earlier backups don't contain them.\n");
+    return {};
 }
 
 void CWallet::SetupDescriptorScriptPubKeyMans()
@@ -4109,6 +4199,9 @@ ScriptPubKeyMan* CWallet::AddWalletDescriptor(WalletDescriptor& desc, const Flat
     for (const auto& entry : signing_provider.keys) {
         const CKey& key = entry.second;
         spk_man->AddDescriptorKey(key, key.GetPubKey());
+    }
+    for (const auto& [node_id, node] : signing_provider.pq_nodes) {
+        spk_man->AddPQNode(node);
     }
 
     // Top up key pool, the manager will generate new scriptPubKeys internally

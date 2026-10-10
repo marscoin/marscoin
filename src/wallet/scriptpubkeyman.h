@@ -62,6 +62,9 @@ static constexpr int64_t UNKNOWN_TIME = std::numeric_limits<int64_t>::max();
 
 //! Default for -keypool
 static const unsigned int DEFAULT_KEYPOOL_SIZE = 1000;
+//! Lookahead of wpq() descriptors when the keypool size is larger: generating
+//! an SLH-DSA key takes tens of milliseconds.
+static const unsigned int DEFAULT_PQ_KEYPOOL_SIZE = 100;
 
 std::vector<CKeyID> GetAffectedKeys(const CScript& spk, const SigningProvider& provider);
 
@@ -587,6 +590,8 @@ private:
     using PubKeyMap = std::map<CPubKey, int32_t>; // Map of pubkeys involved in scripts to descriptor range index
     using CryptedKeyMap = std::map<CKeyID, std::pair<CPubKey, std::vector<unsigned char>>>;
     using KeyMap = std::map<CKeyID, CKey>;
+    using PQNodeMap = std::map<uint256, pq::hd::Node>; // Map of node identifier to PQ HD node (wpq() descriptors)
+    using CryptedPQNodeMap = std::map<uint256, std::vector<unsigned char>>;
 
     ScriptPubKeyMap m_map_script_pub_keys GUARDED_BY(cs_desc_man);
     PubKeyMap m_map_pubkeys GUARDED_BY(cs_desc_man);
@@ -594,6 +599,8 @@ private:
 
     KeyMap m_map_keys GUARDED_BY(cs_desc_man);
     CryptedKeyMap m_map_crypted_keys GUARDED_BY(cs_desc_man);
+    PQNodeMap m_map_pq_nodes GUARDED_BY(cs_desc_man);
+    CryptedPQNodeMap m_map_crypted_pq_nodes GUARDED_BY(cs_desc_man);
 
     //! keeps track of whether Unlock has run a thorough check before
     bool m_decryption_thoroughly_checked = false;
@@ -604,6 +611,12 @@ private:
     bool AddDescriptorKeyWithDB(WalletBatch& batch, const CKey& key, const CPubKey &pubkey) EXCLUSIVE_LOCKS_REQUIRED(cs_desc_man);
 
     KeyMap GetKeys() const EXCLUSIVE_LOCKS_REQUIRED(cs_desc_man);
+
+    bool AddPQNodeWithDB(WalletBatch& batch, const pq::hd::Node& node) EXCLUSIVE_LOCKS_REQUIRED(cs_desc_man);
+    //! The PQ HD nodes, decrypted if the wallet is encrypted. Empty while it is locked.
+    PQNodeMap GetPQNodes() const EXCLUSIVE_LOCKS_REQUIRED(cs_desc_man);
+    //! Whether the descriptor is a wpq() descriptor.
+    bool IsPQ() const EXCLUSIVE_LOCKS_REQUIRED(cs_desc_man);
 
     // Cached FlatSigningProviders to avoid regenerating them each time they are needed.
     mutable std::map<int32_t, FlatSigningProvider> m_map_signing_providers;
@@ -654,6 +667,13 @@ public:
 
     //! Setup descriptors based on the given CExtkey
     bool SetupDescriptorGeneration(WalletBatch& batch, const CExtKey& master_key, OutputType addr_type, bool internal);
+    //! Set up a wpq() descriptor below a PQ HD root (doc/quantum-pq-key-derivation-v1.md).
+    bool SetupPQDescriptorGeneration(WalletBatch& batch, const pq::hd::Node& root, uint32_t coin_type, bool internal);
+
+    //! Add the PQ HD node of a wpq() descriptor, encrypting it if the wallet is encrypted.
+    void AddPQNode(const pq::hd::Node& node);
+    void LoadPQNode(const uint256& node_id, const pq::hd::Node& node);
+    void LoadCryptedPQNode(const uint256& node_id, const std::vector<unsigned char>& secret);
 
     bool HavePrivateKeys() const override;
     bool HasPrivKey(const CKeyID& keyid) const EXCLUSIVE_LOCKS_REQUIRED(cs_desc_man);

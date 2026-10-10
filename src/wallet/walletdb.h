@@ -6,6 +6,7 @@
 #ifndef BITCOIN_WALLET_WALLETDB_H
 #define BITCOIN_WALLET_WALLETDB_H
 
+#include <crypto/pq_hd.h>
 #include <script/sign.h>
 #include <wallet/db.h>
 #include <wallet/walletutil.h>
@@ -88,6 +89,9 @@ extern const std::string VERSION;
 extern const std::string WALLETDESCRIPTOR;
 extern const std::string WALLETDESCRIPTORCKEY;
 extern const std::string WALLETDESCRIPTORKEY;
+extern const std::string WALLETDESCRIPTORPQCACHE;
+extern const std::string WALLETDESCRIPTORPQNODE;
+extern const std::string WALLETDESCRIPTORCPQNODE;
 extern const std::string WATCHMETA;
 extern const std::string WATCHS;
 
@@ -267,6 +271,12 @@ public:
     bool WriteDescriptorParentCache(const CExtPubKey& xpub, const uint256& desc_id, uint32_t key_exp_index);
     bool WriteDescriptorLastHardenedCache(const CExtPubKey& xpub, const uint256& desc_id, uint32_t key_exp_index);
     bool WriteDescriptorCacheItems(const uint256& desc_id, const DescriptorCache& cache);
+    //! Cache the PQ public key a wpq() descriptor derives at der_index.
+    bool WriteDescriptorPQPubKeyCache(const uint256& desc_id, uint32_t der_index, const std::vector<unsigned char>& pubkey);
+    //! Write the unencrypted PQ HD node of a wpq() descriptor.
+    bool WriteDescriptorPQNode(const uint256& desc_id, const uint256& node_id, const pq::hd::Node& node);
+    //! Write the encrypted PQ HD node of a wpq() descriptor, erasing any unencrypted copy.
+    bool WriteCryptedDescriptorPQNode(const uint256& desc_id, const uint256& node_id, const std::vector<unsigned char>& secret);
 
     //! Write an unencrypted post-quantum SPHINCS+ keypair to the database.
     //! Only for wallets without encryption; encrypted wallets use WriteCryptedPQKey.

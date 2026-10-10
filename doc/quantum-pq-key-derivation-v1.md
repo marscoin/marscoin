@@ -1,8 +1,9 @@
 # Post-quantum key derivation: specification v1 (PQ HD v1)
 
-Status: proposed, work order MQ-22. The constants below become final when the
-first mainnet wallet uses them. Until then they may change, and test-network
-coins held under them would have to be swept.
+Status: proposed, work order MQ-22. Implemented in Marscoin Core (sections 4
+and 5.1). The constants below become final when the first mainnet wallet uses
+them. Until then they may change, and test-network coins held under them would
+have to be swept.
 
 This document defines how a wallet derives its P2WPQH (witness v2, SLH-DSA)
 keys from a seed, so that a seed or descriptor backup restores them. Marscoin
@@ -148,9 +149,9 @@ id = SHA256(SHA256("Marscoin/PQHD/node-id") || SHA256("Marscoin/PQHD/node-id") |
 It is encoded as Bech32m with the prefix `mpqid` and the 32-byte payload `id`,
 64 characters in all. An identifier reveals nothing about the node.
 
-## 4. Descriptors (planned, MQ-22 and MQ-23)
+## 4. Descriptors
 
-Marscoin Core will describe the keys with
+Marscoin Core describes the keys with
 
 ```
 wpq(NODE/PATH/*h)
@@ -165,21 +166,35 @@ change.
   `wpq(mpqid1.../107h/0h/0h/*h)`. That is what the wallet file and
   `listdescriptors` without private keys show. Nothing in it leads to the
   node, and nobody can derive keys from it.
-- Watch-only P2WPQH tracking uses `addr()` descriptors.
-- Generating a key takes about 28 ms (SLH-DSA-SHA2-128s, MQ-28 benchmarks), so
-  the wallet caches derived public keys and uses a smaller lookahead than for
-  EC keys.
+- `wpq()` is only valid at the top level, not inside `sh()`, `wsh()` or `tr()`.
+- `importdescriptors` accepts only the private form. Watch-only P2WPQH
+  tracking uses `addr()` descriptors.
+- Generating a key takes about 28 ms (SLH-DSA-SHA2-128s, MQ-28 benchmarks).
+  The wallet looks ahead `min(-keypool, 100)` keys per chain and caches their
+  public keys, so a locked wallet still recognizes them and hands them out.
+  Deriving more needs the node, so the wallet has to be unlocked.
 
 ## 5. Wallets
 
-### 5.1 Marscoin Core (planned)
+### 5.1 Marscoin Core
 
-Core keeps only the BIP32 master key of a descriptor wallet, not its seed. When
-it sets up post-quantum keys (at wallet creation for new wallets, or on first
-use for existing ones), it draws a fresh 32-byte random `S`, stores the root
-encrypted like any other private key, and discards `S`. The `wpq()` descriptor
-is the backup: a backup taken before the post-quantum keys were set up doesn't
-contain them, so the wallet must tell the user to make a new one.
+Core keeps only the BIP32 master key of a descriptor wallet, not its seed, so
+it draws a fresh 32-byte random `S` for the post-quantum keys. It stores the
+root, encrypted like any other private key, and discards `S`. The `wpq()`
+descriptors are the backup (`listdescriptors true`).
+
+- New descriptor wallets get active receiving and change `wpq()` descriptors on
+  chains where P2WPQH is scheduled (`nPQWitnessActivationHeight > 0`: the test
+  networks today, not mainnet).
+- A wallet created earlier, or a blank one, gets them on its first
+  `getnewpqaddress`, which needs the wallet unlocked. The call returns a
+  warning, because backups taken before then don't contain the keys.
+- Change goes to a P2WPQH address when the transaction pays a P2WPQH address
+  or the wallet has no other change keys, and only where witness v2 is
+  enforced.
+- Wallets without private keys, external-signer wallets and legacy (BDB)
+  wallets get no `wpq()` descriptors. Legacy wallets keep generating random
+  post-quantum keys that only a wallet backup restores.
 
 ### 5.2 Seed-phrase wallets
 

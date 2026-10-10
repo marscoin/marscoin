@@ -29,9 +29,18 @@ static constexpr auto OUTPUT_TYPES = std::array{
     OutputType::BECH32,
     OutputType::BECH32M,
 };
-// BECH32_PQ is intentionally excluded from OUTPUT_TYPES because PQ keys
-// use a separate generation path (getnewpqaddress), not the standard
-// descriptor-based ScriptPubKeyMan system.
+// BECH32_PQ is not in OUTPUT_TYPES: its wpq() descriptors don't come from the
+// BIP32 master key, and it can't be a default address or change type, since
+// P2WPQH outputs are only safe where consensus enforces witness v2. Wallets
+// with post-quantum keys have active BECH32_PQ descriptors too, so code that
+// visits every active descriptor uses OUTPUT_TYPES_WITH_PQ.
+static constexpr auto OUTPUT_TYPES_WITH_PQ = std::array{
+    OutputType::LEGACY,
+    OutputType::P2SH_SEGWIT,
+    OutputType::BECH32,
+    OutputType::BECH32M,
+    OutputType::BECH32_PQ,
+};
 
 std::optional<OutputType> ParseOutputType(const std::string& str);
 const std::string& FormatOutputType(OutputType type);

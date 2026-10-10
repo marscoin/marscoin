@@ -66,6 +66,9 @@ const std::string WALLETDESCRIPTORCACHE{"walletdescriptorcache"};
 const std::string WALLETDESCRIPTORLHCACHE{"walletdescriptorlhcache"};
 const std::string WALLETDESCRIPTORCKEY{"walletdescriptorckey"};
 const std::string WALLETDESCRIPTORKEY{"walletdescriptorkey"};
+const std::string WALLETDESCRIPTORPQCACHE{"walletdescriptorpqcache"};
+const std::string WALLETDESCRIPTORPQNODE{"walletdescriptorpqnode"};
+const std::string WALLETDESCRIPTORCPQNODE{"walletdescriptorcpqnode"};
 const std::string WATCHMETA{"watchmeta"};
 const std::string WATCHS{"watchs"};
 const std::unordered_set<std::string> LEGACY_TYPES{CRYPTED_KEY, CSCRIPT, DEFAULTKEY, HDCHAIN, KEYMETA, KEY, OLD_KEY, POOL, WATCHMETA, WATCHS};
@@ -304,6 +307,31 @@ bool WalletBatch::WriteDescriptorCacheItems(const uint256& desc_id, const Descri
             return false;
         }
     }
+    for (const auto& [der_index, pubkey] : cache.GetCachedPQPubKeys()) {
+        if (!WriteDescriptorPQPubKeyCache(desc_id, der_index, pubkey)) {
+            return false;
+        }
+    }
+    return true;
+}
+
+bool WalletBatch::WriteDescriptorPQPubKeyCache(const uint256& desc_id, uint32_t der_index, const std::vector<unsigned char>& pubkey)
+{
+    return WriteIC(std::make_pair(std::make_pair(DBKeys::WALLETDESCRIPTORPQCACHE, desc_id), der_index), pubkey);
+}
+
+bool WalletBatch::WriteDescriptorPQNode(const uint256& desc_id, const uint256& node_id, const pq::hd::Node& node)
+{
+    // The identifier in the key doubles as a checksum of the node at load.
+    return WriteIC(std::make_pair(DBKeys::WALLETDESCRIPTORPQNODE, std::make_pair(desc_id, node_id)), std::make_pair(node.key, node.chaincode), false);
+}
+
+bool WalletBatch::WriteCryptedDescriptorPQNode(const uint256& desc_id, const uint256& node_id, const std::vector<unsigned char>& secret)
+{
+    if (!WriteIC(std::make_pair(DBKeys::WALLETDESCRIPTORCPQNODE, std::make_pair(desc_id, node_id)), secret, false)) {
+        return false;
+    }
+    EraseIC(std::make_pair(DBKeys::WALLETDESCRIPTORPQNODE, std::make_pair(desc_id, node_id)));
     return true;
 }
 
@@ -977,6 +1005,22 @@ static DBErrors LoadDescriptorWalletRecords(CWallet* pwallet, DatabaseBatch& bat
         });
         result = std::max(result, lh_cache_res.m_result);
 
+        // Get the PQ public key cache of a wpq() descriptor
+        prefix = PrefixStream(DBKeys::WALLETDESCRIPTORPQCACHE, id);
+        LoadResult pq_cache_res = LoadRecords(pwallet, batch, DBKeys::WALLETDESCRIPTORPQCACHE, prefix,
+            [&id, &cache] (CWallet* pwallet, DataStream& key, DataStream& value, std::string& err) {
+            uint256 desc_id;
+            uint32_t der_index;
+            key >> desc_id;
+            assert(desc_id == id);
+            key >> der_index;
+            std::vector<unsigned char> pubkey;
+            value >> pubkey;
+            cache.CachePQPubKey(der_index, pubkey);
+            return DBErrors::LOAD_OK;
+        });
+        result = std::max(result, pq_cache_res.m_result);
+
         // Set the cache for this descriptor
         auto spk_man = (DescriptorScriptPubKeyMan*)pwallet->GetScriptPubKeyMan(id);
         assert(spk_man);
@@ -1048,6 +1092,41 @@ static DBErrors LoadDescriptorWalletRecords(CWallet* pwallet, DatabaseBatch& bat
         });
         result = std::max(result, ckey_res.m_result);
         num_ckeys = ckey_res.m_records;
+
+        // Get the PQ HD node of a wpq() descriptor
+        prefix = PrefixStream(DBKeys::WALLETDESCRIPTORPQNODE, id);
+        LoadResult pq_node_res = LoadRecords(pwallet, batch, DBKeys::WALLETDESCRIPTORPQNODE, prefix,
+            [&id, &spk_man] (CWallet* pwallet, DataStream& key, DataStream& value, std::string& err) {
+            uint256 desc_id;
+            uint256 node_id;
+            key >> desc_id;
+            assert(desc_id == id);
+            key >> node_id;
+            pq::hd::Node node;
+            value >> node.key >> node.chaincode;
+            if (pq::hd::NodeId(node) != node_id) {
+                err = "Error reading wallet database: descriptor PQ HD node corrupt";
+                return DBErrors::CORRUPT;
+            }
+            spk_man->LoadPQNode(node_id, node);
+            return DBErrors::LOAD_OK;
+        });
+        result = std::max(result, pq_node_res.m_result);
+
+        prefix = PrefixStream(DBKeys::WALLETDESCRIPTORCPQNODE, id);
+        LoadResult cpq_node_res = LoadRecords(pwallet, batch, DBKeys::WALLETDESCRIPTORCPQNODE, prefix,
+            [&id, &spk_man] (CWallet* pwallet, DataStream& key, DataStream& value, std::string& err) {
+            uint256 desc_id;
+            uint256 node_id;
+            key >> desc_id;
+            assert(desc_id == id);
+            key >> node_id;
+            std::vector<unsigned char> secret;
+            value >> secret;
+            spk_man->LoadCryptedPQNode(node_id, secret);
+            return DBErrors::LOAD_OK;
+        });
+        result = std::max(result, cpq_node_res.m_result);
 
         return result;
     });

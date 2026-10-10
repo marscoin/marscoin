@@ -132,6 +132,7 @@ BITCOIN_TESTS =\
   test/policyestimator_tests.cpp \
   test/pool_tests.cpp \
   test/pow_tests.cpp \
+  test/pq_descriptor_tests.cpp \
   test/pq_hd_tests.cpp \
   test/pq_sighash_tests.cpp \
   test/prevector_tests.cpp \

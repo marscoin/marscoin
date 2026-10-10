@@ -11,6 +11,7 @@
 #include <interfaces/chain.h>
 #include <key_io.h>
 #include <merkleblock.h>
+#include <outputtype.h>
 #include <rpc/util.h>
 #include <script/descriptor.h>
 #include <script/script.h>
@@ -1505,8 +1506,14 @@ static UniValue ProcessDescriptorImport(CWallet& wallet, const UniValue& data, c
         }
 
         // If the wallet disabled private keys, abort if private keys exist
-        if (wallet.IsWalletFlagSet(WALLET_FLAG_DISABLE_PRIVATE_KEYS) && !keys.keys.empty()) {
+        if (wallet.IsWalletFlagSet(WALLET_FLAG_DISABLE_PRIVATE_KEYS) && (!keys.keys.empty() || !keys.pq_nodes.empty())) {
             throw JSONRPCError(RPC_WALLET_ERROR, "Cannot import private keys to a wallet with private keys disabled");
+        }
+
+        // A wpq() descriptor derives nothing without its PQ HD node, which has no public form.
+        const bool is_pq{parsed_desc->GetOutputType() == OutputType::BECH32_PQ};
+        if (is_pq && keys.pq_nodes.empty()) {
+            throw JSONRPCError(RPC_WALLET_ERROR, "Cannot import a wpq() descriptor without its mpqprv node. Track P2WPQH addresses with addr() descriptors instead");
         }
 
         // Need to ExpandPrivate to check if private keys are available for all pubkeys
@@ -1528,9 +1535,11 @@ static UniValue ProcessDescriptorImport(CWallet& wallet, const UniValue& data, c
             }
         }
 
+        if (is_pq) have_all_privkeys = true;
+
         // If private keys are enabled, check some things.
         if (!wallet.IsWalletFlagSet(WALLET_FLAG_DISABLE_PRIVATE_KEYS)) {
-           if (keys.keys.empty()) {
+           if (keys.keys.empty() && keys.pq_nodes.empty()) {
                 throw JSONRPCError(RPC_WALLET_ERROR, "Cannot import descriptor without private keys to a wallet with private keys enabled");
            }
            if (!have_all_privkeys) {
