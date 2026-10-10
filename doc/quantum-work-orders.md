@@ -57,12 +57,12 @@ tracked in #32, #34, #36, #37 and #43.
 | [MQ-19](#mq-19--abwl-persistence-and-block-index-versioning) | ABWL persistence and block-index versioning | C · Consensus | Complete: PR #58 merged | — |
 | [MQ-20](#mq-20--abwl-end-to-end-capacity) | ABWL end-to-end capacity | C · Consensus | Queued | MQ-19, MQ-28 |
 | [MQ-21](#mq-21--restore-the-mainnet-context-free-block-bound) | Restore the mainnet context-free block bound | C · Consensus | Complete: PR #57 merged | — |
-| [MQ-22](#mq-22--seed-derived-pq-keys-and-backup) | Seed-derived PQ keys and backup | D · Wallet | In progress: derivation spec (PQ HD v1); wallet integration next | MQ-10 |
-| [MQ-23](#mq-23--pq-keys-in-the-key-manager) | PQ keys in the key manager | D · Wallet | Queued | MQ-22 |
+| [MQ-22](#mq-22--seed-derived-pq-keys-and-backup) | Seed-derived PQ keys and backup | D · Wallet | Implemented: PRs #80 (spec) and #82 (wallet), awaiting merge | MQ-10 |
+| [MQ-23](#mq-23--pq-keys-in-the-key-manager) | PQ keys in the key manager | D · Wallet | In progress: `wpq()` keys in the descriptor ScriptPubKeyMan (#82) | MQ-22 |
 | [MQ-24](#mq-24--migration-tooling) | Migration tooling | D · Wallet | Queued | MQ-23 |
-| [MQ-25](#mq-25--script-level-and-unit-tests) | Script-level and unit tests | E · Verification | Queued | — |
-| [MQ-26](#mq-26--functional-tests) | Functional tests | E · Verification | In progress: PRs #65 and #66 merged; inherited test failures remain | — |
-| [MQ-27](#mq-27--ci-and-release-discipline) | CI and release discipline | E · Verification | In progress: secret scanning (#54) and config lint (#72) merged | — |
+| [MQ-25](#mq-25--script-level-and-unit-tests) | Script-level and unit tests | E · Verification | In progress: unit suite passes with #81, #83 and #84 | — |
+| [MQ-26](#mq-26--functional-tests) | Functional tests | E · Verification | In progress: 176 of 245 non-skipped runs pass; failures grouped by cause | — |
+| [MQ-27](#mq-27--ci-and-release-discipline) | CI and release discipline | E · Verification | In progress: secret scanning (#54, and #86 for 28.x) and config lint (#72) | — |
 | [MQ-28](#mq-28--performance-and-stress-testing) | Performance and stress testing | E · Verification | In progress: benchmarks merged (PR #74); stress run pending | MQ-25 |
 | [MQ-29](#mq-29--documentation-refresh) | Documentation refresh | E · Verification | In progress: sighash spec merged (#64) | — |
 | [MQ-30](#mq-30--marsqnet-v2-fresh-genesis) | Marsqnet v2 (fresh genesis) | F · Network | Queued | Track C, MQ-22 |
@@ -86,6 +86,9 @@ tracked in #32, #34, #36, #37 and #43.
 | [MQ-48](#mq-48--backport-the-generatetoaddress-fix-to-28x) | Backport the generatetoaddress fix to 28.x | B · Network ops | Complete: PR #68 merged (28.x) | #65 |
 | [MQ-49](#mq-49--signet-cant-start) | Signet can't start | E · Verification | Queued | — |
 | [MQ-50](#mq-50--end-address-reuse-in-marscoin-wallets-and-services) | End address reuse in Marscoin wallets and services | G · Mainnet | Queued | MQ-31 |
+| [MQ-51](#mq-51--asert-anchor-lookup-is-linear) | ASERT anchor lookup is linear | B · Network ops | Fixed: PRs #84 and #85 (28.x), awaiting merge | — |
+| [MQ-52](#mq-52--floating-point-in-dark-gravity-wave-v2) | Floating point in Dark Gravity Wave v2 | I · Research | Research | — |
+| [MQ-53](#mq-53--bip30-and-bip34-are-not-enforced) | BIP30 and BIP34 are not enforced | C · Consensus | Research: mainnet scan, then a soft fork | — |
 
 ---
 
@@ -697,8 +700,9 @@ shows `bad-blk-length` on mainnet but not on regtest. It passes, and the full
 
 ### MQ-22 · Seed-derived PQ keys and backup
 
-**Status:** In progress. Required before mainnet. Derivation specified in
-`doc/quantum-pq-key-derivation-v1.md` (PQ HD v1); wallet integration next.
+**Status:** Implemented, awaiting merge. Required before mainnet. Derivation
+specified in `doc/quantum-pq-key-derivation-v1.md` (PQ HD v1, PR #80); wallet
+integration in PR #82.
 
 Finding: PQ keys come from the system RNG (`GenerateKeypair`,
 `src/crypto/pq_sphincs_random.cpp`; liboqs's `OQS_SIG_keypair` before MQ-13),
@@ -721,9 +725,20 @@ Progress:
   rescue spec reveals BIP32 nodes). Spec, reference code
   (`src/crypto/pq_hd.cpp`), and vectors from an independent Python
   implementation whose SLH-DSA key generation matches NIST ACVP.
-- Next, together with MQ-23: the `wpq()` descriptor, cached public keys and a
-  smaller lookahead (key generation takes about 28 ms), recovery by rescan, and
-  a functional test of restore and spend.
+- PR #82: `wpq(NODE/path/*h)` descriptors.
+  - New descriptor wallets get active receiving and change `wpq()`
+    descriptors where P2WPQH is scheduled. Older wallets get them on their
+    first `getnewpqaddress`, with a warning to back up again.
+  - The node is stored encrypted, and derived public keys are cached.
+  - The lookahead is `min(-keypool, 100)`.
+  - `wallet_pq_hd.py` shows the acceptance: a wallet restored from its
+    `wpq()` descriptors alone finds its coins, with a block filter rescan,
+    and spends them.
+- Bugs fixed on the way:
+  - `encryptwallet` failed on wallets with PQ descriptors.
+  - Wallets with only PQ keys couldn't make change.
+  - No wallet send RPC could spend P2WPQH coins at all: the transaction size
+    check found no descriptor for them.
 - The same derivation goes into Electrum-Mars and MarsWallet (MQ-35), so one
   seed phrase gives the same P2WPQH addresses everywhere.
 
@@ -742,6 +757,11 @@ index, with a per-parameter-set layout.
 Acceptance: `IsMine` performs no database reads, and a wallet with 10,000 PQ
 keys loads and rescans in a time comparable to a legacy wallet of that size.
 
+Progress: keys from `wpq()` descriptors (#82) live in the descriptor
+ScriptPubKeyMan, so `IsMine` finds them in memory and loading reads the cached
+public keys. Random keys from before #82, and from legacy (BDB) wallets, still
+go through the database on every `IsMine`.
+
 ### MQ-24 · Migration tooling
 
 **Status:** Queued
@@ -755,6 +775,15 @@ legacy; a sweep command from legacy to PQ; Qt support.
 
 Acceptance: status is correct for a mixed wallet, a one-command sweep works on
 marsqnet, and a functional test covers both.
+
+Notes, 2026-10-09:
+- #82 makes P2WPQH coins spendable through the wallet's send RPCs. It sends
+  change to P2WPQH when the transaction pays a P2WPQH address or the wallet
+  has no other change keys.
+- A migration also needs PQ change whenever the inputs are PQ, so that
+  spending migrated coins doesn't move funds back to EC outputs.
+- Marscoin defaults to legacy addresses (d2bd6c6ff1), so all EC change is
+  P2PKH today.
 
 ## Track E · Verification and documentation
 
@@ -773,6 +802,19 @@ signature, wrong sizes, wrapped), sighash vectors, PoW tests through
 witness parsing.
 
 Acceptance: all run in CI.
+
+Progress, 2026-10-09: the unit suite on `feature/quantum-upgrade` had 90
+failures. With #81, #83 and #84 it has none.
+- **#81:** test helpers mined against SHA256d instead of the scrypt hash, and
+  the 100-block test chain expected Bitcoin's tip hash.
+- **#83:** Marscoin's address, key and message encodings; the no-RBF and
+  legacy-address policies; regtest assumeutxo block hashes; regtest mining
+  for `miner_tests`; BIP324 vectors for Marscoin's network magic.
+  - Vectors that had to be re-derived (message signatures, BIP324) come from
+    the test framework's independent implementations, which first reproduce
+    Bitcoin's official vectors.
+- **#84:** the first tests of Marscoin's retargeting (ASERT, Dark Gravity Wave
+  v3, the legacy rule) replace Bitcoin's.
 
 ### MQ-26 · Functional tests
 
@@ -825,6 +867,41 @@ Progress, 2026-10-08:
     yet diagnosed.
 - Minor: the `-mempoolfullrbf` help text still advertises replace-by-fee.
 
+Status, 2026-10-09: full run on `feature/quantum-upgrade` at 5a3d931 (313 runs):
+176 pass, 69 fail, 69 skip (most for lack of BDB). Failures by cause:
+- **RBF, disabled by design (about 15).**
+  - Tests of RBF itself: `feature_rbf`, `mempool_package_rbf`, `mempool_truc`
+    and `wallet_bumpfee`.
+  - Tests that use it in passing: `wallet_balance`, `wallet_conflicts`,
+    `wallet_listtransactions`, `wallet_resendwallettransactions`,
+    `feature_fee_estimation`, `mining_prioritisetransaction`,
+    `mempool_package_onemore` and `p2p_leak_tx`.
+  - The first group should leave the runner with a note. The second needs
+    its RBF steps adapted.
+- **P2P (about 15).** `p2p_handshake`, `p2p_invalid_messages`, `p2p_leak`,
+  `p2p_compactblocks`, `p2p_mutated_blocks`, `p2p_sendtxrcncl`,
+  `p2p_sendheaders`, `p2p_dos_header_tree`, `p2p_node_network_limited`,
+  `p2p_ibd_stalling`, `p2p_segwit`, `p2p_headers_sync_with_minchainwork`,
+  `feature_block`, `feature_assumevalid`, `feature_versionbits_warning` and
+  `rpc_getblockfrompeer`. The most valuable group to fix next.
+- **Buried deployments and consensus.**
+  - `feature_cltv`, `feature_dersig`, `feature_nulldummy` and
+    `feature_bip68_sequence` expect Bitcoin's activation heights.
+  - `feature_taproot` gets "Witness program hash mismatch" where it expects
+    a Schnorr hash-type error. Needs a closer look.
+- **Bitcoin constants.** `rpc_validateaddress`, `rpc_invalid_address_message`,
+  `rpc_signmessagewithprivkey`, `rpc_rawtransaction`, `rpc_blockchain`
+  (regtest difficulty), `rpc_dumptxoutset`, `rpc_scanblocks`,
+  `rpc_getblockstats`, `interface_rest` (headers are 294 bytes, not 80) and
+  `feature_init`. Also `wallet_fundrawtransaction` and `wallet_send`, which
+  use a Bitcoin change address.
+- **Other.**
+  - Signet (MQ-49), and assumeutxo (fixed in #83 for `wallet_assumeutxo`).
+  - External signer: `wallet_signer` and `rpc_signer`.
+  - `feature_notifications`, `feature_filelock`, `interface_rpc`,
+    `rpc_packages`, `mempool_limit`, `rpc_psbt`, `wallet_create_tx` and
+    `wallet_sendall`.
+
 Acceptance: all are in `test_runner.py` and pass in CI.
 
 ### MQ-27 · CI and release discipline
@@ -833,6 +910,9 @@ Acceptance: all are in `test_runner.py` and pass in CI.
 
 Finding: whether the CI jobs pass is unknown, and recent local builds used
 `--disable-tests`. 48 commits sit on `feature/quantum-upgrade`, none in `28.x`.
+
+Note, 2026-10-09: `28.x`, which mainnet releases are built from, had no secret
+scanning. PR #86 adds the same gitleaks job.
 The only testnet tag is `marsqnet-baseline-2026-04-13`. Merged local branches
 remain.
 
@@ -934,6 +1014,12 @@ pool, a faucet, seed nodes and an announcement. Retire the current marsqnet.
 Acceptance: at least three independent node operators and two independent
 miners, a 30-day soak following `doc/marsqnet-soak-checklist.md`, and an agreed
 PQ transaction volume.
+
+Before launch: `GetNetworkForMagic` (`src/kernel/chainparams.cpp`) recognizes
+mainnet, testnet, testnet4 and regtest, but not marsqnet or signet. A marsqnet
+node would reject its own UTXO snapshots as "created for an unrecognized
+network".
+
 
 ## Track G · Mainnet path
 
@@ -1351,3 +1437,71 @@ Audit, 2026-10-09 (read-only, project wallet and service repositories):
   secret, as the draft spec (PR #70) does.
 - Minor: marscoin-electrumx sets `P2PKH_VERBYTE = 0x30` while the clients use
   `0x32`. This affects only address-based RPCs.
+
+### MQ-51 · ASERT anchor lookup is linear
+
+**Status:** Fixed in PRs #84 (feature branch) and #85 (28.x), awaiting merge.
+
+Finding, 2026-10-09: `GravityAsert` found its anchor (height 2999999 on
+mainnet) by walking back one block at a time. It did this for every header and
+block it checked and for every block template.
+- At mainnet height 3,576,632, 576,633 blocks past the anchor, that took
+  7.6 ms per call against 0.1 µs with `GetAncestor`, on the build machine
+  (Apple M-series).
+- Over a fresh sync through the ASERT era it adds up to roughly 37 minutes
+  there, and it grows quadratically with the chain.
+
+Fix: `GetAncestor`, which returns the same block through the skip list, so
+consensus is unchanged. Worth shipping in the next 28.x release.
+
+### MQ-52 · Floating point in Dark Gravity Wave v2
+
+**Status:** Research
+
+Finding, 2026-10-09: `DarkGravityWave2` (`src/pow.cpp`), which set mainnet's
+difficulty for heights 120000 to 125998, computes with `double` and
+`long double`. Every node replays it during a sync. Results that differ by
+compiler, architecture or floating-point mode would split nodes on historical
+blocks. `long double` in particular has different widths on x86 and ARM.
+Height 125999 falls through to the legacy rule.
+
+A related spot: for heights up to 126000, `ContextualCheckBlockHeader`
+compares difficulties with `abs(n1-n2)` on doubles. Depending on which
+overload a compiler's headers make visible, plain `abs` can be the `int`
+version, which truncates.
+
+Evidence so far: full syncs agree with the chain on x86-64 Linux (80-bit
+`long double`) and on arm64 macOS (64-bit `long double`; the census node of
+2026-10-08). arm64 Linux, where `long double` is 128 bits, is untested.
+
+Scope: replay those heights on the release platforms, arm64 Linux in
+particular, and compare with the chain's `nBits`. If any differ, replace the
+computation with an exact one that reproduces mainnet's values, checked
+against the chain.
+
+### MQ-53 · BIP30 and BIP34 are not enforced
+
+**Status:** Research
+
+Finding, 2026-10-09: since db5c033f96 ("auxpow: entirely remove bip30/34
+section & checks", January 2025), consensus enforces neither BIP30 nor BIP34.
+- BIP30: `fEnforceBIP30` is hard-wired to false (`src/validation.cpp`,
+  "FIXME: Enable strict check after appropriate fork").
+- BIP34: the coinbase-height check is commented out.
+
+So a block may contain a transaction whose txid matches an earlier, unspent
+one, overwriting it. This is the CVE-2012-1909 class that BIP30 and BIP34
+closed in Bitcoin. Exploiting it needs a miner, and it mostly allows griefing
+(the first instance of a duplicated coin can no longer be spent).
+
+Evidence: sampled mainnet coinbases from height 1000 to the tip all start with
+the BIP34 height push, so miners follow BIP34 voluntarily.
+`feature_block.py` skips its BIP30 and BIP34 cases until the rules are back.
+
+Scope:
+1. Scan mainnet for duplicate txids and coinbases without the height push.
+   Any found become exceptions, as in Bitcoin.
+2. Re-enable BIP34 at a future height (a soft fork that current miners
+   already satisfy).
+3. Enforce BIP30 before that height and skip it after, as Bitcoin does.
+
