@@ -64,12 +64,13 @@ WITNESS_COMMITMENT_HEADER = b"\xaa\x21\xa9\xed"
 NORMAL_GBT_REQUEST_PARAMS = {"rules": ["segwit"]}
 VERSIONBITS_LAST_OLD_BLOCK_VERSION = 4
 
-# Marscoin uses merged mining (auxpow): the chain ID occupies the upper 16 bits of
-# nVersion, and with a strict chain-ID check, blocks without it are rejected.
-# Plain versions 1-4 count as legacy blocks, which regtest rejects from height 0.
-VERSION_CHAIN_START = 1 << 16
-REGTEST_AUXPOW_CHAIN_ID = 0x0001
-DEFAULT_BLOCK_VERSION = VERSIONBITS_LAST_OLD_BLOCK_VERSION | (REGTEST_AUXPOW_CHAIN_ID * VERSION_CHAIN_START)
+# The auxpow chain-ID constants live in messages.py, so that CBlockHeader
+# defaults to a version regtest accepts.
+from .messages import (  # noqa: E402,F401
+    DEFAULT_BLOCK_VERSION,
+    REGTEST_AUXPOW_CHAIN_ID,
+    VERSION_CHAIN_START,
+)
 MIN_BLOCKS_TO_KEEP = 288
 
 

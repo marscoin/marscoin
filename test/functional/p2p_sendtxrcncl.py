@@ -85,17 +85,8 @@ class SendTxRcnclTest(BitcoinTestFramework):
         assert sendtxrcncl_index < verack_index
         self.nodes[0].disconnect_p2ps()
 
-        self.log.info('SENDTXRCNCL on pre-WTXID version should not be sent')
-        peer = self.nodes[0].add_p2p_connection(SendTxrcnclReceiver(), send_version=False, wait_for_verack=False)
-        pre_wtxid_version_msg = msg_version()
-        pre_wtxid_version_msg.nVersion = 70015
-        pre_wtxid_version_msg.strSubVer = P2P_SUBVERSION
-        pre_wtxid_version_msg.nServices = P2P_SERVICES
-        pre_wtxid_version_msg.relay = 1
-        peer.send_message(pre_wtxid_version_msg)
-        peer.wait_for_verack()
-        assert not peer.sendtxrcncl_msg_received
-        self.nodes[0].disconnect_p2ps()
+        # Bitcoin also checks peers below the wtxidrelay version (70016) here and
+        # below. Marscoin's minimum peer version is 70050, so they can't connect.
 
         self.log.info('SENDTXRCNCL for fRelay=false should not be sent')
         peer = self.nodes[0].add_p2p_connection(SendTxrcnclReceiver(), send_version=False, wait_for_verack=False)
@@ -195,18 +186,6 @@ class SendTxRcnclTest(BitcoinTestFramework):
         peer = self.nodes[0].add_p2p_connection(PeerNoVerack(), send_version=True, wait_for_verack=False)
         with self.nodes[0].assert_debug_log(['Register peer=1']):
             peer.send_message(sendtxrcncl_higher_version)
-        self.nodes[0].disconnect_p2ps()
-
-        self.log.info('unexpected SENDTXRCNCL is ignored')
-        peer = self.nodes[0].add_p2p_connection(PeerNoVerack(), send_version=False, wait_for_verack=False)
-        old_version_msg = msg_version()
-        old_version_msg.nVersion = 70015
-        old_version_msg.strSubVer = P2P_SUBVERSION
-        old_version_msg.nServices = P2P_SERVICES
-        old_version_msg.relay = 1
-        peer.send_message(old_version_msg)
-        with self.nodes[0].assert_debug_log(['Ignore unexpected txreconciliation signal']):
-            peer.send_message(create_sendtxrcncl_msg())
         self.nodes[0].disconnect_p2ps()
 
         self.log.info('sending SENDTXRCNCL after sending VERACK triggers a disconnect')

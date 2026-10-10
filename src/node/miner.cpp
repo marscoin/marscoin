@@ -33,6 +33,11 @@ int64_t UpdateTime(CBlockHeader* pblock, const Consensus::Params& consensusParam
 {
     int64_t nOldTime = pblock->nTime;
     int64_t nNewTime{std::max<int64_t>(pindexPrev->GetMedianTimePast() + 1, TicksSinceEpoch<std::chrono::seconds>(NodeClock::now()))};
+    // Where BIP94 is enforced (regtest, testnet4), the first block of a
+    // difficulty period may be at most MAX_TIMEWARP earlier than its parent.
+    if (consensusParams.enforce_BIP94 && (pindexPrev->nHeight + 1) % consensusParams.DifficultyAdjustmentInterval() == 0) {
+        nNewTime = std::max<int64_t>(nNewTime, pindexPrev->GetBlockTime() - MAX_TIMEWARP);
+    }
 
     if (nOldTime < nNewTime) {
         pblock->nTime = nNewTime;
@@ -131,15 +136,17 @@ std::unique_ptr<CBlockTemplate> BlockAssembler::CreateNewBlock()
     }
 
     pblock->nVersion = m_chainstate.m_chainman.m_versionbitscache.ComputeBlockVersion(pindexPrev, chainparams.GetConsensus());
-    // The auxpow chain ID occupies the upper version bits; blocks without it
-    // fail the strict chain-ID check (auxpow.cpp).
-    pblock->SetChainId(chainparams.GetConsensus().nAuxpowChainId);
-
     // -regtest only: allow overriding block.nVersion with
     // -blockversion=N to test forking scenarios
     if (chainparams.MineBlocksOnDemand()) {
         pblock->nVersion = gArgs.GetIntArg("-blockversion", pblock->nVersion);
+        // The block has no auxpow; an auxpow flag would make serializing it abort.
+        pblock->SetAuxpowVersion(false);
     }
+    // The auxpow chain ID occupies the upper version bits; blocks without it
+    // fail the strict chain-ID check (auxpow.cpp). It is set last, so that
+    // -blockversion only sets the lower bits.
+    pblock->SetChainId(chainparams.GetConsensus().nAuxpowChainId);
 
     pblock->nTime = TicksSinceEpoch<std::chrono::seconds>(NodeClock::now());
     m_lock_time_cutoff = pindexPrev->GetMedianTimePast();

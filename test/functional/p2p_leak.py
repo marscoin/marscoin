@@ -118,19 +118,16 @@ class P2PLeakTest(BitcoinTestFramework):
         # Peer that sends a version but not a verack.
         no_verack_idle_peer = self.nodes[0].add_p2p_connection(NoVerackIdlePeer(), wait_for_verack=False)
 
-        # Pre-wtxidRelay peer that sends a version but not a verack and does not support feature negotiation
-        # messages which start at nVersion == 70016
-        pre_wtxidrelay_peer = self.nodes[0].add_p2p_connection(NoVerackIdlePeer(), send_version=False, wait_for_verack=False)
-        pre_wtxidrelay_peer.send_message(self.create_old_version(70015))
+        # Bitcoin also tests a pre-wtxidrelay peer (version 70015). Marscoin's
+        # minimum peer version is 70050, so such a peer is disconnected as
+        # obsolete (tested below) and can't exist here.
 
         # Wait until the peer gets the verack in response to the version. Though, don't wait for the node to receive the
         # verack, since the peer never sent one
         no_verack_idle_peer.wait_for_verack()
-        pre_wtxidrelay_peer.wait_for_verack()
 
         no_version_idle_peer.wait_until(lambda: no_version_idle_peer.ever_connected)
         no_verack_idle_peer.wait_until(lambda: no_verack_idle_peer.version_received)
-        pre_wtxidrelay_peer.wait_until(lambda: pre_wtxidrelay_peer.version_received)
 
         # Mine a block and make sure that it's not sent to the connected peers
         self.generate(self.nodes[0], nblocks=1)
@@ -150,14 +147,9 @@ class P2PLeakTest(BitcoinTestFramework):
         assert no_verack_idle_peer.got_wtxidrelay
         assert no_verack_idle_peer.got_sendaddrv2
 
-        assert not pre_wtxidrelay_peer.unexpected_msg
-        assert not pre_wtxidrelay_peer.got_wtxidrelay
-        assert not pre_wtxidrelay_peer.got_sendaddrv2
-
         # Expect peers to be disconnected due to timeout
         assert not no_version_idle_peer.is_connected
         assert not no_verack_idle_peer.is_connected
-        assert not pre_wtxidrelay_peer.is_connected
 
         self.log.info('Check that the version message does not leak the local address of the node')
         p2p_version_store = self.nodes[0].add_p2p_connection(P2PVersionStore())
