@@ -57,11 +57,11 @@ tracked in #32, #34, #36, #37 and #43.
 | [MQ-19](#mq-19--abwl-persistence-and-block-index-versioning) | ABWL persistence and block-index versioning | C · Consensus | Complete: PR #58 merged | — |
 | [MQ-20](#mq-20--abwl-end-to-end-capacity) | ABWL end-to-end capacity | C · Consensus | Queued | MQ-19, MQ-28 |
 | [MQ-21](#mq-21--restore-the-mainnet-context-free-block-bound) | Restore the mainnet context-free block bound | C · Consensus | Complete: PR #57 merged | — |
-| [MQ-22](#mq-22--seed-derived-pq-keys-and-backup) | Seed-derived PQ keys and backup | D · Wallet | Implemented: PRs #80 (spec) and #82 (wallet), awaiting merge | MQ-10 |
+| [MQ-22](#mq-22--seed-derived-pq-keys-and-backup) | Seed-derived PQ keys and backup | D · Wallet | Complete: PRs #80 (spec) and #82 (wallet) merged | MQ-10 |
 | [MQ-23](#mq-23--pq-keys-in-the-key-manager) | PQ keys in the key manager | D · Wallet | In progress: `wpq()` keys in the descriptor ScriptPubKeyMan (#82) | MQ-22 |
 | [MQ-24](#mq-24--migration-tooling) | Migration tooling | D · Wallet | Queued | MQ-23 |
-| [MQ-25](#mq-25--script-level-and-unit-tests) | Script-level and unit tests | E · Verification | In progress: unit suite passes with #81, #83 and #84 | — |
-| [MQ-26](#mq-26--functional-tests) | Functional tests | E · Verification | In progress: 176 of 245 non-skipped runs pass; failures grouped by cause | — |
+| [MQ-25](#mq-25--script-level-and-unit-tests) | Script-level and unit tests | E · Verification | In progress: 632 of 661 unit cases pass; all 661 with #83 | — |
+| [MQ-26](#mq-26--functional-tests) | Functional tests | E · Verification | In progress: 204 of 245 non-skipped runs pass after #88–#91 and #94 | — |
 | [MQ-27](#mq-27--ci-and-release-discipline) | CI and release discipline | E · Verification | In progress: secret scanning (#54, and #86 for 28.x) and config lint (#72) | — |
 | [MQ-28](#mq-28--performance-and-stress-testing) | Performance and stress testing | E · Verification | In progress: benchmarks merged (PR #74); stress run pending | MQ-25 |
 | [MQ-29](#mq-29--documentation-refresh) | Documentation refresh | E · Verification | In progress: sighash spec merged (#64) | — |
@@ -86,9 +86,11 @@ tracked in #32, #34, #36, #37 and #43.
 | [MQ-48](#mq-48--backport-the-generatetoaddress-fix-to-28x) | Backport the generatetoaddress fix to 28.x | B · Network ops | Complete: PR #68 merged (28.x) | #65 |
 | [MQ-49](#mq-49--signet-cant-start) | Signet can't start | E · Verification | Queued | — |
 | [MQ-50](#mq-50--end-address-reuse-in-marscoin-wallets-and-services) | End address reuse in Marscoin wallets and services | G · Mainnet | Queued | MQ-31 |
-| [MQ-51](#mq-51--asert-anchor-lookup-is-linear) | ASERT anchor lookup is linear | B · Network ops | Fixed: PRs #84 and #85 (28.x), awaiting merge | — |
+| [MQ-51](#mq-51--asert-anchor-lookup-is-linear) | ASERT anchor lookup is linear | B · Network ops | Complete: PRs #84 and #85 merged; ships in 28.1.4 | — |
 | [MQ-52](#mq-52--floating-point-in-dark-gravity-wave-v2) | Floating point in Dark Gravity Wave v2 | I · Research | Research | — |
 | [MQ-53](#mq-53--bip30-and-bip34-are-not-enforced) | BIP30 and BIP34 are not enforced | C · Consensus | Research: mainnet scan, then a soft fork | — |
+| [MQ-54](#mq-54--restore-headers-presync) | Restore headers presync | B · Network ops | Complete on the feature branch (#91); 28.x in #92, ships in 28.1.4 | — |
+| [MQ-55](#mq-55--block-announcements-break-the-headers-redownload) | Block announcements break the headers redownload | B · Network ops | Complete on the feature branch (#91); 28.x in #92, ships in 28.1.4 | MQ-54 |
 
 ---
 
@@ -902,6 +904,53 @@ Status, 2026-10-09: full run on `feature/quantum-upgrade` at 5a3d931 (313 runs):
     `rpc_packages`, `mempool_limit`, `rpc_psbt`, `wallet_create_tx` and
     `wallet_sendall`.
 
+Status, 2026-10-10: full run after #80–#90 merged (`feature/quantum-upgrade`
+at 6cfa00e, 314 runs): 202 pass, 43 fail, 69 skip. Fixed since the last count:
+- #88: `feature_block`, `feature_assumevalid`, `mining_basic`,
+  `feature_nulldummy`, `feature_bip68_sequence` and seven P2P tests. Node
+  fixes: getblocktemplate versions, a `-blockversion` crash, BIP94's minimum
+  time, and `submitblock`'s checks.
+- #89: `p2p_sendheaders`, `p2p_ibd_stalling` and `p2p_node_network_limited`.
+  Node fix: headers direct fetch asked pruned peers for blocks they no longer
+  keep, because the in-flight limit is 768 (16 upstream).
+- #90: nine RPC, segwit and taproot tests.
+- Merged since the run: #91 fixes `p2p_headers_sync_with_minchainwork`
+  (MQ-54), and #94 fixes an intermittent failure in `p2p_invalid_messages`.
+
+Remaining failures by cause:
+- **RBF, disabled by design.** `feature_rbf`, `mempool_package_rbf`,
+  `mempool_truc`, `wallet_bumpfee`, `wallet_conflicts`, `wallet_balance`,
+  `wallet_listtransactions`, `feature_fee_estimation`,
+  `mining_prioritisetransaction`, `mempool_accept`, `mempool_limit`,
+  `mempool_package_onemore`, `rpc_packages` and `p2p_leak_tx`.
+  `wallet_resendwallettransactions` takes an RBF path only when a random txid
+  order comes out a certain way, so it fails intermittently. Still open: drop
+  the RBF-only tests with a note, or have them assert that replacement is
+  refused.
+- **Buried deployments.** `feature_cltv` and `feature_dersig`.
+- **Chain data.**
+  - `rpc_validateaddress` checks mainnet BIP173/BIP350 vectors, which need
+    regenerating for `mars`.
+  - `rpc_blockchain` computes network hash rate with Bitcoin's spacing.
+  - `interface_rest`: headers carry an auxpow (294 bytes, not 80).
+  - `rpc_dumptxoutset` and `feature_assumeutxo`/`wallet_assumeutxo` expect
+    Bitcoin's snapshot hashes and block files.
+  - `p2p_dos_header_tree` feeds Bitcoin testnet3 headers.
+- **`feature_init`.** A corrupted block index goes undetected at startup.
+  Upstream's loader rejects a block-index entry whose header fails proof of
+  work, but auxpow chains can't check that when loading, because the auxpow
+  isn't stored in the index. Needs a decision on what to verify instead.
+- **Other.** Signet (MQ-49), the external signer (`rpc_signer`,
+  `wallet_signer`), `feature_config_args`, `feature_notifications`,
+  `feature_versionbits_warning` (versionbits can't be signalled alongside the
+  chain ID), `rpc_psbt`, `rpc_rawtransaction`, `wallet_create_tx`,
+  `wallet_fundrawtransaction`, `wallet_importdescriptors`, `wallet_send` and
+  `wallet_sendall`.
+
+The 28.x branch can't run functional tests at all. Its test framework still
+writes `bitcoin.conf`, so test nodes start with mainnet defaults. The framework
+fixes (#66, #62) are only on the feature branch.
+
 Acceptance: all are in `test_runner.py` and pass in CI.
 
 ### MQ-27 · CI and release discipline
@@ -1440,7 +1489,7 @@ Audit, 2026-10-09 (read-only, project wallet and service repositories):
 
 ### MQ-51 · ASERT anchor lookup is linear
 
-**Status:** Fixed in PRs #84 (feature branch) and #85 (28.x), awaiting merge.
+**Status:** Complete: PRs #84 (feature branch) and #85 (28.x) merged. Ships in 28.1.4.
 
 Finding, 2026-10-09: `GravityAsert` found its anchor (height 2999999 on
 mainnet) by walking back one block at a time. It did this for every header and
@@ -1505,3 +1554,48 @@ Scope:
    already satisfy).
 3. Enforce BIP30 before that height and skip it after, as Bitcoin does.
 
+### MQ-54 · Restore headers presync
+
+**Status:** Complete on the feature branch (#91). The 28.x backport is #92,
+shipping in 28.1.4.
+
+Finding, 2026-10-09: c71f892be7 made `IsContinuationOfLowWorkHeadersSync()`
+return `true` at once, which skipped upstream's headers presync: the check that
+a peer's headers chain has enough work before the node stores it. Releases
+28.1.1 to 28.1.3 shipped without it. `p2p_headers_sync_with_minchainwork`
+caught it.
+
+Cost of restoring it: a fresh node's header sync gains a presync pass. That
+pass took 370–425 s for mainnet's 3.1M headers up to the minimum chain work,
+syncing from a local peer on the build machine. A full mainnet header sync
+with the 28.1.4 release candidate took 1,382 s with presync and the MQ-55 fix,
+against 987 s without presync. Both figures include MQ-51, which saves more
+than presync costs.
+
+### MQ-55 · Block announcements break the headers redownload
+
+**Status:** Complete on the feature branch (#91, with MQ-54). The 28.x backport
+is #92, shipping in 28.1.4.
+
+Finding, 2026-10-10: in two of three mainnet header syncs with presync
+restored, the redownload phase aborted and a new presync started. Each restart
+cost about 6 minutes. With `-debug=net` the log showed this sequence:
+
+```
+got inv: block 40d9ff42…  new peer=0
+getheaders (911379) 40d9ff42… to peer=0
+Initial headers sync aborted with peer=0: non-continuous headers at height=928001 (redownload phase)
+```
+
+In the redownload phase each headers message releases headers for validation.
+`ProcessHeadersMessage` then cleared `m_last_getheaders_timestamp`, even though
+`IsContinuationOfLowWorkHeadersSync()` had already sent the next `getheaders`.
+A block `inv` arriving before the reply passed the one-request-in-flight check
+and sent a second `getheaders` from the best header. Its reply didn't continue
+the redownload. Marscoin blocks come about every two minutes and a mainnet
+redownload takes about 15, so this is common.
+
+Fix: keep the timestamp while a headers sync is in progress, as the
+`getheaders` logic further down in `ProcessHeadersMessage` already does. In the
+release-candidate run, 18 block announcements arrived during the redownload,
+none triggered a `getheaders`, and the sync didn't abort.
