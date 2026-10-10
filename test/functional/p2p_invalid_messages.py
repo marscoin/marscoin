@@ -301,10 +301,10 @@ class InvalidMessagesTest(BitcoinTestFramework):
         assert_equal(chaintips[0]['status'], 'headers-only')
         assert_equal(chaintips[0]['hash'], blockheader.hash)
 
-        # invalidate PoW
-        while not blockheader.hash.startswith('f'):
+        # invalidate PoW (on the scrypt hash, which is what Marscoin checks)
+        while blockheader.calc_pow_hash() <= uint256_from_compact(blockheader.nBits):
             blockheader.nNonce += 1
-            blockheader.rehash()
+        blockheader.rehash()
         with self.nodes[0].assert_debug_log(['Misbehaving', 'header with invalid proof of work']):
             peer.send_message(msg_headers([blockheader]))
             peer.wait_for_disconnect()
