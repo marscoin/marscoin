@@ -2784,8 +2784,6 @@ bool PeerManagerImpl::CheckHeadersAreContinuous(const std::vector<CBlockHeader>&
 
 bool PeerManagerImpl::IsContinuationOfLowWorkHeadersSync(Peer& peer, CNode& pfrom, std::vector<CBlockHeader>& headers)
 {
-    return true;
-
     if (peer.m_headers_sync) {
         auto result = peer.m_headers_sync->ProcessNextHeaders(headers, headers.size() == MAX_HEADERS_RESULTS);
         // If it is a valid continuation, we should treat the existing getheaders request as responded to.
@@ -3142,7 +3140,11 @@ void PeerManagerImpl::ProcessHeadersMessage(CNode& pfrom, Peer& peer,
     // If headers connect, assume that this is in response to any outstanding getheaders
     // request we may have sent, and clear out the time of our last request. Non-connecting
     // headers cannot be a response to a getheaders request.
-    peer.m_last_getheaders_timestamp = {};
+    // During a low-work headers sync, IsContinuationOfLowWorkHeadersSync() has
+    // already handled the response and sent the next request, so keep its
+    // timestamp. Otherwise a block announcement could send a second getheaders,
+    // and its reply would break the sync's chain of headers.
+    if (!have_headers_sync) peer.m_last_getheaders_timestamp = {};
 
     // If the headers we received are already in memory and an ancestor of
     // m_best_header or our tip, skip anti-DoS checks. These headers will not
