@@ -43,7 +43,7 @@ tracked in #32, #34, #36, #37 and #43.
 | [MQ-05](#mq-05--redundant-block-producers) | Redundant block producers | B · Testnet ops | Queued | MQ-04 |
 | [MQ-06](#mq-06--uniform-identifiable-testnet-builds) | Uniform, identifiable testnet builds | B · Testnet ops | Queued | MQ-04 |
 | [MQ-07](#mq-07--monitoring-that-leads-to-action) | Monitoring that leads to action | B · Testnet ops | Waiting: operator applies fix | — |
-| [MQ-08](#mq-08--faucet-and-dashboard-reflect-chain-health) | Faucet and dashboard reflect chain health | B · Testnet ops | Queued | — |
+| [MQ-08](#mq-08--faucet-and-dashboard-reflect-chain-health) | Faucet and dashboard reflect chain health | B · Testnet ops | In progress: faucet and dashboard switched to marsqnet v2 | — |
 | [MQ-09](#mq-09--testnet-host-cleanup) | Testnet host cleanup | B · Testnet ops | Queued | — |
 | [MQ-10](#mq-10--switch-to-fips-205-slh-dsa) | Switch to FIPS 205 SLH-DSA | C · Consensus | Complete: PR #61 merged | — |
 | [MQ-11](#mq-11--complete-pq-signature-hash) | Complete PQ signature hash | C · Consensus | Complete: PR #64 merged | MQ-10 |
@@ -65,7 +65,7 @@ tracked in #32, #34, #36, #37 and #43.
 | [MQ-27](#mq-27--ci-and-release-discipline) | CI and release discipline | E · Verification | In progress: secret scanning (#54, and #86 for 28.x) and config lint (#72) | — |
 | [MQ-28](#mq-28--performance-and-stress-testing) | Performance and stress testing | E · Verification | In progress: benchmarks merged (PR #74); stress run pending | MQ-25 |
 | [MQ-29](#mq-29--documentation-refresh) | Documentation refresh | E · Verification | In progress: sighash spec merged (#64) | — |
-| [MQ-30](#mq-30--marsqnet-v2-fresh-genesis) | Marsqnet v2 (fresh genesis) | F · Network | Queued | Track C, MQ-22 |
+| [MQ-30](#mq-30--marsqnet-v2-fresh-genesis) | Marsqnet v2 (fresh genesis) | F · Network | Launched 2026-10-10: three nodes, faucet; soak and outside operators pending | Track C, MQ-22 |
 | [MQ-31](#mq-31--mainnet-exposure-census) | Mainnet exposure census | G · Mainnet | Part 1 and 2 complete: PR #73 merged | — |
 | [MQ-32](#mq-32--unbundled-roadmap-and-crypto-policy) | Unbundled roadmap and crypto policy | G · Mainnet | Waiting: owner decision | MQ-31 helps |
 | [MQ-33](#mq-33--external-security-review) | External security review | G · Mainnet | Queued | Tracks C, D |
@@ -79,7 +79,7 @@ tracked in #32, #34, #36, #37 and #43.
 | [MQ-41](#mq-41--non-signature-public-key-crypto-threat-model) | Non-signature public-key crypto threat model | I · Research | Research | — |
 | [MQ-42](#mq-42--ecosystem-public-key-and-identity-review) | Ecosystem public-key and identity review | I · Research | Research | — |
 | [MQ-43](#mq-43--randomx-mainnet-track) | RandomX mainnet track | I · Research | Waiting: owner decision | MQ-15–17 |
-| [MQ-44](#mq-44--correct-public-claims-about-marsqnet) | Correct public claims about marsqnet | G · Mainnet | Queued | — |
+| [MQ-44](#mq-44--correct-public-claims-about-marsqnet) | Correct public claims about marsqnet | G · Mainnet | In progress: dashboard no longer calls RandomX quantum-resistant | — |
 | [MQ-45](#mq-45--secret-scanning-in-ci) | Secret scanning in CI | E · Verification | Complete: PR #54 merged | — |
 | [MQ-46](#mq-46--regtest-that-can-mine) | Regtest that can mine (unblocks functional tests) | E · Verification | Complete: PR #62 merged | — |
 | [MQ-47](#mq-47--fresh-mainnet-nodes-dont-bootstrap) | Fresh mainnet nodes don't bootstrap | B · Network ops | Complete: PRs #67 and #68 merged (28.x) | — |
@@ -91,6 +91,8 @@ tracked in #32, #34, #36, #37 and #43.
 | [MQ-53](#mq-53--bip30-and-bip34-are-not-enforced) | BIP30 and BIP34 are not enforced | C · Consensus | Research: mainnet scan, then a soft fork | — |
 | [MQ-54](#mq-54--restore-headers-presync) | Restore headers presync | B · Network ops | Complete on the feature branch (#91); 28.x in #92, ships in 28.1.4 | — |
 | [MQ-55](#mq-55--block-announcements-break-the-headers-redownload) | Block announcements break the headers redownload | B · Network ops | Complete on the feature branch (#91); 28.x in #92, ships in 28.1.4 | MQ-54 |
+| [MQ-56](#mq-56--mining-starves-randomx-validation) | Mining starves RandomX validation | C · Consensus | In review: PR #97 | — |
+| [MQ-57](#mq-57--competing-miners-split-marsqnet-v2) | Competing miners split marsqnet v2 | B · Testnet ops | Mitigated: one primary miner and a stall-only backup | MQ-56 |
 
 ---
 
@@ -325,6 +327,11 @@ Finding: a shell loop waiting for a build has been running on one host since
 outside systemd, so relaunching it the same way reindexes again. One peer host
 is not reachable with current operator SSH keys.
 
+Note, 2026-10-10: while the hand-launched node runs, its systemd unit fails on
+the data-directory lock and restarts every five seconds, about 2.7 million
+times since April. Retiring the first marsqnet (MQ-30) will end it. The v2
+nodes all run under systemd.
+
 Scope: kill the leftover loop, put every marsqnet daemon under a systemd unit
 without `-reindex`, record the host inventory in operator notes, and restore
 access to the unreachable peer or decommission it.
@@ -536,6 +543,12 @@ verification. See #34.
 
 Acceptance: a spec plus tests, including rejection of an auxpow block whose key
 is not derived from the Marscoin chain.
+
+Live evidence, 2026-10-10: every block mined on marsqnet v2 so far hashes with
+an all-zero RandomX key, the null `hashPrevBlock` of the locally built auxpow
+parent. So the key never rotates. A miner could also vary it on every block, to
+make each validating node rebuild its RandomX cache (256 MB, about a second of
+CPU) for each block or header it checks.
 
 ### MQ-17 · Marsqnet difficulty retargeting
 
@@ -1055,7 +1068,7 @@ Acceptance: docs match the code at a tag and have been reviewed.
 
 ### MQ-30 · Marsqnet v2 (fresh genesis)
 
-**Status:** Queued. Depends on Track C and MQ-22.
+**Status:** Launched 2026-10-10. The acceptance criteria below are still open.
 
 Scope: launch a new marsqnet on the final rules, with external miners and the
 pool, a faucet, seed nodes and an announcement. Retire the current marsqnet.
@@ -1064,10 +1077,17 @@ Acceptance: at least three independent node operators and two independent
 miners, a 30-day soak following `doc/marsqnet-soak-checklist.md`, and an agreed
 PQ transaction volume.
 
-Before launch: `GetNetworkForMagic` (`src/kernel/chainparams.cpp`) recognizes
-mainnet, testnet, testnet4 and regtest, but not marsqnet or signet. A marsqnet
-node would reject its own UTXO snapshots as "created for an unrecognized
-network".
+Launch, 2026-10-10:
+- Built from `feature/quantum-upgrade` at cad0c66. #96 gave v2 its own message
+  start (`4d5132fa`) and ports (P2P 29348, RPC 29347), so it runs beside the
+  first marsqnet. (`GetNetworkForMagic` already recognized marsqnet, so the
+  earlier note about it was out of date.)
+- Three nodes: mydomains (primary miner), explorer4 (faucet and dashboard) and
+  republic (stall-only backup miner). Peers show `/Marscoin:28.1.0(marsqnet-v2)/`.
+- The first SLH-DSA spend, tx `0341fa80…1f3c`, was verified by all three nodes.
+  The public faucet pays to `mqt1z` addresses.
+- Problems found in the first hours: MQ-56 (mining starves validation) and MQ-57
+  (two competing miners split the chain).
 
 
 ## Track G · Mainnet path
@@ -1599,3 +1619,36 @@ Fix: keep the timestamp while a headers sync is in progress, as the
 `getheaders` logic further down in `ProcessHeadersMessage` already does. In the
 release-candidate run, 18 block announcements arrived during the redownload,
 none triggered a `getheaders`, and the sync didn't abort.
+
+### MQ-56 · Mining starves RandomX validation
+
+**Status:** In review: PR #97.
+
+Finding, 2026-10-10: `GetProofOfWorkHash()` used one global RandomX cache
+behind a `std::mutex`. `generatetoaddress` takes it once per nonce in a tight
+loop, and `std::mutex` isn't fair, so validation, which waits while holding
+`cs_main`, could wait for minutes. On the v2 mining node, RPC took minutes,
+peers timed out downloading blocks from it, and it accepted competing blocks
+late.
+
+Fix (#97): local mining uses its own cache. In a two-node reproduction,
+`getblockchaininfo` latency on the mining node dropped from an average of
+701 ms (worst 4.9 s) to 8 ms. Until #97 is deployed, the v2 miners mine in
+bursts of 100 nonces.
+
+### MQ-57 · Competing miners split marsqnet v2
+
+**Status:** Mitigated by running one primary miner and a stall-only backup.
+
+Finding, 2026-10-10: two continuous miners (mydomains, and republic at half a
+core) kept two branches alive for about 40 minutes, while ASERT warm-up made
+blocks 10–30 s apart. A node announces a block on another branch by `inv`, and
+the receiver asks for headers it can't connect only every two minutes. So each
+side saw the other's tip several blocks late and judged its own branch
+heavier. MQ-56 made it worse.
+
+Rule for now: one continuous miner, plus a backup that mines only after 10
+minutes without a block. Next: once blocks settle near 123 s and #97 is
+deployed, test two independent miners again. Outside miners are part of MQ-30's
+acceptance, so the network has to converge with several of them.
+
