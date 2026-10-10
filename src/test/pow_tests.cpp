@@ -406,6 +406,29 @@ BOOST_AUTO_TEST_CASE(marsqnet_genesis_randomx_pow)
     const CBlockHeader header = params->GenesisBlock().GetBlockHeader();
     BOOST_CHECK(CheckProofOfWork(header, header.nBits, params->GetConsensus()));
 }
+
+BOOST_AUTO_TEST_CASE(randomx_mining_cache_matches_validation)
+{
+    // Local mining hashes with its own RandomX cache. It must compute the same
+    // proof-of-work hash as validation, including when the two alternate
+    // between keys.
+    const auto params = CreateChainParams(*m_node.args, ChainType::MARSQNET);
+    const auto& consensus = params->GetConsensus();
+    CBlockHeader a = params->GenesisBlock().GetBlockHeader();
+    CBlockHeader b = a;
+    b.hashPrevBlock = a.GetHash();
+    b.nNonce = 7;
+    for (int round = 0; round < 2; ++round) {
+        for (const CBlockHeader* header : {&a, &b}) {
+            const auto validation = GetProofOfWorkHash(*header, consensus, PowHashCache::VALIDATION);
+            const auto mining = GetProofOfWorkHash(*header, consensus, PowHashCache::MINING);
+            BOOST_REQUIRE(validation.has_value() && mining.has_value());
+            BOOST_CHECK_EQUAL(validation->GetHex(), mining->GetHex());
+        }
+    }
+    BOOST_CHECK(*GetProofOfWorkHash(a, consensus) != *GetProofOfWorkHash(b, consensus));
+    BOOST_CHECK(CheckProofOfWork(a, a.nBits, consensus, PowHashCache::MINING));
+}
 #endif
 
 BOOST_AUTO_TEST_CASE(RandomX_pow_fails_closed)
