@@ -34,6 +34,7 @@ static CBlock BuildBlockTestCase(FastRandomContext& ctx) {
     block.vtx.resize(3);
     block.vtx[0] = MakeTransactionRef(tx);
     block.nVersion = 42;
+    block.SetChainId(Params().GetConsensus().nAuxpowChainId);
     block.hashPrevBlock = ctx.rand256();
     block.nBits = 0x207fffff;
 
@@ -51,7 +52,7 @@ static CBlock BuildBlockTestCase(FastRandomContext& ctx) {
     bool mutated;
     block.hashMerkleRoot = BlockMerkleRoot(block, &mutated);
     assert(!mutated);
-    while (!CheckProofOfWork(block.GetHash(), block.nBits, Params().GetConsensus())) ++block.nNonce;
+    while (!CheckProofOfWork(block, block.nBits, Params().GetConsensus())) ++block.nNonce;
     return block;
 }
 
@@ -276,13 +277,14 @@ BOOST_AUTO_TEST_CASE(EmptyBlockRoundTripTest)
     block.vtx.resize(1);
     block.vtx[0] = MakeTransactionRef(std::move(coinbase));
     block.nVersion = 42;
+    block.SetChainId(Params().GetConsensus().nAuxpowChainId);
     block.hashPrevBlock = rand_ctx.rand256();
     block.nBits = 0x207fffff;
 
     bool mutated;
     block.hashMerkleRoot = BlockMerkleRoot(block, &mutated);
     assert(!mutated);
-    while (!CheckProofOfWork(block.GetHash(), block.nBits, Params().GetConsensus())) ++block.nNonce;
+    while (!CheckProofOfWork(block, block.nBits, Params().GetConsensus())) ++block.nNonce;
 
     // Test simple header round-trip with only coinbase
     {
