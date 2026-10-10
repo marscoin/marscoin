@@ -32,7 +32,12 @@ struct RandomXCacheState {
     std::mutex mutex;
 };
 
+// Validation (headers and blocks from peers, RPC checks) and local mining
+// keep separate caches. Mining takes its cache for every hash it tries; with
+// one shared mutex it starved validation, which waits while holding cs_main,
+// so a mining node stopped processing blocks and answering RPC for minutes.
 RandomXCacheState g_randomx_cache;
+RandomXCacheState g_randomx_mining_cache;
 #endif
 
 } // namespace
@@ -420,7 +425,7 @@ bool IsProofOfWorkSupported(const Consensus::Params& params)
 #endif
 }
 
-std::optional<uint256> GetProofOfWorkHash(const CPureBlockHeader& header, const Consensus::Params& params)
+std::optional<uint256> GetProofOfWorkHash(const CPureBlockHeader& header, const Consensus::Params& params, PowHashCache cache)
 {
     if (!params.fPowUseRandomX) {
         return header.GetPoWHash();
@@ -436,17 +441,18 @@ std::optional<uint256> GetProofOfWorkHash(const CPureBlockHeader& header, const 
     std::array<unsigned char, 32> hash_out{};
     std::string error;
 
-    std::lock_guard<std::mutex> lock(g_randomx_cache.mutex);
-    if (!g_randomx_cache.has_cache || g_randomx_cache.prev_block_hash != header.hashPrevBlock) {
-        if (!randomx::InitCache(g_randomx_cache.handle, Span<const unsigned char>(key.data(), key.size()), error)) {
+    RandomXCacheState& state{cache == PowHashCache::MINING ? g_randomx_mining_cache : g_randomx_cache};
+    std::lock_guard<std::mutex> lock(state.mutex);
+    if (!state.has_cache || state.prev_block_hash != header.hashPrevBlock) {
+        if (!randomx::InitCache(state.handle, Span<const unsigned char>(key.data(), key.size()), error)) {
             LogError("%s: randomx cache init failed: %s\n", __func__, error);
             return std::nullopt;
         }
-        g_randomx_cache.prev_block_hash = header.hashPrevBlock;
-        g_randomx_cache.has_cache = true;
+        state.prev_block_hash = header.hashPrevBlock;
+        state.has_cache = true;
     }
 
-    if (!randomx::HashOnce(g_randomx_cache.handle, MakeUCharSpan(input_stream), hash_out, error)) {
+    if (!randomx::HashOnce(state.handle, MakeUCharSpan(input_stream), hash_out, error)) {
         LogError("%s: randomx hash failed: %s\n", __func__, error);
         return std::nullopt;
     }
@@ -455,10 +461,10 @@ std::optional<uint256> GetProofOfWorkHash(const CPureBlockHeader& header, const 
 #endif
 }
 
-bool CheckProofOfWork(const CPureBlockHeader& header, unsigned int nBits, const Consensus::Params& params)
+bool CheckProofOfWork(const CPureBlockHeader& header, unsigned int nBits, const Consensus::Params& params, PowHashCache cache)
 {
     // A header whose proof-of-work hash cannot be computed is invalid.
-    const std::optional<uint256> pow_hash{GetProofOfWorkHash(header, params)};
+    const std::optional<uint256> pow_hash{GetProofOfWorkHash(header, params, cache)};
     if (!pow_hash) return false;
     return CheckProofOfWork(*pow_hash, nBits, params);
 }

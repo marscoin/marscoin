@@ -25,8 +25,11 @@ bool CheckProofOfWorkImpl(uint256 hash, unsigned int nBits, const Consensus::Par
 /** Return false if these consensus params need a proof-of-work algorithm this build lacks. */
 bool IsProofOfWorkSupported(const Consensus::Params& params);
 /** Compute the proof-of-work hash, or std::nullopt if it cannot be computed. */
-std::optional<uint256> GetProofOfWorkHash(const CPureBlockHeader& header, const Consensus::Params& params);
-bool CheckProofOfWork(const CPureBlockHeader& header, unsigned int nBits, const Consensus::Params& params);
+/** Which RandomX cache to hash with. Local mining has its own, so grinding
+ *  never blocks the validation of headers and blocks from peers. */
+enum class PowHashCache { VALIDATION, MINING };
+std::optional<uint256> GetProofOfWorkHash(const CPureBlockHeader& header, const Consensus::Params& params, PowHashCache cache = PowHashCache::VALIDATION);
+bool CheckProofOfWork(const CPureBlockHeader& header, unsigned int nBits, const Consensus::Params& params, PowHashCache cache = PowHashCache::VALIDATION);
 
 /**
  * Return false if the proof-of-work requirement specified by new_nbits at a
