@@ -336,7 +336,7 @@ BASE_SCRIPTS = [
     'rpc_dumptxoutset.py',
     'feature_minchainwork.py',
     'rpc_estimatefee.py',
-    'rpc_getblockstats.py',
+    'rpc_getblockstats.py --descriptors',
     'feature_port.py',
     'feature_bind_port_externalip.py',
     'wallet_create_tx.py --legacy-wallet',
