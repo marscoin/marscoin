@@ -2971,11 +2971,18 @@ void PeerManagerImpl::HeadersDirectFetchBlocks(CNode& pfrom, const Peer& peer, c
                      last_header.nHeight);
         } else {
             std::vector<CInv> vGetData;
+            const bool is_limited_peer{IsLimitedPeer(peer)};
             // Download as much as possible, from earliest to latest.
             for (const CBlockIndex* pindex : vToFetch | std::views::reverse) {
                 if (nodestate->vBlocksInFlight.size() >= MAX_BLOCKS_IN_TRANSIT_PER_PEER) {
                     // Can't download any more from this peer
                     break;
+                }
+                // Marscoin lets a direct fetch reach back MAX_BLOCKS_IN_TRANSIT_PER_PEER
+                // (768) blocks, further than limited peers keep blocks. Leave the
+                // deeper blocks to the parallel download, which skips limited peers.
+                if (is_limited_peer && last_header.nHeight - pindex->nHeight >= static_cast<int>(NODE_NETWORK_LIMITED_MIN_BLOCKS) - 2 /* two blocks buffer for possible races */) {
+                    continue;
                 }
                 uint32_t nFetchFlags = GetFetchFlags(peer);
                 vGetData.emplace_back(MSG_BLOCK | nFetchFlags, pindex->GetBlockHash());
