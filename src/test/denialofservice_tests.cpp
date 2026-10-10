@@ -149,7 +149,10 @@ BOOST_AUTO_TEST_CASE(stale_tip_peer_management)
 
     const auto time_init{GetTime<std::chrono::seconds>()};
     SetMockTime(time_init);
-    const auto time_later{time_init + 3 * std::chrono::seconds{m_node.chainman->GetConsensus().nPowTargetSpacing} + 1s};
+    // The tip counts as stale after 3 target spacings, but the check only runs
+    // every 10 minutes (STALE_CHECK_INTERVAL in net_processing.cpp). Bitcoin's
+    // 3 * 600 seconds covers that; Marscoin's 3 * 150 seconds doesn't.
+    const auto time_later{time_init + std::max<std::chrono::seconds>(3 * std::chrono::seconds{m_node.chainman->GetConsensus().nPowTargetSpacing}, 10min) + 1s};
     connman->Init(options);
     std::vector<CNode *> vNodes;
 

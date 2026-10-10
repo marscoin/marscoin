@@ -10,6 +10,7 @@
 #include <consensus/tx_verify.h>
 #include <node/miner.h>
 #include <policy/policy.h>
+#include <pow.h>
 #include <test/util/random.h>
 #include <test/util/txmempool.h>
 #include <txmempool.h>
@@ -32,6 +33,11 @@ using node::CBlockTemplate;
 
 namespace miner_tests {
 struct MinerTestingSetup : public TestingSetup {
+    // Marscoin mainnet's minimum difficulty takes about 2^20 scrypt hashes per
+    // block, so the 110 test blocks are mined on regtest. The test expects the
+    // deployments inactive at these heights, as on Bitcoin mainnet where it
+    // comes from (sequence locks, for example, aren't enforced yet).
+    MinerTestingSetup() : TestingSetup{ChainType::REGTEST, {.extra_args = {"-testactivationheight=csv@100000"}}} {}
     void TestPackageSelection(const CScript& scriptPubKey, const std::vector<CTransactionRef>& txFirst) EXCLUSIVE_LOCKS_REQUIRED(::cs_main);
     void TestBasicMining(const CScript& scriptPubKey, const std::vector<CTransactionRef>& txFirst, int baseheight) EXCLUSIVE_LOCKS_REQUIRED(::cs_main);
     void TestPrioritisedMining(const CScript& scriptPubKey, const std::vector<CTransactionRef>& txFirst) EXCLUSIVE_LOCKS_REQUIRED(::cs_main);
@@ -625,6 +631,8 @@ BOOST_AUTO_TEST_CASE(CreateNewBlock_validity)
         {
             LOCK(cs_main);
             pblock->nVersion = VERSIONBITS_TOP_BITS;
+            // Regtest requires the auxpow chain ID, set as the block assembler does.
+            pblock->SetChainId(m_node.chainman->GetConsensus().nAuxpowChainId);
             pblock->nTime = m_node.chainman->ActiveChain().Tip()->GetMedianTimePast()+1;
             CMutableTransaction txCoinbase(*pblock->vtx[0]);
             txCoinbase.version = 1;
@@ -637,7 +645,10 @@ BOOST_AUTO_TEST_CASE(CreateNewBlock_validity)
             if (txFirst.size() < 4)
                 txFirst.push_back(pblock->vtx[0]);
             pblock->hashMerkleRoot = BlockMerkleRoot(*pblock);
-            pblock->nNonce = bi.nonce;
+            // The table's nonces are Bitcoin's (SHA256d); grind one for Marscoin's
+            // proof-of-work hash instead.
+            pblock->nNonce = 0;
+            while (!CheckProofOfWork(*pblock, pblock->nBits, m_node.chainman->GetConsensus())) ++pblock->nNonce;
         }
         std::shared_ptr<const CBlock> shared_pblock = std::make_shared<const CBlock>(*pblock);
         BOOST_CHECK(Assert(m_node.chainman)->ProcessNewBlock(shared_pblock, true, true, nullptr));

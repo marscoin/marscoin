@@ -247,7 +247,7 @@ BOOST_FIXTURE_TEST_CASE(importmulti_rescan, TestChain100Setup)
                       "timestamp %d. There was an error reading a block from time %d, which is after or within %d "
                       "seconds of key creation, and could contain transactions pertaining to the key. As a result, "
                       "transactions and coins using this key may not appear in the wallet. This error could be caused "
-                      "by pruning or data corruption (see bitcoind log for details) and could be dealt with by "
+                      "by pruning or data corruption (see marscoind log for details) and could be dealt with by "
                       "downloading and rescanning the relevant blocks (see -reindex option and rescanblockchain "
                       "RPC).\"}},{\"success\":true}]",
                               0, oldTip->GetBlockTimeMax(), TIMESTAMP_WINDOW));
@@ -692,6 +692,9 @@ void TestCoinsResult(ListCoinsTest& context, OutputType out_type, CAmount amount
 
 BOOST_FIXTURE_TEST_CASE(BasicOutputTypesTest, ListCoinsTest)
 {
+    // Marscoin defaults to legacy addresses (d2bd6c6ff1), and with that default
+    // all change is legacy. Use bech32, so change follows the payment's type.
+    WITH_LOCK(wallet->cs_wallet, wallet->m_default_address_type = OutputType::BECH32);
     std::map<OutputType, size_t> expected_coins_sizes;
     for (const auto& out_type : OUTPUT_TYPES) { expected_coins_sizes[out_type] = 0U; }
 

@@ -978,20 +978,19 @@ BOOST_FIXTURE_TEST_CASE(package_rbf_tests, TestChain100Setup)
         expected_pool_size += 2;
         BOOST_CHECK_EQUAL(m_node.mempool->size(), expected_pool_size);
 
+        // Marscoin never allows replacement (58e16509a24, "core: never allow
+        // rbf to occur"): the conflicting child is rejected and child1 stays.
         const auto submit2 = ProcessNewPackage(m_node.chainman->ActiveChainstate(), *m_node.mempool, package2, /*test_accept=*/false, std::nullopt);
-        if (auto err_2{CheckPackageMempoolAcceptResult(package2, submit2, /*expect_valid=*/true, m_node.mempool.get())}) {
-            BOOST_ERROR(err_2.value());
-        }
-
-        // Check precise ResultTypes and mempool size. We know it_parent_2 and it_child_2 exist from above call
+        BOOST_CHECK(submit2.m_state.IsInvalid());
         auto it_parent_2 = submit2.m_tx_results.find(tx_parent->GetWitnessHash());
         auto it_child_2 = submit2.m_tx_results.find(tx_child_2->GetWitnessHash());
+        BOOST_REQUIRE(it_parent_2 != submit2.m_tx_results.end() && it_child_2 != submit2.m_tx_results.end());
         BOOST_CHECK_EQUAL(it_parent_2->second.m_result_type, MempoolAcceptResult::ResultType::MEMPOOL_ENTRY);
-        BOOST_CHECK_EQUAL(it_child_2->second.m_result_type, MempoolAcceptResult::ResultType::VALID);
+        BOOST_CHECK_EQUAL(it_child_2->second.m_result_type, MempoolAcceptResult::ResultType::INVALID);
+        BOOST_CHECK_EQUAL(it_child_2->second.m_state.GetRejectReason(), "bip125-replacement-disallowed");
         BOOST_CHECK_EQUAL(m_node.mempool->size(), expected_pool_size);
-
-        // child1 has been replaced
-        BOOST_CHECK(!m_node.mempool->exists(GenTxid::Txid(tx_child_1->GetHash())));
+        BOOST_CHECK(m_node.mempool->exists(GenTxid::Txid(tx_child_1->GetHash())));
+        BOOST_CHECK(!m_node.mempool->exists(GenTxid::Txid(tx_child_2->GetHash())));
     }
 
     // Test package rbf.
@@ -1038,39 +1037,22 @@ BOOST_FIXTURE_TEST_CASE(package_rbf_tests, TestChain100Setup)
         expected_pool_size += 2;
         BOOST_CHECK_EQUAL(m_node.mempool->size(), expected_pool_size);
 
-        // This replacement is actually not package rbf; the parent carries enough fees
-        // to replace the entire package on its own.
-        const auto submit2 = ProcessNewPackage(m_node.chainman->ActiveChainstate(), *m_node.mempool, package2, false, std::nullopt);
-        if (auto err_2{CheckPackageMempoolAcceptResult(package2, submit2, /*expect_valid=*/true, m_node.mempool.get())}) {
-            BOOST_ERROR(err_2.value());
+        // Marscoin never allows replacement, so neither a parent paying enough to
+        // replace the whole package on its own (package2) nor a child sponsoring
+        // its parent's replacement (package3, package RBF) gets in.
+        for (const Package& package : {package2, package3}) {
+            const auto submit = ProcessNewPackage(m_node.chainman->ActiveChainstate(), *m_node.mempool, package, false, std::nullopt);
+            BOOST_CHECK(submit.m_state.IsInvalid());
+            const auto it_parent = submit.m_tx_results.find(package.front()->GetWitnessHash());
+            BOOST_REQUIRE(it_parent != submit.m_tx_results.end());
+            BOOST_CHECK_EQUAL(it_parent->second.m_result_type, MempoolAcceptResult::ResultType::INVALID);
+            BOOST_CHECK_EQUAL(it_parent->second.m_state.GetRejectReason(), "bip125-replacement-disallowed");
+            for (const auto& tx : package) {
+                BOOST_CHECK(!m_node.mempool->exists(GenTxid::Txid(tx->GetHash())));
+            }
         }
-        auto it_parent_2 = submit2.m_tx_results.find(tx_parent_2->GetWitnessHash());
-        auto it_child_2 = submit2.m_tx_results.find(tx_child_2->GetWitnessHash());
-        BOOST_CHECK_EQUAL(it_parent_2->second.m_result_type, MempoolAcceptResult::ResultType::VALID);
-        BOOST_CHECK_EQUAL(it_child_2->second.m_result_type, MempoolAcceptResult::ResultType::VALID);
-        BOOST_CHECK_EQUAL(m_node.mempool->size(), expected_pool_size);
-
-        // Package RBF, in which the replacement transaction's child sponsors the fees to meet RBF feerate rules
-        const auto submit3 = ProcessNewPackage(m_node.chainman->ActiveChainstate(), *m_node.mempool, package3, false, std::nullopt);
-        if (auto err_3{CheckPackageMempoolAcceptResult(package3, submit3, /*expect_valid=*/true, m_node.mempool.get())}) {
-            BOOST_ERROR(err_3.value());
-        }
-        auto it_parent_3 = submit3.m_tx_results.find(tx_parent_3->GetWitnessHash());
-        auto it_child_3 = submit3.m_tx_results.find(tx_child_3->GetWitnessHash());
-        BOOST_CHECK_EQUAL(it_parent_3->second.m_result_type, MempoolAcceptResult::ResultType::VALID);
-        BOOST_CHECK_EQUAL(it_child_3->second.m_result_type, MempoolAcceptResult::ResultType::VALID);
-
-        // package3 was considered as a package to replace both package2 transactions
-        BOOST_CHECK(it_parent_3->second.m_replaced_transactions.size() == 2);
-        BOOST_CHECK(it_child_3->second.m_replaced_transactions.empty());
-
-        std::vector<Wtxid> expected_package3_wtxids({tx_parent_3->GetWitnessHash(), tx_child_3->GetWitnessHash()});
-        const auto package3_total_vsize{GetVirtualTransactionSize(*tx_parent_3) + GetVirtualTransactionSize(*tx_child_3)};
-        BOOST_CHECK(it_parent_3->second.m_wtxids_fee_calculations.value() == expected_package3_wtxids);
-        BOOST_CHECK(it_child_3->second.m_wtxids_fee_calculations.value() == expected_package3_wtxids);
-        BOOST_CHECK_EQUAL(it_parent_3->second.m_effective_feerate.value().GetFee(package3_total_vsize), 199 + 1300);
-        BOOST_CHECK_EQUAL(it_child_3->second.m_effective_feerate.value().GetFee(package3_total_vsize), 199 + 1300);
-
+        BOOST_CHECK(m_node.mempool->exists(GenTxid::Txid(tx_parent_1->GetHash())));
+        BOOST_CHECK(m_node.mempool->exists(GenTxid::Txid(tx_child_1->GetHash())));
         BOOST_CHECK_EQUAL(m_node.mempool->size(), expected_pool_size);
     }
 
