@@ -170,13 +170,12 @@ unsigned int GravityAsert(const CBlockIndex* pindexLast, const CBlockHeader *pbl
         return CBigNum(params.powLimit).GetCompact();
     }
 
-    // Find the anchor block
-    const CBlockIndex* pindexAnchor = pindexLast;
-    while (pindexAnchor && pindexAnchor->nHeight > params.nASERTAnchor) {
-        pindexAnchor = pindexAnchor->pprev;
-    }
-
-    if (pindexAnchor == NULL || pindexAnchor->nHeight != params.nASERTAnchor) {
+    // Find the anchor block. GetAncestor follows the skip list; walking back
+    // one block at a time cost one step per block since the anchor, for every
+    // header and block checked (over 570,000 steps per block on mainnet in
+    // 2026, and growing).
+    const CBlockIndex* pindexAnchor = pindexLast->GetAncestor(params.nASERTAnchor);
+    if (pindexAnchor == nullptr) {
         return CBigNum(params.powLimit).GetCompact();
     }
 

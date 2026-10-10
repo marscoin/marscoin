@@ -13,71 +13,136 @@
 
 BOOST_FIXTURE_TEST_SUITE(pow_tests, BasicTestingSetup)
 
-/* Test calculation of next difficulty target with no constraints applying */
-BOOST_AUTO_TEST_CASE(get_next_work)
-{
-    const auto chainParams = CreateChainParams(*m_node.args, ChainType::MAIN);
-    int64_t nLastRetargetTime = 1261130161; // Block #30240
-    CBlockIndex pindexLast;
-    pindexLast.nHeight = 32255;
-    pindexLast.nTime = 1262152739;  // Block #32255
-    pindexLast.nBits = 0x1d00ffff;
+namespace {
 
-    // Here (and below): expected_nbits is calculated in
-    // CalculateNextWorkRequired(); redoing the calculation here would be just
-    // reimplementing the same code that is written in pow.cpp. Rather than
-    // copy that code, we just hardcode the expected result.
-    unsigned int expected_nbits = 0x1d00d86aU;
-    BOOST_CHECK_EQUAL(CalculateNextWorkRequired(&pindexLast, nLastRetargetTime, chainParams->GetConsensus()), expected_nbits);
-    BOOST_CHECK(PermittedDifficultyTransition(chainParams->GetConsensus(), pindexLast.nHeight+1, pindexLast.nBits, expected_nbits));
+//! A chain of block indexes with fixed spacing and difficulty, for the
+//! retarget tests. Chains that start at height 0 get skip pointers.
+struct RetargetChain {
+    std::vector<CBlockIndex> blocks;
+
+    RetargetChain(int first_height, int count, int64_t first_time, int64_t spacing, uint32_t bits) : blocks(count)
+    {
+        for (int i = 0; i < count; ++i) {
+            blocks[i].pprev = i ? &blocks[i - 1] : nullptr;
+            blocks[i].nHeight = first_height + i;
+            blocks[i].nTime = first_time + i * spacing;
+            blocks[i].nBits = bits;
+            if (first_height == 0) blocks[i].BuildSkip();
+        }
+    }
+
+    CBlockIndex& Tip() { return blocks.back(); }
+};
+
+arith_uint256 Target(uint32_t bits)
+{
+    arith_uint256 target;
+    target.SetCompact(bits);
+    return target;
 }
 
-/* Test the constraint on the upper bound for next work */
-BOOST_AUTO_TEST_CASE(get_next_work_pow_limit)
+uint32_t Compact(const arith_uint256& target)
 {
-    const auto chainParams = CreateChainParams(*m_node.args, ChainType::MAIN);
-    int64_t nLastRetargetTime = 1231006505; // Block #0
-    CBlockIndex pindexLast;
-    pindexLast.nHeight = 2015;
-    pindexLast.nTime = 1233061996;  // Block #2015
-    pindexLast.nBits = 0x1d00ffff;
-    unsigned int expected_nbits = 0x1d00ffffU;
-    BOOST_CHECK_EQUAL(CalculateNextWorkRequired(&pindexLast, nLastRetargetTime, chainParams->GetConsensus()), expected_nbits);
-    BOOST_CHECK(PermittedDifficultyTransition(chainParams->GetConsensus(), pindexLast.nHeight+1, pindexLast.nBits, expected_nbits));
+    return target.GetCompact();
 }
 
-/* Test the constraint on the lower bound for actual time taken */
-BOOST_AUTO_TEST_CASE(get_next_work_lower_limit_actual)
+//! A difficulty well inside every mainnet limit, about 2^224.
+constexpr uint32_t TEST_BITS{0x1d00ffff};
+constexpr int64_t START_TIME{1388590627};
+
+} // namespace
+
+/* Mainnet uses aserti3-2d (GravityAsert) from height 2999999 on, anchored at
+ * that height. The test chain runs from just below the anchor to 50,000 blocks
+ * past it. */
+BOOST_AUTO_TEST_CASE(asert_retarget)
 {
-    const auto chainParams = CreateChainParams(*m_node.args, ChainType::MAIN);
-    int64_t nLastRetargetTime = 1279008237; // Block #66528
-    CBlockIndex pindexLast;
-    pindexLast.nHeight = 68543;
-    pindexLast.nTime = 1279297671;  // Block #68543
-    pindexLast.nBits = 0x1c05a3f4;
-    unsigned int expected_nbits = 0x1c0168fdU;
-    BOOST_CHECK_EQUAL(CalculateNextWorkRequired(&pindexLast, nLastRetargetTime, chainParams->GetConsensus()), expected_nbits);
-    BOOST_CHECK(PermittedDifficultyTransition(chainParams->GetConsensus(), pindexLast.nHeight+1, pindexLast.nBits, expected_nbits));
-    // Test that reducing nbits further would not be a PermittedDifficultyTransition.
-    unsigned int invalid_nbits = expected_nbits-1;
-    BOOST_CHECK(!PermittedDifficultyTransition(chainParams->GetConsensus(), pindexLast.nHeight+1, pindexLast.nBits, invalid_nbits));
+    const Consensus::Params params{CreateChainParams(*m_node.args, ChainType::MAIN)->GetConsensus()};
+    const int64_t spacing{params.nASERTSpacing};
+    const int64_t half_life{params.nASERTHalfLife};
+    constexpr int first_height{2'999'900};
+
+    RetargetChain chain{first_height, 50'100, START_TIME, spacing, TEST_BITS};
+    const CBlockIndex& anchor{chain.blocks[params.nASERTAnchor - first_height]};
+    BOOST_REQUIRE_EQUAL(anchor.nHeight, params.nASERTAnchor);
+    CBlockIndex& last{chain.Tip()};
+    const int64_t height_diff{last.nHeight - anchor.nHeight};
+    // The ideal time of the next block, as the formula counts it.
+    const int64_t on_schedule{anchor.GetBlockTime() + spacing * (height_diff + 1)};
+
+    last.nTime = on_schedule;
+    BOOST_CHECK_EQUAL(GetNextWorkRequired(&last, nullptr, params), TEST_BITS);
+
+    // One half-life behind schedule doubles the target, one ahead halves it.
+    last.nTime = on_schedule + half_life;
+    BOOST_CHECK_EQUAL(GetNextWorkRequired(&last, nullptr, params), Compact(Target(TEST_BITS) * 2));
+    last.nTime = on_schedule - half_life;
+    BOOST_CHECK_EQUAL(GetNextWorkRequired(&last, nullptr, params), Compact(Target(TEST_BITS) / 2));
+
+    // Between, the target moves monotonically.
+    last.nTime = on_schedule + half_life / 2;
+    const arith_uint256 mid{Target(GetNextWorkRequired(&last, nullptr, params))};
+    BOOST_CHECK(mid > Target(TEST_BITS) && mid < Target(TEST_BITS) * 2);
+
+    // Far behind schedule the target stops at the limit; far ahead it stays positive.
+    last.nTime = on_schedule + 100 * half_life;
+    BOOST_CHECK_EQUAL(GetNextWorkRequired(&last, nullptr, params), UintToArith256(params.powLimit).GetCompact());
+    last.nTime = on_schedule - 300 * half_life;
+    BOOST_CHECK(Target(GetNextWorkRequired(&last, nullptr, params)) > 0);
+
+    // Right after the anchor, the next block is due one spacing later, so the
+    // target is a little lower.
+    const arith_uint256 after_anchor{Target(GetNextWorkRequired(&anchor, nullptr, params))};
+    BOOST_CHECK(after_anchor < Target(TEST_BITS) && after_anchor > Target(TEST_BITS) / 2);
 }
 
-/* Test the constraint on the upper bound for actual time taken */
-BOOST_AUTO_TEST_CASE(get_next_work_upper_limit_actual)
+/* Mainnet heights 126000 to 2999998 use Dark Gravity Wave v3: the average
+ * target of the last 24 blocks, scaled by their timespan against 24 target
+ * spacings, within a factor of 3. */
+BOOST_AUTO_TEST_CASE(dgw3_retarget)
 {
-    const auto chainParams = CreateChainParams(*m_node.args, ChainType::MAIN);
-    int64_t nLastRetargetTime = 1263163443; // NOTE: Not an actual block time
-    CBlockIndex pindexLast;
-    pindexLast.nHeight = 46367;
-    pindexLast.nTime = 1269211443;  // Block #46367
-    pindexLast.nBits = 0x1c387f6f;
-    unsigned int expected_nbits = 0x1d00e1fdU;
-    BOOST_CHECK_EQUAL(CalculateNextWorkRequired(&pindexLast, nLastRetargetTime, chainParams->GetConsensus()), expected_nbits);
-    BOOST_CHECK(PermittedDifficultyTransition(chainParams->GetConsensus(), pindexLast.nHeight+1, pindexLast.nBits, expected_nbits));
-    // Test that increasing nbits further would not be a PermittedDifficultyTransition.
-    unsigned int invalid_nbits = expected_nbits+1;
-    BOOST_CHECK(!PermittedDifficultyTransition(chainParams->GetConsensus(), pindexLast.nHeight+1, pindexLast.nBits, invalid_nbits));
+    const Consensus::Params params{CreateChainParams(*m_node.args, ChainType::MAIN)->GetConsensus()};
+    constexpr int64_t spacing{123};
+    constexpr int64_t target_timespan{24 * spacing};
+
+    // On schedule. The 24 blocks span 23 intervals, so the result is 23/24 of
+    // the average target, as on mainnet.
+    RetargetChain steady{200'000, 30, START_TIME, spacing, TEST_BITS};
+    BOOST_CHECK_EQUAL(GetNextWorkRequired(&steady.Tip(), nullptr, params), Compact(Target(TEST_BITS) * (23 * spacing) / target_timespan));
+
+    RetargetChain slower{200'000, 30, START_TIME, 2 * spacing, TEST_BITS};
+    BOOST_CHECK_EQUAL(GetNextWorkRequired(&slower.Tip(), nullptr, params), Compact(Target(TEST_BITS) * (23 * 2 * spacing) / target_timespan));
+
+    // The timespan is clamped to a factor of 3 either way.
+    RetargetChain very_slow{200'000, 30, START_TIME, 1000, TEST_BITS};
+    BOOST_CHECK_EQUAL(GetNextWorkRequired(&very_slow.Tip(), nullptr, params), Compact(Target(TEST_BITS) * 3));
+    RetargetChain very_fast{200'000, 30, START_TIME, 1, TEST_BITS};
+    BOOST_CHECK_EQUAL(GetNextWorkRequired(&very_fast.Tip(), nullptr, params), Compact(Target(TEST_BITS) / 3));
+}
+
+/* Mainnet heights 70000 to 119999 use the legacy retarget: every 721 blocks
+ * (one Mars-day of 88775 seconds at 123 seconds), within a factor of 4. */
+BOOST_AUTO_TEST_CASE(legacy_retarget)
+{
+    const Consensus::Params params{CreateChainParams(*m_node.args, ChainType::MAIN)->GetConsensus()};
+    constexpr int64_t spacing{123};
+    constexpr int64_t timespan{88775};
+    constexpr int interval{timespan / spacing}; // 721
+    constexpr int retarget_height{interval * 111}; // 80031, the height of the next block
+
+    RetargetChain steady{retarget_height - 1 - interval, interval + 1, START_TIME, spacing, TEST_BITS};
+    BOOST_REQUIRE_EQUAL(steady.Tip().nHeight + 1, retarget_height);
+    BOOST_CHECK_EQUAL(GetNextWorkRequired(&steady.Tip(), nullptr, params), Compact(Target(TEST_BITS) * (interval * spacing) / timespan));
+
+    RetargetChain very_slow{retarget_height - 1 - interval, interval + 1, START_TIME, 2000, TEST_BITS};
+    BOOST_CHECK_EQUAL(GetNextWorkRequired(&very_slow.Tip(), nullptr, params), Compact(Target(TEST_BITS) * 4));
+    // The lower clamp is timespan / 4 in integer division.
+    RetargetChain very_fast{retarget_height - 1 - interval, interval + 1, START_TIME, 1, TEST_BITS};
+    BOOST_CHECK_EQUAL(GetNextWorkRequired(&very_fast.Tip(), nullptr, params), Compact(Target(TEST_BITS) * (timespan / 4) / timespan));
+
+    // Between retargets the difficulty doesn't change.
+    RetargetChain between{retarget_height, 10, START_TIME, 1, 0x1c7fffff};
+    BOOST_CHECK_EQUAL(GetNextWorkRequired(&between.Tip(), nullptr, params), 0x1c7fffffU);
 }
 
 BOOST_AUTO_TEST_CASE(CheckProofOfWork_test_negative_target)
@@ -175,11 +240,15 @@ void sanity_check_chainparams(const ArgsManager& args, ChainType chain_type)
     BOOST_CHECK(!over);
     BOOST_CHECK(UintToArith256(consensus.powLimit) >= pow_compact);
 
-    // check max target * 4*nPowTargetTimespan doesn't overflow -- see pow.cpp:CalculateNextWorkRequired()
+    // The legacy retarget (GetNextWorkRequired_V1) multiplies a target by up to
+    // four target timespans, after halving targets of more than 235 bits.
+    // Check that this can't overflow. (Dark Gravity Wave and ASERT compute
+    // with arbitrary precision.)
     if (!consensus.fPowNoRetargeting) {
-        arith_uint256 targ_max{UintToArith256(uint256{"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"})};
-        targ_max /= consensus.nPowTargetTimespan*4;
-        BOOST_CHECK(UintToArith256(consensus.powLimit) < targ_max);
+        arith_uint256 max_target{UintToArith256(consensus.powLimit)};
+        if (max_target.bits() > 235) max_target >>= 1;
+        const arith_uint256 max_factor{static_cast<uint64_t>(4 * std::max<int64_t>(consensus.nPowTargetTimespan, 88775))};
+        BOOST_CHECK_LE(max_target.bits() + max_factor.bits(), 256U);
     }
 }
 
