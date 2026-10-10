@@ -39,7 +39,7 @@ tracked in #32, #34, #36, #37 and #43.
 | [MQ-01](#mq-01--guard-pq-wallet-functions-to-chains-that-enforce-pq) | Guard PQ wallet functions to chains that enforce PQ | A · Safety | Complete: PR #55 merged | — |
 | [MQ-02](#mq-02--encrypt-pq-private-keys-and-enforce-wallet-lock) | Encrypt PQ private keys and enforce wallet lock | A · Safety | Complete: PR #55 merged | — |
 | [MQ-03](#mq-03--fix-mars1pq-taproot-decode-regression) | Fix `mars1pq` Taproot decode regression | A · Safety | Complete: PR #55 merged | — |
-| [MQ-04](#mq-04--restore-marsqnet-block-production) | Restore marsqnet block production | B · Testnet ops | In progress: 24 h check | — |
+| [MQ-04](#mq-04--restore-marsqnet-block-production) | Restore marsqnet block production | B · Testnet ops | Complete: 24 h check passed 2026-10-09 | — |
 | [MQ-05](#mq-05--redundant-block-producers) | Redundant block producers | B · Testnet ops | Queued | MQ-04 |
 | [MQ-06](#mq-06--uniform-identifiable-testnet-builds) | Uniform, identifiable testnet builds | B · Testnet ops | Queued | MQ-04 |
 | [MQ-07](#mq-07--monitoring-that-leads-to-action) | Monitoring that leads to action | B · Testnet ops | Waiting: operator applies fix | — |
@@ -57,7 +57,7 @@ tracked in #32, #34, #36, #37 and #43.
 | [MQ-19](#mq-19--abwl-persistence-and-block-index-versioning) | ABWL persistence and block-index versioning | C · Consensus | Complete: PR #58 merged | — |
 | [MQ-20](#mq-20--abwl-end-to-end-capacity) | ABWL end-to-end capacity | C · Consensus | Queued | MQ-19, MQ-28 |
 | [MQ-21](#mq-21--restore-the-mainnet-context-free-block-bound) | Restore the mainnet context-free block bound | C · Consensus | Complete: PR #57 merged | — |
-| [MQ-22](#mq-22--seed-derived-pq-keys-and-backup) | Seed-derived PQ keys and backup | D · Wallet | Queued | MQ-10 |
+| [MQ-22](#mq-22--seed-derived-pq-keys-and-backup) | Seed-derived PQ keys and backup | D · Wallet | In progress: derivation spec (PQ HD v1); wallet integration next | MQ-10 |
 | [MQ-23](#mq-23--pq-keys-in-the-key-manager) | PQ keys in the key manager | D · Wallet | Queued | MQ-22 |
 | [MQ-24](#mq-24--migration-tooling) | Migration tooling | D · Wallet | Queued | MQ-23 |
 | [MQ-25](#mq-25--script-level-and-unit-tests) | Script-level and unit tests | E · Verification | Queued | — |
@@ -193,8 +193,8 @@ Evidence, 2026-10-08 (`fix/pq-safety-guards`): `IsPostQuantumAddress` and the
 
 ### MQ-04 · Restore marsqnet block production
 
-**Status:** In progress. Block production restored 2026-10-08; 24-hour check
-pending.
+**Status:** Complete. Block production restored 2026-10-08; 24-hour check
+passed 2026-10-09.
 
 Finding: no marsqnet block since 2026-06-09 (height 3436). The only block
 producer's node crash-loops with
@@ -219,7 +219,17 @@ Evidence, 2026-10-08:
 - The waiting transaction was a faucet payout of 1 PQ coin from about
   2026-09-19. It never reached the producer, so it was relayed there by hand
   (`bf883931…3a45`).
-- Next: the 24-hour check on block production.
+- 24-hour check, 2026-10-09: all three reachable nodes agreed at height 3562
+  and the dashboard showed that tip. 125 blocks in 17.9 hours: about 107 from
+  the 10-minute miner, the rest from the heartbeat timer below.
+- The heartbeat timer on the same host had been crashing the node on every run
+  (it loaded a wallet that trips an assertion), which is a likely cause of the
+  June index corruption. Once fixed, it mined on every run as well, doubling
+  the block rate. It now mines only when the height hasn't moved for 15
+  minutes, so it is a stall backup for the main miner.
+- Two transactions broadcast while the producer was crash-looping never
+  reached it (nodes don't re-announce to peers that reconnect). They were
+  relayed by hand. A second producer (MQ-05) would make this rarer.
 
 ### MQ-05 · Redundant block producers
 
@@ -687,10 +697,12 @@ shows `bad-blk-length` on mainnet but not on regtest. It passes, and the full
 
 ### MQ-22 · Seed-derived PQ keys and backup
 
-**Status:** Queued. Required before mainnet.
+**Status:** In progress. Required before mainnet. Derivation specified in
+`doc/quantum-pq-key-derivation-v1.md` (PQ HD v1); wallet integration next.
 
-Finding: PQ keys come from liboqs's system RNG through `OQS_SIG_keypair`
-(`src/crypto/pq_sphincs.cpp:75`), not from the HD seed. They are not in
+Finding: PQ keys come from the system RNG (`GenerateKeypair`,
+`src/crypto/pq_sphincs_random.cpp`; liboqs's `OQS_SIG_keypair` before MQ-13),
+not from the HD seed. They are not in
 descriptors, so `listdescriptors` does not export them, and a seed backup cannot
 recover them.
 
@@ -701,6 +713,19 @@ rescan.
 
 Acceptance: a wallet restored from its seed or descriptors alone finds and
 spends its PQ coins.
+
+Progress:
+
+- PQ HD v1: a hash-only key tree with its own root, so no BIP32 node or EC key
+  leads to it (a stolen wallet file holds the master xpub in plaintext, and the
+  rescue spec reveals BIP32 nodes). Spec, reference code
+  (`src/crypto/pq_hd.cpp`), and vectors from an independent Python
+  implementation whose SLH-DSA key generation matches NIST ACVP.
+- Next, together with MQ-23: the `wpq()` descriptor, cached public keys and a
+  smaller lookahead (key generation takes about 28 ms), recovery by rescan, and
+  a functional test of restore and spend.
+- The same derivation goes into Electrum-Mars and MarsWallet (MQ-35), so one
+  seed phrase gives the same P2WPQH addresses everywhere.
 
 ### MQ-23 · PQ keys in the key manager
 

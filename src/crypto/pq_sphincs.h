@@ -52,6 +52,16 @@ inline constexpr size_t SignatureSize(const ParameterSet parameter_set)
     return 0;
 }
 
+//! Security parameter n of a parameter set: the size of each key-generation seed.
+inline constexpr size_t SeedSize(const ParameterSet parameter_set)
+{
+    switch (parameter_set) {
+    case ParameterSet::SLH_DSA_SHA2_128S:
+        return SPHINCS_SEED_SIZE_SHA2_128S;
+    }
+    return 0;
+}
+
 inline const char* ParameterSetName(const ParameterSet parameter_set)
 {
     switch (parameter_set) {
