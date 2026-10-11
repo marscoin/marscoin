@@ -497,7 +497,9 @@ public:
                             /* m_coins_to_uncache */ coins_to_uncache,
                             /* m_test_accept */ test_accept,
                             /* m_allow_replacement */ false,
-                            /* m_allow_sibling_eviction */ true,
+                            // Marscoin never replaces mempool transactions (58e16509a2),
+                            // and TRUC sibling eviction would be a replacement too.
+                            /* m_allow_sibling_eviction */ false,
                             /* m_package_submission */ false,
                             /* m_package_feerates */ false,
                             /* m_client_maxfeerate */ {}, // checked by caller
@@ -547,7 +549,9 @@ public:
                             /* m_coins_to_uncache */ package_args.m_coins_to_uncache,
                             /* m_test_accept */ package_args.m_test_accept,
                             /* m_allow_replacement */ false,
-                            /* m_allow_sibling_eviction */ true,
+                            // Marscoin never replaces mempool transactions (58e16509a2),
+                            // and TRUC sibling eviction would be a replacement too.
+                            /* m_allow_sibling_eviction */ false,
                             /* m_package_submission */ true, // do not LimitMempoolSize in Finalize()
                             /* m_package_feerates */ false, // only 1 transaction
                             /* m_client_maxfeerate */ package_args.m_client_maxfeerate,
