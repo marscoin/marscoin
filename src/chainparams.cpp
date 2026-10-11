@@ -44,9 +44,6 @@ void ReadSigNetArgs(const ArgsManager& args, CChainParams::SigNetOptions& option
 void ReadRegTestArgs(const ArgsManager& args, CChainParams::RegTestOptions& options)
 {
     if (auto value = args.GetBoolArg("-fastprune")) options.fastprune = *value;
-    if (args.GetBoolArg("-marsqnet", false) || args.GetBoolArg("-qdevnet", false) || args.GetArg("-chain", "") == "marsqnet" || args.GetArg("-chain", "") == "qdevnet") {
-        options.randomx_devnet = true;
-    }
 
     for (const std::string& arg : args.GetArgs("-testactivationheight")) {
         const auto found{arg.find('@')};
@@ -61,7 +58,11 @@ void ReadRegTestArgs(const ArgsManager& args, CChainParams::RegTestOptions& opti
         }
 
         const auto deployment_name{arg.substr(0, found)};
-        if (const auto buried_deployment = GetBuriedDeployment(deployment_name)) {
+        if (deployment_name == "abwl") {
+            options.abwl_activation_height = height;
+        } else if (deployment_name == "pqwitness") {
+            options.pqwitness_activation_height = height;
+        } else if (const auto buried_deployment = GetBuriedDeployment(deployment_name)) {
             options.activation_heights[*buried_deployment] = height;
         } else {
             throw std::runtime_error(strprintf("Invalid name (%s) for -testactivationheight=name@height.", arg));
@@ -104,6 +105,23 @@ void ReadRegTestArgs(const ArgsManager& args, CChainParams::RegTestOptions& opti
     }
 }
 
+void ReadMarsqnetArgs(const ArgsManager& args, CChainParams::MarsqnetOptions& options)
+{
+    if (auto value{args.GetIntArg("-randomxkeybindingheight")}) {
+        if (*value < 0 || *value > std::numeric_limits<int>::max()) throw std::runtime_error("Invalid -randomxkeybindingheight");
+        options.randomx_key_binding_height = static_cast<int>(*value);
+    }
+    if (auto value{args.GetIntArg("-randomxseedepoch")}) {
+        // The seed height rounds down with a bit mask, so the epoch must be a power of two.
+        if (*value < 2 || *value > 1'000'000 || (*value & (*value - 1)) != 0) throw std::runtime_error("Invalid -randomxseedepoch (a power of two from 2)");
+        options.randomx_seed_epoch = static_cast<int>(*value);
+    }
+    if (auto value{args.GetIntArg("-randomxseedlag")}) {
+        if (*value < 1 || *value > 1'000'000) throw std::runtime_error("Invalid -randomxseedlag");
+        options.randomx_seed_lag = static_cast<int>(*value);
+    }
+}
+
 static std::unique_ptr<const CChainParams> globalChainParams;
 
 const CChainParams &Params() {
@@ -129,6 +147,11 @@ std::unique_ptr<const CChainParams> CreateChainParams(const ArgsManager& args, c
         auto opts = CChainParams::RegTestOptions{};
         ReadRegTestArgs(args, opts);
         return CChainParams::RegTest(opts);
+    }
+    case ChainType::MARSQNET: {
+        auto opts = CChainParams::MarsqnetOptions{};
+        ReadMarsqnetArgs(args, opts);
+        return CChainParams::Marsqnet(opts);
     }
     }
     assert(false);

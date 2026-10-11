@@ -497,7 +497,9 @@ public:
                             /* m_coins_to_uncache */ coins_to_uncache,
                             /* m_test_accept */ test_accept,
                             /* m_allow_replacement */ false,
-                            /* m_allow_sibling_eviction */ true,
+                            // Marscoin never replaces mempool transactions (58e16509a2),
+                            // and TRUC sibling eviction would be a replacement too.
+                            /* m_allow_sibling_eviction */ false,
                             /* m_package_submission */ false,
                             /* m_package_feerates */ false,
                             /* m_client_maxfeerate */ {}, // checked by caller
@@ -547,7 +549,9 @@ public:
                             /* m_coins_to_uncache */ package_args.m_coins_to_uncache,
                             /* m_test_accept */ package_args.m_test_accept,
                             /* m_allow_replacement */ false,
-                            /* m_allow_sibling_eviction */ true,
+                            // Marscoin never replaces mempool transactions (58e16509a2),
+                            // and TRUC sibling eviction would be a replacement too.
+                            /* m_allow_sibling_eviction */ false,
                             /* m_package_submission */ true, // do not LimitMempoolSize in Finalize()
                             /* m_package_feerates */ false, // only 1 transaction
                             /* m_client_maxfeerate */ package_args.m_client_maxfeerate,
@@ -2399,10 +2403,9 @@ static unsigned int GetBlockScriptFlags(const CBlockIndex& block_index, const Ch
         flags |= SCRIPT_VERIFY_NULLDUMMY;
     }
 
-    // Enable post-quantum witness v2 verification after ABWL activation
-    // (PQ witness uses the same activation gate as adaptive block weight)
-    if (consensusparams.nABWLActivationHeight > 0 &&
-        block_index.nHeight >= consensusparams.nABWLActivationHeight) {
+    // Enable post-quantum witness v2 verification once PQ is active
+    // (currently the same activation gate as adaptive block weight)
+    if (consensusparams.IsPQWitnessActive(block_index.nHeight)) {
         flags |= SCRIPT_VERIFY_WITNESS_V2;
     }
 
@@ -3880,8 +3883,9 @@ void ChainstateManager::ReceivedBlockTransactions(const CBlock& block, CBlockInd
 
 static bool CheckBlockHeader(const CBlockHeader& block, BlockValidationState& state, const Consensus::Params& consensusParams, bool fCheckPOW = true)
 {
-    // Check proof of work matches claimed amount
-    if (fCheckPOW && !CheckProofOfWork(block, consensusParams))
+    // Check proof of work matches claimed amount. A RandomX header's key can
+    // depend on its height, so ContextualCheckBlockHeader() checks it instead.
+    if (fCheckPOW && !consensusParams.fPowUseRandomX && !CheckProofOfWork(block, consensusParams))
         return state.Invalid(BlockValidationResult::BLOCK_INVALID_HEADER, "high-hash", "proof of work failed");
 
     return true;
@@ -3996,8 +4000,9 @@ bool CheckBlock(const CBlock& block, BlockValidationState& state, const Consensu
     // Note that witness malleability is checked in ContextualCheckBlock, so no
     // checks that use witness data may be performed here.
 
-    // Size limits (context-free fast-reject against absolute ceiling)
-    if (block.vtx.empty() || block.vtx.size() * WITNESS_SCALE_FACTOR > ABWL_TEMPORARY_MAX || ::GetSerializeSize(TX_NO_WITNESS(block)) * WITNESS_SCALE_FACTOR > ABWL_TEMPORARY_MAX)
+    // Size limits (context-free fast-reject against this chain's absolute ceiling)
+    const int64_t max_block_weight{GetContextFreeMaxBlockWeight(consensusParams)};
+    if (block.vtx.empty() || block.vtx.size() * WITNESS_SCALE_FACTOR > max_block_weight || ::GetSerializeSize(TX_NO_WITNESS(block)) * WITNESS_SCALE_FACTOR > max_block_weight)
         return state.Invalid(BlockValidationResult::BLOCK_CONSENSUS, "bad-blk-length", "size limits failed");
 
     // First transaction must be coinbase, the rest must not be
@@ -4074,6 +4079,10 @@ std::vector<unsigned char> ChainstateManager::GenerateCoinbaseCommitment(CBlock&
 
 bool HasValidProofOfWork(const std::vector<CBlockHeader>& headers, const Consensus::Params& consensusParams)
 {
+    // A RandomX header's key can depend on its height, which isn't known here.
+    // Its proof of work is checked by ContextualCheckBlockHeader() before the
+    // header is stored, and by the headers presync for low-work chains.
+    if (consensusParams.fPowUseRandomX) return true;
     return std::all_of(headers.cbegin(), headers.cend(),
             [&](const auto& header) { return CheckProofOfWork(header, consensusParams);});
 }
@@ -4128,7 +4137,7 @@ arith_uint256 CalculateClaimedHeadersWork(const std::vector<CBlockHeader>& heade
  *  in ConnectBlock().
  *  Note that -reindex-chainstate skips the validation that happens here!
  */
-static bool ContextualCheckBlockHeader(const CBlockHeader& block, BlockValidationState& state, BlockManager& blockman, const ChainstateManager& chainman, const CBlockIndex* pindexPrev) EXCLUSIVE_LOCKS_REQUIRED(::cs_main)
+static bool ContextualCheckBlockHeader(const CBlockHeader& block, BlockValidationState& state, BlockManager& blockman, const ChainstateManager& chainman, const CBlockIndex* pindexPrev, bool check_pow = true) EXCLUSIVE_LOCKS_REQUIRED(::cs_main)
 {
     AssertLockHeld(::cs_main);
     assert(pindexPrev != nullptr);
@@ -4141,8 +4150,28 @@ static bool ContextualCheckBlockHeader(const CBlockHeader& block, BlockValidatio
                              "late-legacy-block",
                              "legacy block after auxpow start");
 
-    // Check proof of work (handle incorrect units for DGW)
-    if (nHeight <= 126000) {
+    // RandomX proof of work (doc/quantum-randomx-key-binding-v1.md). From the
+    // key binding height the key is an earlier block of this chain and merged
+    // mining is invalid; before it, the key comes from the hashed header.
+    if (consensusParams.fPowUseRandomX && check_pow) {
+        if (consensusParams.IsRandomXKeyBound(nHeight)) {
+            if (block.IsAuxpow() || block.auxpow) {
+                return state.Invalid(BlockValidationResult::BLOCK_INVALID_HEADER, "auxpow-randomx", "merged mining is not allowed with RandomX key binding");
+            }
+            if (!block.IsLegacy() && consensusParams.fStrictChainId && block.GetChainId() != consensusParams.nAuxpowChainId) {
+                return state.Invalid(BlockValidationResult::BLOCK_INVALID_HEADER, "bad-chain-id", "block does not have our chain ID");
+            }
+            if (!CheckProofOfWorkWithKey(block, block.nBits, GetRandomXSeedKey(*pindexPrev, consensusParams), consensusParams)) {
+                return state.Invalid(BlockValidationResult::BLOCK_INVALID_HEADER, "high-hash", "proof of work failed");
+            }
+        } else if (!CheckProofOfWork(block, consensusParams)) {
+            return state.Invalid(BlockValidationResult::BLOCK_INVALID_HEADER, "high-hash", "proof of work failed");
+        }
+    }
+
+    // Check proof of work (handle incorrect units for DGW). The tolerance is
+    // mainnet history; a RandomX chain leaves it at key binding.
+    if (nHeight <= 126000 && !consensusParams.IsRandomXKeyBound(nHeight)) {
         unsigned int nBitsNext = GetNextWorkRequired(pindexPrev, &block, consensusParams);
         double n1 = ConvertBitsToDouble(block.nBits);
         double n2 = ConvertBitsToDouble(nBitsNext);
@@ -4604,7 +4633,7 @@ bool TestBlockValidity(BlockValidationState& state,
     indexDummy.phashBlock = &block_hash;
 
     // NOTE: CheckBlockHeader is called by CheckBlock
-    if (!ContextualCheckBlockHeader(block, state, chainstate.m_blockman, chainstate.m_chainman, pindexPrev)) {
+    if (!ContextualCheckBlockHeader(block, state, chainstate.m_blockman, chainstate.m_chainman, pindexPrev, fCheckPOW)) {
         LogError("%s: Consensus::ContextualCheckBlockHeader: %s\n", __func__, state.ToString());
         return false;
     }

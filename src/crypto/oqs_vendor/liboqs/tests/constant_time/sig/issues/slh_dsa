@@ -1,6 +1,0 @@
-{
-   SLH-DSA constant-time behavior has not been studied/analyzed.
-   Memcheck:Cond
-   ...
-   fun:OQS_SIG_slh_dsa*
-}

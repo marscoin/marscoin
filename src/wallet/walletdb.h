@@ -6,6 +6,7 @@
 #ifndef BITCOIN_WALLET_WALLETDB_H
 #define BITCOIN_WALLET_WALLETDB_H
 
+#include <crypto/pq_hd.h>
 #include <script/sign.h>
 #include <wallet/db.h>
 #include <wallet/walletutil.h>
@@ -79,6 +80,8 @@ extern const std::string NAME;
 extern const std::string OLD_KEY;
 extern const std::string ORDERPOSNEXT;
 extern const std::string POOL;
+extern const std::string PQKEY;
+extern const std::string CRYPTED_PQKEY;
 extern const std::string PURPOSE;
 extern const std::string SETTINGS;
 extern const std::string TX;
@@ -86,6 +89,9 @@ extern const std::string VERSION;
 extern const std::string WALLETDESCRIPTOR;
 extern const std::string WALLETDESCRIPTORCKEY;
 extern const std::string WALLETDESCRIPTORKEY;
+extern const std::string WALLETDESCRIPTORPQCACHE;
+extern const std::string WALLETDESCRIPTORPQNODE;
+extern const std::string WALLETDESCRIPTORCPQNODE;
 extern const std::string WATCHMETA;
 extern const std::string WATCHS;
 
@@ -265,17 +271,39 @@ public:
     bool WriteDescriptorParentCache(const CExtPubKey& xpub, const uint256& desc_id, uint32_t key_exp_index);
     bool WriteDescriptorLastHardenedCache(const CExtPubKey& xpub, const uint256& desc_id, uint32_t key_exp_index);
     bool WriteDescriptorCacheItems(const uint256& desc_id, const DescriptorCache& cache);
+    //! Cache the PQ public key a wpq() descriptor derives at der_index.
+    bool WriteDescriptorPQPubKeyCache(const uint256& desc_id, uint32_t der_index, const std::vector<unsigned char>& pubkey);
+    //! Write the unencrypted PQ HD node of a wpq() descriptor.
+    bool WriteDescriptorPQNode(const uint256& desc_id, const uint256& node_id, const pq::hd::Node& node);
+    //! Write the encrypted PQ HD node of a wpq() descriptor, erasing any unencrypted copy.
+    bool WriteCryptedDescriptorPQNode(const uint256& desc_id, const uint256& node_id, const std::vector<unsigned char>& secret);
 
-    //! Write a post-quantum SPHINCS+ keypair to the database.
+    //! Write an unencrypted post-quantum SPHINCS+ keypair to the database.
+    //! Only for wallets without encryption; encrypted wallets use WriteCryptedPQKey.
     //! Key: "pqkey" + program_hash, Value: param_set_id + pubkey + privkey
     bool WritePQKey(const uint256& program, uint8_t param_set_id,
                     const std::vector<unsigned char>& pubkey,
                     const std::vector<unsigned char>& privkey);
 
-    //! Read a post-quantum SPHINCS+ keypair from the database.
+    //! Read an unencrypted post-quantum SPHINCS+ keypair from the database.
     bool ReadPQKey(const uint256& program, uint8_t& param_set_id,
                    std::vector<unsigned char>& pubkey,
                    std::vector<unsigned char>& privkey);
+    bool ErasePQKey(const uint256& program);
+
+    //! Write a post-quantum SPHINCS+ keypair whose secret key is encrypted with the wallet master key.
+    //! Key: "cpqkey" + program_hash, Value: param_set_id + pubkey + crypted_secret
+    bool WriteCryptedPQKey(const uint256& program, uint8_t param_set_id,
+                           const std::vector<unsigned char>& pubkey,
+                           const std::vector<unsigned char>& crypted_secret);
+    bool ReadCryptedPQKey(const uint256& program, uint8_t& param_set_id,
+                          std::vector<unsigned char>& pubkey,
+                          std::vector<unsigned char>& crypted_secret);
+
+    //! Whether an encrypted or unencrypted PQ key exists for this program.
+    bool HasPQKey(const uint256& program);
+    //! Programs of all unencrypted PQ key records.
+    bool ListPlaintextPQKeyPrograms(std::vector<uint256>& programs);
 
     bool WriteLockedUTXO(const COutPoint& output);
     bool EraseLockedUTXO(const COutPoint& output);

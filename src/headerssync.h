@@ -15,6 +15,7 @@
 #include <util/hasher.h>
 
 #include <deque>
+#include <map>
 #include <vector>
 
 // A compressed CBlockHeader, which leaves out the prevhash
@@ -202,7 +203,7 @@ private:
     bool ValidateAndStoreHeadersCommitments(const std::vector<CBlockHeader>& headers);
 
     /** In PRESYNC, process and update state for a single header */
-    bool ValidateAndProcessSingleHeader(const CPureBlockHeader& current);
+    bool ValidateAndProcessSingleHeader(const CBlockHeader& current);
 
     /** In REDOWNLOAD, check a header's commitment (if applicable) and add to
      * buffer for later processing */
@@ -232,6 +233,10 @@ private:
 
     /** A queue of commitment bits, created during the 1st phase, and verified during the 2nd. */
     bitdeque<> m_header_commitments;
+
+    /** RandomX seed blocks passed in the presync phase, by height (one per
+     *  seed epoch). Headers further along need them as keys. */
+    std::map<int, uint256> m_randomx_seeds;
 
     /** m_max_commitments is a bound we calculate on how long an honest peer's chain could be,
      * given the MTP rule.

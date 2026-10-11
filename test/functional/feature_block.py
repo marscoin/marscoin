@@ -79,6 +79,10 @@ class CBrokenBlock(CBlock):
 
 
 DUPLICATE_COINBASE_SCRIPT_SIG = b'\x01\x78'  # Valid for block at height 120
+# Marscoin enforces neither BIP30 (no overwriting an unspent transaction) nor
+# BIP34 (height in the coinbase) since db5c033f96. The cases that expect them
+# are skipped until they are back (work order MQ-53).
+ENFORCES_BIP30_BIP34 = False
 
 
 class FullBlockTest(BitcoinTestFramework):
@@ -88,6 +92,9 @@ class FullBlockTest(BitcoinTestFramework):
         self.extra_args = [[
             '-acceptnonstdtxn=1',  # This is a consensus block test, we don't care about tx policy
             '-testactivationheight=bip34@2',
+            # Test the block size rules mainnet runs today: ABWL (adaptive block
+            # weight) is not active there. 0 turns it off.
+            '-testactivationheight=abwl@0',
         ]]
 
     def run_test(self):
@@ -634,8 +641,8 @@ class FullBlockTest(BitcoinTestFramework):
         self.move_tip(44)
         b47 = self.next_block(47)
         target = uint256_from_compact(b47.nBits)
-        while b47.sha256 <= target:
-            # Rehash nonces until an invalid too-high-hash block is found.
+        while b47.calc_pow_hash() <= target:
+            # Try nonces until the proof-of-work (scrypt) hash is too high.
             b47.nNonce += 1
             b47.rehash()
         self.send_blocks([b47], False, force_send=True, reject_reason='high-hash', reconnect=True)
@@ -658,7 +665,9 @@ class FullBlockTest(BitcoinTestFramework):
         self.log.info("Reject a block with incorrect POW limit")
         self.move_tip(44)
         b50 = self.next_block(50)
-        b50.nBits = b50.nBits - 1
+        # Up to height 126000 Marscoin accepts a difficulty within 50% of the
+        # expected one, so nBits - 1 passes. A target four times smaller doesn't.
+        b50.nBits = 0x201fffff
         b50.solve()
         self.send_blocks([b50], False, force_send=True, reject_reason='bad-diffbits', reconnect=True)
 
@@ -828,14 +837,17 @@ class FullBlockTest(BitcoinTestFramework):
         # the second one should be rejected. See also CVE-2012-1909.
         #
         self.log.info("Reject a block with a transaction with a duplicate hash of a previous transaction (BIP30)")
-        self.move_tip(60)
-        b61 = self.next_block(61)
-        b61.vtx[0].vin[0].scriptSig = DUPLICATE_COINBASE_SCRIPT_SIG
-        b61.vtx[0].rehash()
-        b61 = self.update_block(61, [])
-        assert_equal(duplicate_tx.serialize(), b61.vtx[0].serialize())
-        # BIP30 is always checked on regtest, regardless of the BIP34 activation height
-        self.send_blocks([b61], success=False, reject_reason='bad-txns-BIP30', reconnect=True)
+        if ENFORCES_BIP30_BIP34:
+            self.move_tip(60)
+            b61 = self.next_block(61)
+            b61.vtx[0].vin[0].scriptSig = DUPLICATE_COINBASE_SCRIPT_SIG
+            b61.vtx[0].rehash()
+            b61 = self.update_block(61, [])
+            assert_equal(duplicate_tx.serialize(), b61.vtx[0].serialize())
+            # BIP30 is always checked on regtest, regardless of the BIP34 activation height
+            self.send_blocks([b61], success=False, reject_reason='bad-txns-BIP30', reconnect=True)
+        else:
+            self.log.info("  skipped: Marscoin doesn't enforce BIP30 (MQ-53)")
 
         # Test BIP30 (allow duplicate if spent)
         #
@@ -1307,16 +1319,21 @@ class FullBlockTest(BitcoinTestFramework):
         self.send_blocks([block], True, timeout=2440)
 
         self.log.info("Reject a block with an invalid block header version")
+        # Marscoin rejects legacy block versions (1 to 4, no auxpow chain ID)
+        # from the merge-mining start, before the BIP version checks.
         b_v1 = self.next_block('b_v1', version=1)
-        self.send_blocks([b_v1], success=False, force_send=True, reject_reason='bad-version(0x00000001)', reconnect=True)
+        self.send_blocks([b_v1], success=False, force_send=True, reject_reason='late-legacy-block', reconnect=True)
 
-        self.move_tip(chain1_tip + 2)
-        b_cb34 = self.next_block('b_cb34')
-        b_cb34.vtx[0].vin[0].scriptSig = b_cb34.vtx[0].vin[0].scriptSig[:-1]
-        b_cb34.vtx[0].rehash()
-        b_cb34.hashMerkleRoot = b_cb34.calc_merkle_root()
-        b_cb34.solve()
-        self.send_blocks([b_cb34], success=False, reject_reason='bad-cb-height', reconnect=True)
+        if ENFORCES_BIP30_BIP34:
+            self.move_tip(chain1_tip + 2)
+            b_cb34 = self.next_block('b_cb34')
+            b_cb34.vtx[0].vin[0].scriptSig = b_cb34.vtx[0].vin[0].scriptSig[:-1]
+            b_cb34.vtx[0].rehash()
+            b_cb34.hashMerkleRoot = b_cb34.calc_merkle_root()
+            b_cb34.solve()
+            self.send_blocks([b_cb34], success=False, reject_reason='bad-cb-height', reconnect=True)
+        else:
+            self.log.info("Reject a block whose coinbase lacks its height (BIP34): skipped, not enforced (MQ-53)")
 
     # Helper methods
     ################
@@ -1348,7 +1365,7 @@ class FullBlockTest(BitcoinTestFramework):
         tx.rehash()
         return tx
 
-    def next_block(self, number, spend=None, additional_coinbase_value=0, *, script=None, version=4):
+    def next_block(self, number, spend=None, additional_coinbase_value=0, *, script=None, version=None):
         if script is None:
             script = CScript([OP_TRUE])
         if self.tip is None:

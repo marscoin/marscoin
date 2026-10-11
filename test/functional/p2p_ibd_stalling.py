@@ -98,8 +98,9 @@ class P2PIBDStallingTest(BitcoinTestFramework):
                 p.send_message(headers_message)
             self.all_sync_send_with_ping(peers)
 
-        self.log.info("Check that the stalling peer is disconnected after 2 seconds")
-        self.mocktime += 3
+        # Marscoin's stalling timeout starts at 1 second (2 upstream).
+        self.log.info("Check that the stalling peer is disconnected after 1 second")
+        self.mocktime += 2
         node.setmocktime(self.mocktime)
         peers[0].wait_for_disconnect()
         assert_equal(node.num_test_p2p_connections(), NUM_PEERS - 1)
@@ -108,9 +109,9 @@ class P2PIBDStallingTest(BitcoinTestFramework):
         # to another peer and starts the stalling logic for them
         self.all_sync_send_with_ping(peers)
 
-        self.log.info("Check that the stalling timeout gets doubled to 4 seconds for the next staller")
-        # No disconnect after just 3 seconds
-        self.mocktime += 3
+        self.log.info("Check that the stalling timeout gets doubled to 2 seconds for the next staller")
+        # No disconnect after just 1 second
+        self.mocktime += 1
         node.setmocktime(self.mocktime)
         self.all_sync_send_with_ping(peers)
         assert_equal(node.num_test_p2p_connections(), NUM_PEERS - 1)
@@ -121,9 +122,9 @@ class P2PIBDStallingTest(BitcoinTestFramework):
         self.wait_until(lambda: self.is_block_requested(peers, stall_block))
         self.all_sync_send_with_ping(peers)
 
-        self.log.info("Check that the stalling timeout gets doubled to 8 seconds for the next staller")
-        # No disconnect after just 7 seconds
-        self.mocktime += 7
+        self.log.info("Check that the stalling timeout gets doubled to 4 seconds for the next staller")
+        # No disconnect after just 3 seconds
+        self.mocktime += 3
         node.setmocktime(self.mocktime)
         self.all_sync_send_with_ping(peers)
         assert_equal(node.num_test_p2p_connections(), NUM_PEERS - 2)
@@ -134,8 +135,8 @@ class P2PIBDStallingTest(BitcoinTestFramework):
         self.wait_until(lambda: self.is_block_requested(peers, stall_block))
         self.all_sync_send_with_ping(peers)
 
-        self.log.info("Provide the withheld block and check that stalling timeout gets reduced back to 2 seconds")
-        with node.assert_debug_log(expected_msgs=['Decreased stalling timeout to 2 seconds']):
+        self.log.info("Provide the withheld block and check that stalling timeout gets reduced back to 1 second")
+        with node.assert_debug_log(expected_msgs=['Decreased stalling timeout to 1 seconds']):
             for p in peers:
                 if p.is_connected and (stall_block in p.getdata_requests):
                     p.send_message(msg_block(block_dict[stall_block]))

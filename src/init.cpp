@@ -58,6 +58,7 @@
 #include <policy/fees_args.h>
 #include <policy/policy.h>
 #include <policy/settings.h>
+#include <pow.h>
 #include <protocol.h>
 #include <rpc/blockchain.h>
 #include <rpc/register.h>
@@ -647,7 +648,7 @@ void SetupServerArgs(ArgsManager& argsman)
                              "is of this size or less (default: %u)",
                              MAX_OP_RETURN_RELAY),
                    ArgsManager::ALLOW_ANY, OptionsCategory::NODE_RELAY);
-    argsman.AddArg("-mempoolfullrbf", strprintf("(DEPRECATED) Accept transaction replace-by-fee without requiring replaceability signaling (default: %u)", DEFAULT_MEMPOOL_FULL_RBF), ArgsManager::ALLOW_ANY, OptionsCategory::NODE_RELAY);
+    argsman.AddArg("-mempoolfullrbf", strprintf("(DEPRECATED, no effect: Marscoin never replaces mempool transactions) (default: %u)", DEFAULT_MEMPOOL_FULL_RBF), ArgsManager::ALLOW_ANY, OptionsCategory::NODE_RELAY);
     argsman.AddArg("-permitbaremultisig", strprintf("Relay transactions creating non-P2SH multisig outputs (default: %u)", DEFAULT_PERMIT_BAREMULTISIG), ArgsManager::ALLOW_ANY,
                    OptionsCategory::NODE_RELAY);
     argsman.AddArg("-minrelaytxfee=<amt>", strprintf("Fees (in %s/kvB) smaller than this are considered zero fee for relaying, mining and transaction creation (default: %s)",
@@ -913,6 +914,10 @@ bool AppInitParameterInteraction(const ArgsManager& args)
 
     if (!errors.empty()) {
         return InitError(errors);
+    }
+
+    if (!IsProofOfWorkSupported(chainparams.GetConsensus())) {
+        return InitError(Untranslated("This chain uses RandomX proof of work, but this build lacks RandomX support. Rebuild with --enable-randomx-vendor."));
     }
 
     // Testnet3 deprecation warning

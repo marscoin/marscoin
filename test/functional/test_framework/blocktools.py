@@ -50,8 +50,8 @@ MAX_BLOCK_SIGOPS = 20000
 MAX_BLOCK_SIGOPS_WEIGHT = MAX_BLOCK_SIGOPS * WITNESS_SCALE_FACTOR
 MAX_STANDARD_TX_WEIGHT = 400000
 
-# Genesis block time (regtest)
-TIME_GENESIS_BLOCK = 1296688602
+# Genesis block time (Marscoin regtest)
+TIME_GENESIS_BLOCK = 1388590627
 
 MAX_FUTURE_BLOCK_TIME = 2 * 60 * 60
 
@@ -63,6 +63,14 @@ WITNESS_COMMITMENT_HEADER = b"\xaa\x21\xa9\xed"
 
 NORMAL_GBT_REQUEST_PARAMS = {"rules": ["segwit"]}
 VERSIONBITS_LAST_OLD_BLOCK_VERSION = 4
+
+# The auxpow chain-ID constants live in messages.py, so that CBlockHeader
+# defaults to a version regtest accepts.
+from .messages import (  # noqa: E402,F401
+    DEFAULT_BLOCK_VERSION,
+    REGTEST_AUXPOW_CHAIN_ID,
+    VERSION_CHAIN_START,
+)
 MIN_BLOCKS_TO_KEEP = 288
 
 
@@ -71,7 +79,7 @@ def create_block(hashprev=None, coinbase=None, ntime=None, *, version=None, tmpl
     block = CBlock()
     if tmpl is None:
         tmpl = {}
-    block.nVersion = version or tmpl.get('version') or VERSIONBITS_LAST_OLD_BLOCK_VERSION
+    block.nVersion = version or tmpl.get('version') or DEFAULT_BLOCK_VERSION
     block.nTime = ntime or tmpl.get('curtime') or int(time.time() + 600)
     block.hashPrevBlock = hashprev or int(tmpl['previousblockhash'], 0x10)
     if tmpl and not tmpl.get('bits') is None:

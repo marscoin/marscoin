@@ -303,6 +303,13 @@ private:
 
     bool Unlock(const CKeyingMaterial& vMasterKeyIn);
 
+    //! Read every unencrypted post-quantum key record.
+    bool ReadPlaintextPQKeys(std::vector<std::pair<uint256, PQKeyData>>& keys) const;
+    //! Replace unencrypted post-quantum key records with records encrypted under master_key.
+    bool EncryptPQKeys(const CKeyingMaterial& master_key,
+                       const std::vector<std::pair<uint256, PQKeyData>>& keys,
+                       WalletBatch& batch) const;
+
     std::atomic<bool> fAbortRescan{false};
     std::atomic<bool> fScanningWallet{false}; // controlled by WalletRescanReserver
     std::atomic<bool> m_attaching_chain{false};
@@ -561,6 +568,10 @@ public:
     //! Upgrade DescriptorCaches
     void UpgradeDescriptorCache() EXCLUSIVE_LOCKS_REQUIRED(cs_wallet);
 
+    //! Encrypt any unencrypted post-quantum key records left in an encrypted wallet
+    //! (for example, keys created by an earlier build). Requires the wallet to be unlocked.
+    void UpgradePlaintextPQKeys() EXCLUSIVE_LOCKS_REQUIRED(cs_wallet);
+
     bool LoadMinVersion(int nVersion) EXCLUSIVE_LOCKS_REQUIRED(cs_wallet) { AssertLockHeld(cs_wallet); nWalletVersion = nVersion; return true; }
 
     //! Marks destination as previously spent.
@@ -579,6 +590,21 @@ public:
     bool Unlock(const SecureString& strWalletPassphrase);
     bool ChangeWalletPassphrase(const SecureString& strOldWalletPassphrase, const SecureString& strNewWalletPassphrase);
     bool EncryptWallet(const SecureString& strWalletPassphrase);
+
+    //! Whether consensus verifies post-quantum witness v2 spends in the next block.
+    //! While it does not, outputs to mars1z addresses can be spent by anyone, so
+    //! the wallet refuses to create PQ addresses, send to them, or sign PQ inputs.
+    bool IsPQActive() const EXCLUSIVE_LOCKS_REQUIRED(cs_wallet);
+    //! Store a new post-quantum keypair. The secret key is encrypted with the
+    //! wallet master key if the wallet is encrypted, which requires it to be unlocked.
+    bool AddPQKey(const uint256& program, uint8_t param_set_id,
+                  const std::vector<unsigned char>& pubkey,
+                  const std::vector<unsigned char>& privkey) EXCLUSIVE_LOCKS_REQUIRED(cs_wallet);
+    //! Whether the wallet holds a post-quantum key for this witness v2 program.
+    bool HavePQKey(const uint256& program) const;
+    //! Fetch a post-quantum keypair, decrypting it if needed. Fails if the key is
+    //! encrypted and the wallet is locked.
+    bool GetPQKey(const uint256& program, PQKeyData& key) const;
 
     void GetKeyBirthTimes(std::map<CKeyID, int64_t> &mapKeyBirth) const EXCLUSIVE_LOCKS_REQUIRED(cs_wallet);
     unsigned int ComputeTimeSmart(const CWalletTx& wtx, bool rescanning_old_block) const;
@@ -635,7 +661,7 @@ public:
     bool ShouldResend() const;
     void ResubmitWalletTransactions(bool relay, bool force);
 
-    OutputType TransactionChangeType(const std::optional<OutputType>& change_type, const std::vector<CRecipient>& vecSend) const;
+    OutputType TransactionChangeType(const std::optional<OutputType>& change_type, const std::vector<CRecipient>& vecSend) const EXCLUSIVE_LOCKS_REQUIRED(cs_wallet);
 
     /** Fetch the inputs and sign with SIGHASH_ALL. */
     bool SignTransaction(CMutableTransaction& tx) const EXCLUSIVE_LOCKS_REQUIRED(cs_wallet);
@@ -1020,6 +1046,13 @@ public:
     //! Create new DescriptorScriptPubKeyMans and add them to the wallet
     void SetupDescriptorScriptPubKeyMans(const CExtKey& master_key) EXCLUSIVE_LOCKS_REQUIRED(cs_wallet);
     void SetupDescriptorScriptPubKeyMans() EXCLUSIVE_LOCKS_REQUIRED(cs_wallet);
+
+    //! Set up active wpq() descriptors for receiving and change, below the root
+    //! of a fresh random seed (doc/quantum-pq-key-derivation-v1.md, section 5.1).
+    void SetupPQDescriptorScriptPubKeyMans(WalletBatch& batch) EXCLUSIVE_LOCKS_REQUIRED(cs_wallet);
+    //! Set up wpq() descriptors in a wallet created before it had them. Does
+    //! nothing if the wallet already has an active one.
+    util::Result<void> SetupMissingPQDescriptors() EXCLUSIVE_LOCKS_REQUIRED(cs_wallet);
 
     //! Return the DescriptorScriptPubKeyMan for a WalletDescriptor if it is already in the wallet
     DescriptorScriptPubKeyMan* GetDescriptorScriptPubKeyMan(const WalletDescriptor& desc) const;

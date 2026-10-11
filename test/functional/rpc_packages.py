@@ -301,7 +301,10 @@ class RPCPackagesTest(BitcoinTestFramework):
         # This transaction is a valid BIP125 replace-by-fee
         self.wallet.sendrawtransaction(from_node=node, tx_hex=replaceable_tx["hex"])
         testres_rbf_single = node.testmempoolaccept([replacement_tx["hex"]])
-        assert testres_rbf_single[0]["allowed"]
+        # Upstream allows this replacement on its own. Marscoin never replaces
+        # mempool transactions (58e16509a2).
+        assert not testres_rbf_single[0]["allowed"]
+        assert_equal(testres_rbf_single[0]["reject-reason"], "bip125-replacement-disallowed")
         testres_rbf_package = self.independent_txns_testres_blank + [{
             "txid": replacement_tx["txid"], "wtxid": replacement_tx["wtxid"], "allowed": False,
             "reject-reason": "bip125-replacement-disallowed"

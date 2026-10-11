@@ -1,0 +1,17 @@
+# Secret scanning configuration for gitleaks (https://github.com/gitleaks/gitleaks).
+# Used by .github/workflows/secret-scan.yml and for local scans:
+#   gitleaks git --redact .
+# Reviewed findings in existing history are listed by fingerprint in .gitleaksignore.
+
+title = "Marscoin secret scanning"
+
+[extend]
+useDefault = true
+
+[[allowlists]]
+description = "Vendored third-party crypto sources and public test-vector data"
+paths = [
+  '''^src/crypto/oqs_vendor/''',
+  '''^src/crypto/randomx_vendor/''',
+  '''^src/test/data/''',
+]

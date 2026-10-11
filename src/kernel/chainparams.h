@@ -155,7 +155,20 @@ public:
         std::unordered_map<Consensus::DeploymentPos, VersionBitsParameters> version_bits_parameters{};
         std::unordered_map<Consensus::BuriedDeployment, int> activation_heights{};
         bool fastprune{false};
-        bool randomx_devnet{false};
+        //! Override nABWLActivationHeight. 0 disables.
+        std::optional<int> abwl_activation_height{};
+        //! Override nPQWitnessActivationHeight. 0 disables.
+        std::optional<int> pqwitness_activation_height{};
+    };
+
+    /**
+     * MarsqnetOptions overrides marsqnet parameters for testing (debug-only
+     * command-line options). The defaults are the network's own values.
+     */
+    struct MarsqnetOptions {
+        std::optional<int> randomx_key_binding_height{};
+        std::optional<int> randomx_seed_epoch{};
+        std::optional<int> randomx_seed_lag{};
     };
 
     static std::unique_ptr<const CChainParams> RegTest(const RegTestOptions& options);
@@ -163,6 +176,8 @@ public:
     static std::unique_ptr<const CChainParams> Main();
     static std::unique_ptr<const CChainParams> TestNet();
     static std::unique_ptr<const CChainParams> TestNet4();
+    static std::unique_ptr<const CChainParams> Marsqnet();
+    static std::unique_ptr<const CChainParams> Marsqnet(const MarsqnetOptions& options);
 
 protected:
     CChainParams() = default;

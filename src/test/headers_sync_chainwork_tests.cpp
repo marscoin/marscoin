@@ -2,6 +2,9 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
+#include <config/bitcoin-config.h> // IWYU pragma: keep
+
+#include <arith_uint256.h>
 #include <chain.h>
 #include <chainparams.h>
 #include <consensus/params.h>
@@ -28,7 +31,7 @@ struct HeadersGeneratorSetup : public RegTestingSetup {
 
 void HeadersGeneratorSetup::FindProofOfWork(CBlockHeader& starting_header)
 {
-    while (!CheckProofOfWork(starting_header.GetHash(), starting_header.nBits, Params().GetConsensus())) {
+    while (!CheckProofOfWork(starting_header, starting_header.nBits, Params().GetConsensus())) {
         ++(starting_header.nNonce);
     }
 }
@@ -142,5 +145,79 @@ BOOST_AUTO_TEST_CASE(headers_sync_state)
     // chain:
     BOOST_CHECK(result.success);
 }
+
+#ifdef ENABLE_RANDOMX_VENDOR
+BOOST_AUTO_TEST_CASE(headers_presync_randomx_key_binding)
+{
+    // The presync phase checks RandomX proof of work itself, keyed by seed
+    // blocks it remembers as they go by (doc/quantum-randomx-key-binding-v1.md).
+    // Test parameters: an easy target, key binding from height 5, epoch 16,
+    // lag 4, so 60 headers cross three key changes.
+    Consensus::Params params{Params().GetConsensus()};
+    params.fPowUseRandomX = true;
+    params.powLimit = uint256{"7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"};
+    params.nRandomXKeyBindingHeight = 5;
+    params.nRandomXSeedEpoch = 16;
+    params.nRandomXSeedLag = 4;
+    const uint32_t bits{UintToArith256(params.powLimit).GetCompact()};
+    const uint256 genesis_hash{Params().GenesisBlock().GetHash()};
+
+    std::vector<CBlockHeader> chain;
+    auto key_for = [&](int height, const CBlockHeader& header) {
+        if (!params.IsRandomXKeyBound(height)) return header.hashPrevBlock;
+        const int seed{RandomXSeedHeight(height, params)};
+        return seed == 0 ? genesis_hash : chain[seed - 1].GetHash();
+    };
+    auto grind = [&](CBlockHeader& header, const uint256& key) {
+        while (!CheckProofOfWorkWithKey(header, header.nBits, key, params)) ++header.nNonce;
+    };
+    uint256 prev{genesis_hash};
+    uint32_t time{Params().GenesisBlock().nTime};
+    for (int height = 1; height <= 60; ++height) {
+        CBlockHeader header;
+        header.nVersion = 4 | (params.nAuxpowChainId << 16);
+        header.hashPrevBlock = prev;
+        header.nTime = ++time;
+        header.nBits = bits;
+        grind(header, key_for(height, header));
+        chain.push_back(header);
+        prev = header.GetHash();
+    }
+
+    const CBlockIndex* chain_start = WITH_LOCK(::cs_main, return m_node.chainman->m_blockman.LookupBlockIndex(genesis_hash));
+    const arith_uint256 unreachable_work{arith_uint256{1} << 200};
+
+    // A valid chain stays in presync and asks for more.
+    {
+        HeadersSyncState hss{0, params, chain_start, unreachable_work};
+        const auto result{hss.ProcessNextHeaders(chain, true)};
+        BOOST_CHECK(result.success);
+        BOOST_CHECK(result.request_more);
+        BOOST_CHECK(hss.GetState() == HeadersSyncState::State::PRESYNC);
+    }
+
+    // A header ground with the wrong key (here the null key) is rejected, even
+    // though it would pass with that key.
+    {
+        std::vector<CBlockHeader> bad{chain.begin(), chain.begin() + 39};
+        CBlockHeader header{chain[39]};
+        while (!(CheckProofOfWorkWithKey(header, header.nBits, uint256{}, params) &&
+                 !CheckProofOfWorkWithKey(header, header.nBits, key_for(40, header), params))) {
+            ++header.nNonce;
+        }
+        bad.push_back(header);
+        HeadersSyncState hss{0, params, chain_start, unreachable_work};
+        BOOST_CHECK(!hss.ProcessNextHeaders(bad, true).success);
+    }
+
+    // A merged-mined header after key binding is rejected.
+    {
+        std::vector<CBlockHeader> bad{chain.begin(), chain.begin() + 30};
+        bad.back().SetAuxpowVersion(true);
+        HeadersSyncState hss{0, params, chain_start, unreachable_work};
+        BOOST_CHECK(!hss.ProcessNextHeaders(bad, true).success);
+    }
+}
+#endif
 
 BOOST_AUTO_TEST_SUITE_END()

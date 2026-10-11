@@ -116,6 +116,19 @@ struct Params {
     bool enforce_BIP94;
     bool fPowNoRetargeting;
     bool fPowUseRandomX{false};
+    /**
+     * RandomX key binding (doc/quantum-randomx-key-binding-v1.md). From this
+     * height on, a RandomX chain keys each block with the hash of an earlier
+     * block of its own chain, chosen every nRandomXSeedEpoch blocks with a lag
+     * of nRandomXSeedLag, and merged-mined (auxpow) blocks are invalid. Below
+     * it the key is the hashed header's hashPrevBlock.
+     */
+    int nRandomXKeyBindingHeight{std::numeric_limits<int>::max()};
+    int nRandomXSeedEpoch{2048};
+    int nRandomXSeedLag{64};
+    bool IsRandomXKeyBound(int height) const { return fPowUseRandomX && height >= nRandomXKeyBindingHeight; }
+    /** Use ASERT (anchored at nASERTAnchor) at every height instead of mainnet's height schedule. */
+    bool fPowAlwaysAsert{false};
     int64_t nPowTargetSpacing;
     int64_t nPowTargetTimespan;
     int64_t nASERTAnchor;
@@ -157,6 +170,23 @@ struct Params {
 
     /** Adaptive Block Weight Limit activation height. 0 = not activated. */
     int nABWLActivationHeight{0};
+
+    /**
+     * Post-quantum witness v2 (P2WPQH) activation height. 0 = not activated.
+     * A buried height rather than a BIP9 deployment: the auxpow chain ID
+     * occupies the upper version bits, so merged-mined blocks can't signal.
+     */
+    int nPQWitnessActivationHeight{0};
+
+    /**
+     * Whether post-quantum witness v2 (P2WPQH) spends are verified by consensus
+     * in a block at the given height. Wallet safety checks use the same
+     * function, so changing the activation rule here updates both.
+     */
+    bool IsPQWitnessActive(int height) const
+    {
+        return nPQWitnessActivationHeight > 0 && height >= nPQWitnessActivationHeight;
+    }
 
     /** Auxpow parameters */
     int32_t nAuxpowChainId;

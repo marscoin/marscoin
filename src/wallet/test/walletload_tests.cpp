@@ -2,6 +2,7 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or https://www.opensource.org/licenses/mit-license.php.
 
+#include <crypto/pq_sphincs.h>
 #include <wallet/test/util.h>
 #include <wallet/wallet.h>
 #include <test/util/logging.h>
@@ -208,6 +209,99 @@ BOOST_FIXTURE_TEST_CASE(wallet_load_ckey, TestingSetup)
         std::shared_ptr<CWallet> wallet(new CWallet(m_node.chain.get(), "", CreateMockableWalletDatabase(records)));
         BOOST_CHECK_EQUAL(wallet->LoadWallet(), DBErrors::CORRUPT);
     }
+}
+
+//! Whether any record value in the wallet database contains the given bytes.
+static bool AnyRecordContains(CWallet& wallet, const std::vector<unsigned char>& needle)
+{
+    for (const auto& [key, value] : GetMockableDatabase(wallet).m_records) {
+        const auto* begin = reinterpret_cast<const unsigned char*>(value.data());
+        if (std::search(begin, begin + value.size(), needle.begin(), needle.end()) != begin + value.size()) return true;
+    }
+    return false;
+}
+
+BOOST_FIXTURE_TEST_CASE(wallet_pq_key_encryption, TestingSetup)
+{
+    // Fake SPHINCS+ keypair with the real layout: the 64-byte secret key is
+    // SK.seed || SK.prf || PK.seed || PK.root and the public key is PK.seed || PK.root.
+    std::vector<unsigned char> pubkey(pq::sphincs::SPHINCS_PUBLIC_KEY_SIZE_SHA2_128S);
+    std::vector<unsigned char> privkey(pq::sphincs::SPHINCS_SECRET_KEY_SIZE_SHA2_128S);
+    for (size_t i = 0; i < pubkey.size(); ++i) pubkey[i] = static_cast<unsigned char>(0xa0 + i);
+    for (size_t i = 0; i < 32; ++i) privkey[i] = static_cast<unsigned char>(0x10 + i);
+    std::copy(pubkey.begin(), pubkey.end(), privkey.begin() + 32);
+    const std::vector<unsigned char> secret_part(privkey.begin(), privkey.begin() + 32);
+    const uint256 program_a{uint256::ONE};
+    const uint256 program_b{uint256S("02")};
+    const uint256 program_c{uint256S("03")};
+
+    std::shared_ptr<CWallet> wallet(new CWallet(m_node.chain.get(), "", CreateMockableWalletDatabase()));
+    {
+        LOCK(wallet->cs_wallet);
+        wallet->SetWalletFlag(WALLET_FLAG_DESCRIPTORS);
+        wallet->SetupDescriptorScriptPubKeyMans();
+
+        // A secret key that does not end with its public key is rejected
+        std::vector<unsigned char> mismatched{privkey};
+        mismatched.back() ^= 1;
+        BOOST_CHECK(!wallet->AddPQKey(program_c, 0, pubkey, mismatched));
+
+        // An unencrypted wallet stores the key in a plaintext record
+        BOOST_CHECK(wallet->AddPQKey(program_a, 0, pubkey, privkey));
+    }
+    BOOST_CHECK(HasAnyRecordOfType(wallet->GetDatabase(), DBKeys::PQKEY));
+    BOOST_CHECK(AnyRecordContains(*wallet, secret_part));
+
+    // Encrypting the wallet encrypts existing PQ keys
+    BOOST_CHECK(wallet->EncryptWallet("pass"));
+    BOOST_CHECK(!HasAnyRecordOfType(wallet->GetDatabase(), DBKeys::PQKEY));
+    BOOST_CHECK(HasAnyRecordOfType(wallet->GetDatabase(), DBKeys::CRYPTED_PQKEY));
+    BOOST_CHECK(!AnyRecordContains(*wallet, secret_part));
+
+    // Locked: the key is known but cannot be read, and new keys cannot be stored
+    BOOST_CHECK(wallet->IsLocked());
+    BOOST_CHECK(wallet->HavePQKey(program_a));
+    PQKeyData key;
+    BOOST_CHECK(!wallet->GetPQKey(program_a, key));
+    {
+        LOCK(wallet->cs_wallet);
+        BOOST_CHECK(!wallet->AddPQKey(program_b, 0, pubkey, privkey));
+    }
+
+    // Unlocked: the key decrypts to the original
+    BOOST_CHECK(wallet->Unlock("pass"));
+    BOOST_CHECK(wallet->GetPQKey(program_a, key));
+    BOOST_CHECK(key.pubkey == pubkey);
+    BOOST_CHECK(key.privkey == privkey);
+    {
+        // Keys added while unlocked are stored encrypted
+        LOCK(wallet->cs_wallet);
+        BOOST_CHECK(wallet->AddPQKey(program_b, 0, pubkey, privkey));
+    }
+    BOOST_CHECK(!HasAnyRecordOfType(wallet->GetDatabase(), DBKeys::PQKEY));
+    BOOST_CHECK(!AnyRecordContains(*wallet, secret_part));
+    BOOST_CHECK(wallet->Lock());
+
+    // An encrypted wallet that still holds a plaintext PQ key (written by an
+    // earlier build) loads, and the key is encrypted on the next unlock
+    {
+        WalletBatch batch(wallet->GetDatabase());
+        BOOST_CHECK(batch.WritePQKey(program_c, 0, pubkey, privkey));
+    }
+    const MockableData records{GetMockableDatabase(*wallet).m_records};
+    std::shared_ptr<CWallet> reloaded(new CWallet(m_node.chain.get(), "", CreateMockableWalletDatabase(records)));
+    BOOST_CHECK_EQUAL(reloaded->LoadWallet(), DBErrors::LOAD_OK);
+    BOOST_CHECK(reloaded->IsCrypted());
+    BOOST_CHECK(reloaded->HavePQKey(program_a));
+    BOOST_CHECK(reloaded->HavePQKey(program_c));
+    BOOST_CHECK(HasAnyRecordOfType(reloaded->GetDatabase(), DBKeys::PQKEY));
+    BOOST_CHECK(reloaded->Unlock("pass"));
+    BOOST_CHECK(!HasAnyRecordOfType(reloaded->GetDatabase(), DBKeys::PQKEY));
+    BOOST_CHECK(!AnyRecordContains(*reloaded, secret_part));
+    BOOST_CHECK(reloaded->GetPQKey(program_c, key));
+    BOOST_CHECK(key.privkey == privkey);
+    BOOST_CHECK(reloaded->GetPQKey(program_a, key));
+    BOOST_CHECK(key.privkey == privkey);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

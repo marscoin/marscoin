@@ -30,7 +30,8 @@ class SignMessagesWithPrivTest(BitcoinTestFramework):
 
         self.log.info('test signing with priv_key')
         priv_key = 'cUeKHd5orzT3mz8P9pxyREHfsWtVfgsfDjiZZBcjUBAaGk1BTj7N'
-        expected_signature = 'INbVnW4e6PeRmsv2Qgu8NuopvrVjkcxob+sX8OcZG0SALhWybUjzMLPdAsXI46YZGb0KQTRii+wWIQzRpG/U+S0='
+        # Signed over Marscoin's message magic, "Marscoin Signed Message:\n"
+        expected_signature = 'IBE0aX0MI9YCi1mB+tm0987Ft9yYWGOjJ+lcJ2U1QsCqaVmpBE38kNhNX+25PufF30JWTtGsEv3EnNt2gJLGuWY='
         signature = self.nodes[0].signmessagewithprivkey(priv_key, message)
         assert_equal(expected_signature, signature)
 

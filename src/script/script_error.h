@@ -84,6 +84,7 @@ typedef enum ScriptError_t
     SCRIPT_ERR_PQ_SIG_FORMAT,
     SCRIPT_ERR_PQ_SIG_VERIFY,
     SCRIPT_ERR_PQ_PROGRAM_MISMATCH,
+    SCRIPT_ERR_PQ_SIG_HASHTYPE,
 
     /* Constant scriptCode */
     SCRIPT_ERR_OP_CODESEPARATOR,

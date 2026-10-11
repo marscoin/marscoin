@@ -101,6 +101,8 @@ from test_framework.util import (
 )
 
 DIRECT_FETCH_RESPONSE_TIME = 0.05
+# Marscoin allows 768 blocks in flight per peer (16 upstream).
+MAX_BLOCKS_IN_TRANSIT_PER_PEER = 768
 
 class BaseNode(P2PInterface):
     def __init__(self):
@@ -477,7 +479,7 @@ class SendHeadersTest(BitcoinTestFramework):
         blocks = []
 
         # Create extra blocks for later
-        for _ in range(20):
+        for _ in range(MAX_BLOCKS_IN_TRANSIT_PER_PEER + 4):
             blocks.append(create_block(tip, create_coinbase(height), block_time))
             blocks[-1].solve()
             tip = blocks[-1].sha256
@@ -498,15 +500,15 @@ class SendHeadersTest(BitcoinTestFramework):
         test_node.sync_with_ping()
         test_node.wait_for_getdata([x.sha256 for x in blocks[0:2]], timeout=DIRECT_FETCH_RESPONSE_TIME)
 
-        # Announcing 16 more headers should trigger direct fetch for 14 more
-        # blocks
-        test_node.send_header_for_blocks(blocks[2:18])
+        # Announcing MAX_BLOCKS_IN_TRANSIT_PER_PEER more headers should trigger
+        # direct fetch for all but 2 of them, up to the in-flight limit
+        test_node.send_header_for_blocks(blocks[2:MAX_BLOCKS_IN_TRANSIT_PER_PEER + 2])
         test_node.sync_with_ping()
-        test_node.wait_for_getdata([x.sha256 for x in blocks[2:16]], timeout=DIRECT_FETCH_RESPONSE_TIME)
+        test_node.wait_for_getdata([x.sha256 for x in blocks[2:MAX_BLOCKS_IN_TRANSIT_PER_PEER]], timeout=DIRECT_FETCH_RESPONSE_TIME)
 
         # Announcing 1 more header should not trigger any response
         test_node.last_message.pop("getdata", None)
-        test_node.send_header_for_blocks(blocks[18:19])
+        test_node.send_header_for_blocks(blocks[MAX_BLOCKS_IN_TRANSIT_PER_PEER + 2:MAX_BLOCKS_IN_TRANSIT_PER_PEER + 3])
         test_node.sync_with_ping()
         with p2p_lock:
             assert "getdata" not in test_node.last_message

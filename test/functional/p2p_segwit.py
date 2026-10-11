@@ -55,6 +55,7 @@ from test_framework.script import (
     OP_0,
     OP_1,
     OP_2,
+    OP_3,
     OP_16,
     OP_2DROP,
     OP_CHECKMULTISIG,
@@ -591,8 +592,12 @@ class SegWitTest(BitcoinTestFramework):
         tx.rehash()
 
         # This is always accepted, since the mempool policy is to consider segwit as always active
-        # and thus allow segwit outputs
-        test_transaction_acceptance(self.nodes[1], self.std_node, tx, with_witness=True, accepted=True)
+        # and thus allow segwit outputs.
+        # Before activation, tx2 can't be mined, and Marscoin never replaces mempool
+        # transactions, so tx couldn't be replaced to evict it. Only test-accept tx and
+        # tx2 then, and add a replacement for tx below.
+        if self.segwit_active:
+            test_transaction_acceptance(self.nodes[1], self.std_node, tx, with_witness=True, accepted=True)
 
         # Now create something that looks like a P2PKH output. This won't be spendable.
         witness_hash = sha256(witness_script)
@@ -605,7 +610,11 @@ class SegWitTest(BitcoinTestFramework):
         tx2.wit.vtxinwit[0].scriptWitness.stack = [witness_script]
         tx2.rehash()
 
-        test_transaction_acceptance(self.nodes[1], self.std_node, tx2, with_witness=True, accepted=True)
+        if self.segwit_active:
+            test_transaction_acceptance(self.nodes[1], self.std_node, tx2, with_witness=True, accepted=True)
+        else:
+            testres = self.nodes[1].testmempoolaccept([tx.serialize_with_witness().hex(), tx2.serialize_with_witness().hex()])
+            assert all(res['allowed'] for res in testres)
 
         # Now update self.utxo for later tests.
         tx3 = CTransaction()
@@ -620,7 +629,7 @@ class SegWitTest(BitcoinTestFramework):
         if not self.segwit_active:
             # Just check mempool acceptance, but don't add the transaction to the mempool, since witness is disallowed
             # in blocks and the tx is impossible to mine right now.
-            testres3 = self.nodes[0].testmempoolaccept([tx3.serialize_with_witness().hex()])
+            testres3 = self.nodes[0].testmempoolaccept([tx.serialize_with_witness().hex(), tx3.serialize_with_witness().hex()])[1:]
             testres3[0]["fees"].pop("effective-feerate")
             testres3[0]["fees"].pop("effective-includes")
             assert_equal(testres3,
@@ -634,7 +643,7 @@ class SegWitTest(BitcoinTestFramework):
                     },
                 }],
             )
-            # Create the same output as tx3, but by replacing tx
+            # Create the same output as tx3, but in place of tx
             tx3_out = tx3.vout[0]
             tx3 = tx
             tx3.vout = [tx3_out]
@@ -1342,8 +1351,9 @@ class SegWitTest(BitcoinTestFramework):
         assert_equal(len(self.nodes[1].getrawmempool()), 0)
         for version in list(range(OP_1, OP_16 + 1)) + [OP_0]:
             # First try to spend to a future version segwit script_pubkey.
-            if version == OP_1:
-                # Don't use 32-byte v1 witness (used by Taproot; see BIP 341)
+            if version in (OP_1, OP_2):
+                # Don't use 32-byte v1 or v2 witness programs (used by Taproot, see
+                # BIP 341, and by Marscoin's P2WPQH)
                 script_pubkey = CScript([CScriptOp(version), witness_hash + b'\x00'])
             else:
                 script_pubkey = CScript([CScriptOp(version), witness_hash])
@@ -1358,9 +1368,9 @@ class SegWitTest(BitcoinTestFramework):
         self.generate(self.nodes[0], 1)  # Mine all the transactions
         assert len(self.nodes[0].getrawmempool()) == 0
 
-        # Finally, verify that version 0 -> version 2 transactions
-        # are standard
-        script_pubkey = CScript([CScriptOp(OP_2), witness_hash])
+        # Finally, verify that version 0 -> version 3 transactions
+        # are standard (version 2 is Marscoin's P2WPQH)
+        script_pubkey = CScript([CScriptOp(OP_3), witness_hash])
         tx2 = CTransaction()
         tx2.vin = [CTxIn(COutPoint(tx.sha256, 0), b"")]
         tx2.vout = [CTxOut(tx.vout[0].nValue - 1000, script_pubkey)]

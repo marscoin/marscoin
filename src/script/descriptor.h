@@ -24,6 +24,8 @@ private:
     ExtPubKeyMap m_parent_xpubs;
     /** Map key expression index -> last hardened xpub */
     ExtPubKeyMap m_last_hardened_xpubs;
+    /** Map derivation index -> PQ public key, for wpq() descriptors */
+    std::unordered_map<uint32_t, std::vector<unsigned char>> m_pq_pubkeys;
 
 public:
     /** Cache a parent xpub
@@ -64,6 +66,21 @@ public:
      * @param[out] xpub The CExtPubKey to get from cache
      */
     bool GetCachedLastHardenedExtPubKey(uint32_t key_exp_pos, CExtPubKey& xpub) const;
+
+    /** Cache a PQ public key derived at an index (wpq() descriptors)
+     *
+     * @param[in] der_index Derivation index of the key
+     * @param[in] pubkey The SLH-DSA public key to cache
+     */
+    void CachePQPubKey(uint32_t der_index, const std::vector<unsigned char>& pubkey);
+    /** Retrieve a cached PQ public key derived at an index
+     *
+     * @param[in] der_index Derivation index of the key
+     * @param[out] pubkey The SLH-DSA public key from the cache
+     */
+    bool GetCachedPQPubKey(uint32_t der_index, std::vector<unsigned char>& pubkey) const;
+    /** Retrieve all cached PQ public keys */
+    std::unordered_map<uint32_t, std::vector<unsigned char>> GetCachedPQPubKeys() const;
 
     /** Retrieve all cached parent xpubs */
     ExtPubKeyMap GetCachedParentExtPubKeys() const;

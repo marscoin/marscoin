@@ -12,12 +12,14 @@ import copy
 from decimal import Decimal
 
 from test_framework.blocktools import (
+    DEFAULT_BLOCK_VERSION,
     create_coinbase,
     get_witness_script,
     NORMAL_GBT_REQUEST_PARAMS,
     TIME_GENESIS_BLOCK,
 )
 from test_framework.messages import (
+    VERSION_AUXPOW,
     BLOCK_HEADER_SIZE,
     CBlock,
     CBlockHeader,
@@ -35,11 +37,11 @@ from test_framework.util import (
 from test_framework.wallet import MiniWallet
 
 
-DIFFICULTY_ADJUSTMENT_INTERVAL = 144
+# Marscoin regtest: a 3.5-day target timespan at 150-second spacing (Bitcoin
+# regtest: one day at 600 seconds, 144).
+DIFFICULTY_ADJUSTMENT_INTERVAL = 2016
 MAX_FUTURE_BLOCK_TIME = 2 * 3600
 MAX_TIMEWARP = 600
-VERSIONBITS_TOP_BITS = 0x20000000
-VERSIONBITS_DEPLOYMENT_TESTDUMMY_BIT = 28
 DEFAULT_BLOCK_MIN_TX_FEE = 1000  # default `-blockmintxfee` setting [sat/kvB]
 
 
@@ -73,10 +75,15 @@ class MiningTest(BitcoinTestFramework):
         self.log.info('test blockversion')
         self.restart_node(0, extra_args=[f'-mocktime={t}', '-blockversion=1337'])
         self.connect_nodes(0, 1)
-        assert_equal(1337, self.nodes[0].getblocktemplate(NORMAL_GBT_REQUEST_PARAMS)['version'])
+        # -blockversion sets the lower bits. The auxpow chain ID stays in the
+        # upper bits, and the auxpow flag (bit 8, set in 1337) is cleared
+        # because the block has no auxpow.
+        assert_equal((1337 & ~VERSION_AUXPOW) | (DEFAULT_BLOCK_VERSION & ~0xffff), self.nodes[0].getblocktemplate(NORMAL_GBT_REQUEST_PARAMS)['version'])
         self.restart_node(0, extra_args=[f'-mocktime={t}'])
         self.connect_nodes(0, 1)
-        assert_equal(VERSIONBITS_TOP_BITS + (1 << VERSIONBITS_DEPLOYMENT_TESTDUMMY_BIT), self.nodes[0].getblocktemplate(NORMAL_GBT_REQUEST_PARAMS)['version'])
+        # Bitcoin signals version bits here. Marscoin's upper version bits hold
+        # the auxpow chain ID, so its blocks can't signal them.
+        assert_equal(DEFAULT_BLOCK_VERSION, self.nodes[0].getblocktemplate(NORMAL_GBT_REQUEST_PARAMS)['version'])
         self.restart_node(0)
         self.connect_nodes(0, 1)
 

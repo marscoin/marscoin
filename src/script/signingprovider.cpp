@@ -8,6 +8,7 @@
 #include <script/signingprovider.h>
 
 #include <logging.h>
+#include <support/cleanse.h>
 
 const SigningProvider& DUMMY_SIGNING_PROVIDER = SigningProvider();
 
@@ -53,6 +54,24 @@ bool HidingSigningProvider::GetTaprootBuilder(const XOnlyPubKey& output_key, Tap
     return m_provider->GetTaprootBuilder(output_key, builder);
 }
 
+bool HidingSigningProvider::GetPQKey(const uint256& program, uint8_t& param_set_id,
+                                     std::vector<unsigned char>& pubkey,
+                                     std::vector<unsigned char>& privkey) const
+{
+    if (!m_provider->GetPQKey(program, param_set_id, pubkey, privkey)) return false;
+    if (m_hide_secret) {
+        memory_cleanse(privkey.data(), privkey.size());
+        privkey.clear();
+    }
+    return true;
+}
+
+bool HidingSigningProvider::GetPQNode(const uint256& node_id, pq::hd::Node& node) const
+{
+    if (m_hide_secret) return false;
+    return m_provider->GetPQNode(node_id, node);
+}
+
 bool FlatSigningProvider::GetCScript(const CScriptID& scriptid, CScript& script) const { return LookupHelper(scripts, scriptid, script); }
 bool FlatSigningProvider::GetPubKey(const CKeyID& keyid, CPubKey& pubkey) const { return LookupHelper(pubkeys, keyid, pubkey); }
 bool FlatSigningProvider::GetKeyOrigin(const CKeyID& keyid, KeyOriginInfo& info) const
@@ -89,6 +108,11 @@ bool FlatSigningProvider::GetPQKey(const uint256& program, uint8_t& param_set_id
     return true;
 }
 
+bool FlatSigningProvider::GetPQNode(const uint256& node_id, pq::hd::Node& node) const
+{
+    return LookupHelper(pq_nodes, node_id, node);
+}
+
 FlatSigningProvider& FlatSigningProvider::Merge(FlatSigningProvider&& b)
 {
     scripts.merge(b.scripts);
@@ -96,7 +120,13 @@ FlatSigningProvider& FlatSigningProvider::Merge(FlatSigningProvider&& b)
     keys.merge(b.keys);
     origins.merge(b.origins);
     tr_trees.merge(b.tr_trees);
-    pq_keys.merge(b.pq_keys);
+    // An entry with the private key replaces one with only the public key.
+    for (auto& [program, key] : b.pq_keys) {
+        auto [it, inserted] = pq_keys.try_emplace(program, std::move(key));
+        if (!inserted && it->second.privkey.empty() && !key.privkey.empty()) it->second = std::move(key);
+    }
+    b.pq_keys.clear();
+    pq_nodes.merge(b.pq_nodes);
     return *this;
 }
 

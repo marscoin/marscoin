@@ -157,7 +157,7 @@ std::list<SectionInfo> ArgsManager::GetUnrecognizedSections() const
     // Section names to be recognized in the config file.
     static const std::set<std::string> available_sections{
         ChainTypeToString(ChainType::REGTEST),
-        "marsqnet",
+        ChainTypeToString(ChainType::MARSQNET),
         "qdevnet",
         ChainTypeToString(ChainType::SIGNET),
         ChainTypeToString(ChainType::TESTNET),
@@ -785,13 +785,12 @@ std::variant<ChainType, std::string> ArgsManager::GetChainArg() const
         throw std::runtime_error("Invalid combination of -regtest, -marsqnet, -qdevnet, -signet, -testnet, -testnet4 and -chain. Can use at most one.");
     }
     if (chain_arg) {
-        if (*chain_arg == "marsqnet" || *chain_arg == "qdevnet") return ChainType::REGTEST;
+        if (*chain_arg == "qdevnet") return ChainType::MARSQNET;
         if (auto parsed = ChainTypeFromString(*chain_arg)) return *parsed;
         // Not a known string, so return original string
         return *chain_arg;
     }
-    if (fMarsQNet) return ChainType::REGTEST;
-    if (fQDevNet) return ChainType::REGTEST;
+    if (fMarsQNet || fQDevNet) return ChainType::MARSQNET;
     if (fRegTest) return ChainType::REGTEST;
     if (fSigNet) return ChainType::SIGNET;
     if (fTestNet) return ChainType::TESTNET;

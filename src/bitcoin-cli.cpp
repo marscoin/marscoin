@@ -437,6 +437,8 @@ private:
             return " signet";
         case ChainType::REGTEST:
             return " regtest";
+        case ChainType::MARSQNET:
+            return " marsqnet";
         case ChainType::MAIN:
             return "";
         }

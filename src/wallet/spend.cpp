@@ -8,6 +8,7 @@
 #include <common/system.h>
 #include <consensus/amount.h>
 #include <consensus/validation.h>
+#include <crypto/pq_sphincs.h>
 #include <interfaces/chain.h>
 #include <node/types.h>
 #include <numeric>
@@ -82,19 +83,34 @@ static std::optional<int64_t> MaxInputWeight(const Descriptor& desc, const std::
     return {};
 }
 
-int CalculateMaximumSignedInputSize(const CTxOut& txout, const COutPoint outpoint, const SigningProvider* provider, bool can_grind_r, const CCoinControl* coin_control)
+//! The maximum weight of a signed P2WPQH input, or nullopt for any other script.
+//! No descriptor is inferred for P2WPQH outputs, but their size is fixed.
+static std::optional<int64_t> MaxP2WPQHInputWeight(const CScript& script_pubkey)
 {
-    // P2WPQH inputs have a known fixed size: ~8058 weight units
-    // Non-witness: 41 bytes (prevout 36 + sequence 4 + scriptSig len 1)
-    // Witness: sig_payload 7857 + param_set 1 + pubkey 32 + stack encoding ~4
     int witness_version;
     std::vector<unsigned char> witness_program;
-    if (txout.scriptPubKey.IsWitnessProgram(witness_version, witness_program) &&
-        witness_version == 2 && witness_program.size() == 32) {
-        const int non_witness = 41;
-        const int witness = 7857 + 1 + 32 + 4; // sig + paramset + pubkey + encoding overhead
-        const int weight = non_witness * 4 + witness;
-        return static_cast<int>(GetVirtualTransactionSize(weight, 0, 0));
+    if (!script_pubkey.IsWitnessProgram(witness_version, witness_program) ||
+        witness_version != 2 || witness_program.size() != 32) {
+        return std::nullopt;
+    }
+    // Non-witness: 41 bytes (prevout 36 + sequence 4 + scriptSig length 1).
+    // Witness: item count, then <payload> <param id> <pubkey>, each with its
+    // length prefix. The payload is [param id][signature] plus an optional
+    // hash type byte, which is counted here so the estimate is a maximum.
+    const int64_t non_witness = 41;
+    const size_t payload = 1 + pq::sphincs::SPHINCS_SIGNATURE_SIZE_SHA2_128S + 1;
+    const size_t pubkey = pq::sphincs::SPHINCS_PUBLIC_KEY_SIZE_SHA2_128S;
+    const int64_t witness = GetSizeOfCompactSize(3) +
+                            GetSizeOfCompactSize(payload) + payload +
+                            GetSizeOfCompactSize(1) + 1 +
+                            GetSizeOfCompactSize(pubkey) + pubkey;
+    return non_witness * WITNESS_SCALE_FACTOR + witness;
+}
+
+int CalculateMaximumSignedInputSize(const CTxOut& txout, const COutPoint outpoint, const SigningProvider* provider, bool can_grind_r, const CCoinControl* coin_control)
+{
+    if (const auto weight{MaxP2WPQHInputWeight(txout.scriptPubKey)}) {
+        return static_cast<int>(GetVirtualTransactionSize(*weight, 0, 0));
     }
 
     if (!provider) return -1;
@@ -136,6 +152,10 @@ static std::optional<int64_t> GetSignedTxinWeight(const CWallet* wallet, const C
     // If weight was provided, use that.
     std::optional<int64_t> weight;
     if (coin_control && (weight = coin_control->GetInputWeight(txin.prevout))) {
+        return weight.value();
+    }
+
+    if ((weight = MaxP2WPQHInputWeight(txo.scriptPubKey))) {
         return weight.value();
     }
 
@@ -1390,6 +1410,11 @@ util::Result<CreatedTransactionResult> CreateTransaction(
     }
 
     LOCK(wallet.cs_wallet);
+
+    if (!wallet.IsPQActive() &&
+        std::any_of(vecSend.cbegin(), vecSend.cend(), [](const auto& recipient) { return std::holds_alternative<WitnessV2PQ>(recipient.dest); })) {
+        return util::Error{_("Cannot send to a post-quantum (witness v2) address: these outputs are not enforced by consensus on this chain yet, so anyone could spend them")};
+    }
 
     auto res = CreateTransactionInternal(wallet, vecSend, change_pos, coin_control, sign);
     TRACE4(coin_selection, normal_create_tx_internal,

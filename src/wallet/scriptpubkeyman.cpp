@@ -2,6 +2,7 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
+#include <crypto/pq_hd.h>
 #include <hash.h>
 #include <key_io.h>
 #include <logging.h>
@@ -11,6 +12,7 @@
 #include <script/script.h>
 #include <script/sign.h>
 #include <script/solver.h>
+#include <support/cleanse.h>
 #include <util/bip32.h>
 #include <util/check.h>
 #include <util/strencodings.h>
@@ -19,12 +21,33 @@
 #include <util/translation.h>
 #include <wallet/scriptpubkeyman.h>
 
+#include <algorithm>
 #include <optional>
 
 using common::PSBTError;
 using util::ToString;
 
 namespace wallet {
+namespace {
+//! A PQ HD node as keying material, for wallet encryption.
+CKeyingMaterial PQNodeSecret(const pq::hd::Node& node)
+{
+    CKeyingMaterial secret(node.key.begin(), node.key.end());
+    secret.insert(secret.end(), node.chaincode.begin(), node.chaincode.end());
+    return secret;
+}
+
+//! Decrypt a PQ HD node and check it against its identifier, which is also the IV.
+bool DecryptPQNode(const CKeyingMaterial& master_key, const std::vector<unsigned char>& crypted, const uint256& node_id, pq::hd::Node& node)
+{
+    CKeyingMaterial secret;
+    if (!DecryptSecret(master_key, crypted, node_id, secret) || secret.size() != node.key.size() + node.chaincode.size()) return false;
+    std::copy(secret.begin(), secret.begin() + node.key.size(), node.key.begin());
+    std::copy(secret.begin() + node.key.size(), secret.end(), node.chaincode.begin());
+    return pq::hd::NodeId(node) == node_id;
+}
+} // namespace
+
 //! Value for the first BIP 32 hardened derivation. Can be used as a bit mask and as a value. See BIP 32 for more details.
 const uint32_t BIP32_HARDENED_KEY_LIMIT = 0x80000000;
 
@@ -2079,17 +2102,28 @@ isminetype DescriptorScriptPubKeyMan::IsMine(const CScript& script) const
 bool DescriptorScriptPubKeyMan::CheckDecryptionKey(const CKeyingMaterial& master_key)
 {
     LOCK(cs_desc_man);
-    if (!m_map_keys.empty()) {
+    if (!m_map_keys.empty() || !m_map_pq_nodes.empty()) {
         return false;
     }
 
-    bool keyPass = m_map_crypted_keys.empty(); // Always pass when there are no encrypted keys
+    bool keyPass = m_map_crypted_keys.empty() && m_map_crypted_pq_nodes.empty(); // Always pass when there are no encrypted keys
     bool keyFail = false;
     for (const auto& mi : m_map_crypted_keys) {
         const CPubKey &pubkey = mi.second.first;
         const std::vector<unsigned char> &crypted_secret = mi.second.second;
         CKey key;
         if (!DecryptKey(master_key, crypted_secret, pubkey, key)) {
+            keyFail = true;
+            break;
+        }
+        keyPass = true;
+        if (m_decryption_thoroughly_checked)
+            break;
+    }
+    for (const auto& [node_id, crypted] : m_map_crypted_pq_nodes) {
+        if (keyFail) break;
+        pq::hd::Node node;
+        if (!DecryptPQNode(master_key, crypted, node_id, node)) {
             keyFail = true;
             break;
         }
@@ -2111,7 +2145,7 @@ bool DescriptorScriptPubKeyMan::CheckDecryptionKey(const CKeyingMaterial& master
 bool DescriptorScriptPubKeyMan::Encrypt(const CKeyingMaterial& master_key, WalletBatch* batch)
 {
     LOCK(cs_desc_man);
-    if (!m_map_crypted_keys.empty()) {
+    if (!m_map_crypted_keys.empty() || !m_map_crypted_pq_nodes.empty()) {
         return false;
     }
 
@@ -2128,6 +2162,15 @@ bool DescriptorScriptPubKeyMan::Encrypt(const CKeyingMaterial& master_key, Walle
         batch->WriteCryptedDescriptorKey(GetID(), pubkey, crypted_secret);
     }
     m_map_keys.clear();
+    for (const auto& [node_id, node] : m_map_pq_nodes) {
+        std::vector<unsigned char> crypted;
+        if (!EncryptSecret(master_key, PQNodeSecret(node), node_id, crypted)) {
+            return false;
+        }
+        m_map_crypted_pq_nodes[node_id] = crypted;
+        batch->WriteCryptedDescriptorPQNode(GetID(), node_id, crypted);
+    }
+    m_map_pq_nodes.clear();
     return true;
 }
 
@@ -2167,6 +2210,78 @@ std::map<CKeyID, CKey> DescriptorScriptPubKeyMan::GetKeys() const
         return keys;
     }
     return m_map_keys;
+}
+
+DescriptorScriptPubKeyMan::PQNodeMap DescriptorScriptPubKeyMan::GetPQNodes() const
+{
+    AssertLockHeld(cs_desc_man);
+    if (m_storage.HasEncryptionKeys() && !m_storage.IsLocked()) {
+        PQNodeMap nodes;
+        for (const auto& [node_id, crypted] : m_map_crypted_pq_nodes) {
+            pq::hd::Node node;
+            if (m_storage.WithEncryptionKey([&](const CKeyingMaterial& encryption_key) {
+                return DecryptPQNode(encryption_key, crypted, node_id, node);
+            })) {
+                nodes.emplace(node_id, node);
+            }
+        }
+        return nodes;
+    }
+    return m_map_pq_nodes;
+}
+
+bool DescriptorScriptPubKeyMan::IsPQ() const
+{
+    AssertLockHeld(cs_desc_man);
+    return m_wallet_descriptor.descriptor && m_wallet_descriptor.descriptor->GetOutputType() == OutputType::BECH32_PQ;
+}
+
+bool DescriptorScriptPubKeyMan::AddPQNodeWithDB(WalletBatch& batch, const pq::hd::Node& node)
+{
+    AssertLockHeld(cs_desc_man);
+    assert(!m_storage.IsWalletFlagSet(WALLET_FLAG_DISABLE_PRIVATE_KEYS));
+
+    const uint256 node_id{pq::hd::NodeId(node)};
+    if (m_map_pq_nodes.contains(node_id) || m_map_crypted_pq_nodes.contains(node_id)) {
+        return true;
+    }
+
+    if (m_storage.HasEncryptionKeys()) {
+        if (m_storage.IsLocked()) {
+            return false;
+        }
+        std::vector<unsigned char> crypted;
+        if (!m_storage.WithEncryptionKey([&](const CKeyingMaterial& encryption_key) {
+                return EncryptSecret(encryption_key, PQNodeSecret(node), node_id, crypted);
+            })) {
+            return false;
+        }
+        m_map_crypted_pq_nodes[node_id] = crypted;
+        return batch.WriteCryptedDescriptorPQNode(GetID(), node_id, crypted);
+    }
+    m_map_pq_nodes[node_id] = node;
+    return batch.WriteDescriptorPQNode(GetID(), node_id, node);
+}
+
+void DescriptorScriptPubKeyMan::AddPQNode(const pq::hd::Node& node)
+{
+    LOCK(cs_desc_man);
+    WalletBatch batch(m_storage.GetDatabase());
+    if (!AddPQNodeWithDB(batch, node)) {
+        throw std::runtime_error(std::string(__func__) + ": writing descriptor PQ HD node failed");
+    }
+}
+
+void DescriptorScriptPubKeyMan::LoadPQNode(const uint256& node_id, const pq::hd::Node& node)
+{
+    LOCK(cs_desc_man);
+    m_map_pq_nodes[node_id] = node;
+}
+
+void DescriptorScriptPubKeyMan::LoadCryptedPQNode(const uint256& node_id, const std::vector<unsigned char>& secret)
+{
+    LOCK(cs_desc_man);
+    m_map_crypted_pq_nodes[node_id] = secret;
 }
 
 bool DescriptorScriptPubKeyMan::HasPrivKey(const CKeyID& keyid) const
@@ -2217,6 +2332,7 @@ bool DescriptorScriptPubKeyMan::TopUpWithDB(WalletBatch& batch, unsigned int siz
         target_size = size;
     } else {
         target_size = m_keypool_size;
+        if (IsPQ()) target_size = std::min<unsigned int>(target_size, DEFAULT_PQ_KEYPOOL_SIZE);
     }
 
     // Calculate the new range_end
@@ -2231,6 +2347,7 @@ bool DescriptorScriptPubKeyMan::TopUpWithDB(WalletBatch& batch, unsigned int siz
 
     FlatSigningProvider provider;
     provider.keys = GetKeys();
+    provider.pq_nodes = GetPQNodes();
 
     uint256 id = GetID();
     for (int32_t i = m_max_cached_index + 1; i < new_range_end; ++i) {
@@ -2369,6 +2486,40 @@ bool DescriptorScriptPubKeyMan::SetupDescriptorGeneration(WalletBatch& batch, co
     return true;
 }
 
+bool DescriptorScriptPubKeyMan::SetupPQDescriptorGeneration(WalletBatch& batch, const pq::hd::Node& root, uint32_t coin_type, bool internal)
+{
+    LOCK(cs_desc_man);
+    assert(m_storage.IsWalletFlagSet(WALLET_FLAG_DESCRIPTORS));
+
+    // Ignore when there is already a descriptor
+    if (m_wallet_descriptor.descriptor) {
+        return false;
+    }
+
+    std::string desc_str{strprintf("wpq(%s/%uh/0h/%uh/*h)", pq::hd::EncodeNode(root), coin_type, internal ? 1 : 0)};
+    FlatSigningProvider keys;
+    std::string error;
+    std::unique_ptr<Descriptor> desc{Parse(desc_str, keys, error, /*require_checksum=*/false)};
+    memory_cleanse(desc_str.data(), desc_str.size());
+    if (!desc) {
+        throw std::runtime_error(std::string(__func__) + ": " + error);
+    }
+    m_wallet_descriptor = WalletDescriptor(std::move(desc), GetTime(), 0, 0, 0);
+
+    // Store the root, and the descriptor
+    if (!AddPQNodeWithDB(batch, root)) {
+        throw std::runtime_error(std::string(__func__) + ": writing descriptor PQ HD node failed");
+    }
+    if (!batch.WriteDescriptor(GetID(), m_wallet_descriptor)) {
+        throw std::runtime_error(std::string(__func__) + ": writing descriptor failed");
+    }
+
+    TopUpWithDB(batch);
+
+    m_storage.UnsetBlankWalletFlag(batch);
+    return true;
+}
+
 bool DescriptorScriptPubKeyMan::IsHDEnabled() const
 {
     LOCK(cs_desc_man);
@@ -2388,7 +2539,7 @@ bool DescriptorScriptPubKeyMan::CanGetAddresses(bool internal) const
 bool DescriptorScriptPubKeyMan::HavePrivateKeys() const
 {
     LOCK(cs_desc_man);
-    return m_map_keys.size() > 0 || m_map_crypted_keys.size() > 0;
+    return m_map_keys.size() > 0 || m_map_crypted_keys.size() > 0 || !m_map_pq_nodes.empty() || !m_map_crypted_pq_nodes.empty();
 }
 
 std::optional<int64_t> DescriptorScriptPubKeyMan::GetOldestKeyPoolTime() const
@@ -2461,6 +2612,7 @@ std::unique_ptr<FlatSigningProvider> DescriptorScriptPubKeyMan::GetSigningProvid
     if (HavePrivateKeys() && include_private) {
         FlatSigningProvider master_provider;
         master_provider.keys = GetKeys();
+        master_provider.pq_nodes = GetPQNodes();
         m_wallet_descriptor.descriptor->ExpandPrivate(index, master_provider, *out_keys);
     }
 
@@ -2731,6 +2883,7 @@ bool DescriptorScriptPubKeyMan::GetDescriptorString(std::string& out, const bool
 
     FlatSigningProvider provider;
     provider.keys = GetKeys();
+    provider.pq_nodes = GetPQNodes();
 
     if (priv) {
         // For the private version, always return the master key to avoid
@@ -2749,8 +2902,8 @@ void DescriptorScriptPubKeyMan::UpgradeDescriptorCache()
         return;
     }
 
-    // Skip if we have the last hardened xpub cache
-    if (m_wallet_descriptor.cache.GetCachedLastHardenedExtPubKeys().size() > 0) {
+    // Skip if we have the last hardened xpub cache, or if there are no xpubs (wpq() descriptors)
+    if (m_wallet_descriptor.cache.GetCachedLastHardenedExtPubKeys().size() > 0 || IsPQ()) {
         return;
     }
 

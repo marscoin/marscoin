@@ -612,35 +612,14 @@ AC_ARG_ENABLE([randomx-vendor],
   [enable_randomx_vendor=$enableval],
   [enable_randomx_vendor=no])
 
+dnl SLH-DSA (P2WPQH signatures) is always built from src/crypto/slhdsa.
+dnl The former liboqs vendor option is accepted and ignored so existing build
+dnl scripts keep working.
 AC_ARG_ENABLE([pq-oqs-vendor],
   [AS_HELP_STRING([--enable-pq-oqs-vendor],
-  [enable vendored liboqs backend for SLH-DSA/SPHINCS integration (default=no)])],
-  [enable_pq_oqs_vendor=$enableval],
-  [enable_pq_oqs_vendor=no])
-
-OQS_VENDOR_LIBS=""
-
-if test "$enable_pq_oqs_vendor" = "yes"; then
-  OQS_VENDOR_INSTALL_PATH="$ac_pwd/src/crypto/oqs_vendor/build/install"
-  OQS_VENDOR_HEADER_PATH="$OQS_VENDOR_INSTALL_PATH/include/oqs/oqs.h"
-  OQS_VENDOR_LIB_PATH="$OQS_VENDOR_INSTALL_PATH/lib/liboqs.a"
-
-  AC_MSG_CHECKING([for vendored liboqs header at $OQS_VENDOR_HEADER_PATH])
-  if test ! -f "$OQS_VENDOR_HEADER_PATH"; then
-    AC_MSG_ERROR([vendored liboqs header not found. Run src/crypto/oqs_vendor/build-liboqs-vendor.sh first.])
-  fi
-  AC_MSG_RESULT([yes])
-
-  AC_MSG_CHECKING([for vendored liboqs static library at $OQS_VENDOR_LIB_PATH])
-  if test ! -f "$OQS_VENDOR_LIB_PATH"; then
-    AC_MSG_ERROR([vendored liboqs static library not found. Run src/crypto/oqs_vendor/build-liboqs-vendor.sh first.])
-  fi
-  AC_MSG_RESULT([yes])
-
-  CPPFLAGS="$CPPFLAGS -I$OQS_VENDOR_INSTALL_PATH/include"
-  OQS_VENDOR_LIBS="$OQS_VENDOR_LIB_PATH"
-fi
-AC_SUBST([OQS_VENDOR_LIBS])
+  [obsolete and ignored; SLH-DSA is always built])],
+  [AC_MSG_WARN([--enable-pq-oqs-vendor is obsolete and ignored: SLH-DSA is always built])],
+  [])
 case $host_cpu in
   x86_64*|amd64*)
     randomx_arch_x86_64=yes
@@ -1663,7 +1642,6 @@ AM_CONDITIONAL([ENABLE_X86_SHANI], [test "$enable_x86_shani" = "yes"])
 AM_CONDITIONAL([ENABLE_ARM_CRC], [test "$enable_arm_crc" = "yes"])
 AM_CONDITIONAL([ENABLE_ARM_SHANI], [test "$enable_arm_shani" = "yes"])
 AM_CONDITIONAL([ENABLE_RANDOMX_VENDOR], [test "$enable_randomx_vendor" = "yes"])
-AM_CONDITIONAL([ENABLE_PQ_OQS_VENDOR], [test "$enable_pq_oqs_vendor" = "yes"])
 AM_CONDITIONAL([RANDOMX_ARCH_X86_64], [test "$randomx_arch_x86_64" = "yes"])
 AM_CONDITIONAL([RANDOMX_ARCH_AARCH64], [test "$randomx_arch_aarch64" = "yes"])
 AM_CONDITIONAL([WORDS_BIGENDIAN], [test "$ac_cv_c_bigendian" = "yes"])
@@ -1680,9 +1658,6 @@ AC_DEFINE([CLIENT_VERSION_IS_RELEASE], [_CLIENT_VERSION_IS_RELEASE], [Version is
 AC_DEFINE([COPYRIGHT_YEAR], [_COPYRIGHT_YEAR], [Copyright year])
 if test "$enable_randomx_vendor" = "yes"; then
   AC_DEFINE([ENABLE_RANDOMX_VENDOR], [1], [Define to 1 to enable RandomX vendor scaffold checks])
-fi
-if test "$enable_pq_oqs_vendor" = "yes"; then
-  AC_DEFINE([ENABLE_PQ_OQS_VENDOR], [1], [Define to 1 to enable the vendored OQS backend])
 fi
 AC_DEFINE([COPYRIGHT_HOLDERS], ["_COPYRIGHT_HOLDERS"], [Copyright holder(s) before %s replacement])
 AC_DEFINE([COPYRIGHT_HOLDERS_SUBSTITUTION], ["_COPYRIGHT_HOLDERS_SUBSTITUTION"], [Replacement for %s in copyright holders string])

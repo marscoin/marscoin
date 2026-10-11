@@ -3,6 +3,7 @@
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #include <chainparams.h>
+#include <common/args.h>
 #include <consensus/amount.h>
 #include <consensus/blockweight.h>
 #include <consensus/consensus.h>
@@ -10,6 +11,7 @@
 #include <core_io.h>
 #include <hash.h>
 #include <net.h>
+#include <node/miner.h>
 #include <signet.h>
 #include <uint256.h>
 #include <util/chaintype.h>
@@ -484,6 +486,83 @@ BOOST_AUTO_TEST_CASE(abwl_not_activated_returns_fixed)
     prev.nHeight = 999999;
 
     BOOST_CHECK_EQUAL(GetAdaptiveBlockWeightLimit(&prev, params), MAX_BLOCK_WEIGHT);
+}
+
+BOOST_AUTO_TEST_CASE(abwl_context_free_bound_per_chain)
+{
+    const auto main_params = CreateChainParams(*m_node.args, ChainType::MAIN);
+    const auto regtest_params = CreateChainParams(*m_node.args, ChainType::REGTEST);
+    BOOST_CHECK_EQUAL(GetContextFreeMaxBlockWeight(main_params->GetConsensus()), MAX_BLOCK_WEIGHT);
+    BOOST_CHECK_EQUAL(GetContextFreeMaxBlockWeight(regtest_params->GetConsensus()), ABWL_TEMPORARY_MAX);
+
+    // A block just over the legacy limit fails the context-free size check on
+    // mainnet, but passes it where ABWL is configured.
+    CMutableTransaction coinbase;
+    coinbase.vin.resize(1);
+    coinbase.vin[0].prevout.SetNull();
+    coinbase.vout.resize(1);
+    const std::vector<unsigned char> filler(MAX_BLOCK_WEIGHT / WITNESS_SCALE_FACTOR, OP_RETURN);
+    coinbase.vout[0].scriptPubKey = CScript(filler.begin(), filler.end());
+    CBlock block;
+    block.vtx.push_back(MakeTransactionRef(std::move(coinbase)));
+    BOOST_REQUIRE_GT(::GetSerializeSize(TX_NO_WITNESS(block)) * WITNESS_SCALE_FACTOR, MAX_BLOCK_WEIGHT);
+
+    BlockValidationState main_state;
+    BOOST_CHECK(!CheckBlock(block, main_state, main_params->GetConsensus(), /*fCheckPOW=*/false, /*fCheckMerkleRoot=*/false));
+    BOOST_CHECK_EQUAL(main_state.GetRejectReason(), "bad-blk-length");
+
+    BlockValidationState regtest_state;
+    CheckBlock(block, regtest_state, regtest_params->GetConsensus(), /*fCheckPOW=*/false, /*fCheckMerkleRoot=*/false);
+    BOOST_CHECK(regtest_state.GetRejectReason() != "bad-blk-length");
+}
+
+BOOST_AUTO_TEST_CASE(pq_witness_activation)
+{
+    Consensus::Params params;
+    params.nPQWitnessActivationHeight = 0; // never
+    BOOST_CHECK(!params.IsPQWitnessActive(0));
+    BOOST_CHECK(!params.IsPQWitnessActive(10'000'000));
+    params.nPQWitnessActivationHeight = 1000;
+    BOOST_CHECK(!params.IsPQWitnessActive(999));
+    BOOST_CHECK(params.IsPQWitnessActive(1000));
+    BOOST_CHECK(params.IsPQWitnessActive(1001));
+
+    // PQ activation no longer follows ABWL.
+    params.nABWLActivationHeight = 0;
+    BOOST_CHECK(params.IsPQWitnessActive(1000));
+    params.nABWLActivationHeight = 1;
+    params.nPQWitnessActivationHeight = 0;
+    BOOST_CHECK(!params.IsPQWitnessActive(10'000'000));
+
+    // Mainnet does not enforce witness v2; regtest does from height 1
+    const ArgsManager no_args;
+    BOOST_CHECK(!CreateChainParams(no_args, ChainType::MAIN)->GetConsensus().IsPQWitnessActive(10'000'000));
+    const auto regtest{CreateChainParams(no_args, ChainType::REGTEST)};
+    BOOST_CHECK(!regtest->GetConsensus().IsPQWitnessActive(0));
+    BOOST_CHECK(regtest->GetConsensus().IsPQWitnessActive(1));
+
+    // -testactivationheight=pqwitness@<height> moves (or with 0 disables) the activation on regtest
+    ArgsManager moved;
+    moved.ForceSetArg("-testactivationheight", "pqwitness@500");
+    const auto moved_params{CreateChainParams(moved, ChainType::REGTEST)};
+    BOOST_CHECK(!moved_params->GetConsensus().IsPQWitnessActive(499));
+    BOOST_CHECK(moved_params->GetConsensus().IsPQWitnessActive(500));
+    BOOST_CHECK_EQUAL(moved_params->GetConsensus().nABWLActivationHeight, 1);
+    ArgsManager disabled;
+    disabled.ForceSetArg("-testactivationheight", "pqwitness@0");
+    BOOST_CHECK(!CreateChainParams(disabled, ChainType::REGTEST)->GetConsensus().IsPQWitnessActive(10'000'000));
+
+    // Moving ABWL leaves PQ activation alone.
+    ArgsManager abwl_moved;
+    abwl_moved.ForceSetArg("-testactivationheight", "abwl@0");
+    BOOST_CHECK(CreateChainParams(abwl_moved, ChainType::REGTEST)->GetConsensus().IsPQWitnessActive(1));
+}
+
+BOOST_AUTO_TEST_CASE(block_template_has_auxpow_chain_id)
+{
+    const auto block_template{node::BlockAssembler{m_node.chainman->ActiveChainstate(), m_node.mempool.get(), {}}.CreateNewBlock()};
+    BOOST_REQUIRE(block_template);
+    BOOST_CHECK_EQUAL(block_template->block.GetChainId(), Params().GetConsensus().nAuxpowChainId);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

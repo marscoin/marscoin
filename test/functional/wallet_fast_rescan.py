@@ -15,6 +15,7 @@ from test_framework.wallet_util import get_generate_key
 
 KEYPOOL_SIZE = 100   # smaller than default size to speed-up test
 NUM_DESCRIPTORS = 9  # number of descriptors (8 default ranged ones + 1 fixed non-ranged one)
+NUM_PQ_DESCRIPTORS = 2  # wpq() descriptors; wallet_pq_hd.py covers their rescans
 NUM_BLOCKS = 6       # number of blocks to mine
 
 
@@ -46,13 +47,18 @@ class WalletFastRescanTest(BitcoinTestFramework):
         fixed_key = get_generate_key()
         print(w.importdescriptors([{"desc": descsum_create(f"wpkh({fixed_key.privkey})"), "timestamp": "now"}]))
         descriptors = w.listdescriptors()['descriptors']
-        assert_equal(len(descriptors), NUM_DESCRIPTORS)
+        assert_equal(len(descriptors), NUM_DESCRIPTORS + NUM_PQ_DESCRIPTORS)
+        # Generating post-quantum keys is slow, so this test leaves them out, and a
+        # public wpq() descriptor can't be imported into a watch-only wallet.
+        descriptors = [d for d in descriptors if not d['desc'].startswith('wpq(')]
         w.backupwallet(WALLET_BACKUP_FILENAME)
 
         self.log.info(f"Create txs sending to end range address of each descriptor, triggering top-ups")
         for i in range(NUM_BLOCKS):
             self.log.info(f"Block {i+1}/{NUM_BLOCKS}")
             for desc_info in w.listdescriptors()['descriptors']:
+                if desc_info['desc'].startswith('wpq('):
+                    continue
                 if 'range' in desc_info:
                     start_range, end_range = desc_info['range']
                     addr = w.deriveaddresses(desc_info['desc'], [end_range, end_range])[0]

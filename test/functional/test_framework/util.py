@@ -389,11 +389,15 @@ def rpc_url(datadir, i, chain, rpchost):
 ################
 
 
+# marscoind reads marscoin.conf from the datadir (BITCOIN_CONF_FILENAME in src/common/args.cpp)
+CONF_FILENAME = "marscoin.conf"
+
+
 def initialize_datadir(dirname, n, chain, disable_autoconnect=True):
     datadir = get_datadir_path(dirname, n)
     if not os.path.isdir(datadir):
         os.makedirs(datadir)
-    write_config(os.path.join(datadir, "bitcoin.conf"), n=n, chain=chain, disable_autoconnect=disable_autoconnect)
+    write_config(os.path.join(datadir, CONF_FILENAME), n=n, chain=chain, disable_autoconnect=disable_autoconnect)
     os.makedirs(os.path.join(datadir, 'stderr'), exist_ok=True)
     os.makedirs(os.path.join(datadir, 'stdout'), exist_ok=True)
     return datadir
@@ -418,6 +422,9 @@ def write_config(config_path, *, n, chain, extra_config="", disable_autoconnect=
         f.write("rpcservertimeout=99000\n")
         f.write("rpcdoccheck=1\n")
         f.write("fallbackfee=0.0002\n")
+        # Marscoin's wallet defaults to legacy addresses; the inherited tests
+        # assume upstream's bech32 default.
+        f.write("addresstype=bech32\n")
         f.write("server=1\n")
         f.write("keypool=1\n")
         f.write("discover=0\n")
@@ -462,7 +469,7 @@ def get_temp_default_datadir(temp_dir: pathlib.Path) -> tuple[dict, pathlib.Path
 
 
 def append_config(datadir, options):
-    with open(os.path.join(datadir, "bitcoin.conf"), 'a', encoding='utf8') as f:
+    with open(os.path.join(datadir, CONF_FILENAME), 'a', encoding='utf8') as f:
         for option in options:
             f.write(option + "\n")
 
@@ -470,8 +477,8 @@ def append_config(datadir, options):
 def get_auth_cookie(datadir, chain):
     user = None
     password = None
-    if os.path.isfile(os.path.join(datadir, "bitcoin.conf")):
-        with open(os.path.join(datadir, "bitcoin.conf"), 'r', encoding='utf8') as f:
+    if os.path.isfile(os.path.join(datadir, CONF_FILENAME)):
+        with open(os.path.join(datadir, CONF_FILENAME), 'r', encoding='utf8') as f:
             for line in f:
                 if line.startswith("rpcuser="):
                     assert user is None  # Ensure that there is only one rpcuser line

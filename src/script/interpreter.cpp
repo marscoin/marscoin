@@ -1409,9 +1409,14 @@ void PrecomputedTransactionData::Init(const T& txTo, std::vector<CTxOut>&& spent
     // Determine which precomputation-impacting features this transaction uses.
     bool uses_bip143_segwit = force;
     bool uses_bip341_taproot = force;
-    for (size_t inpos = 0; inpos < txTo.vin.size() && !(uses_bip143_segwit && uses_bip341_taproot); ++inpos) {
+    bool uses_p2wpqh = force;
+    for (size_t inpos = 0; inpos < txTo.vin.size() && !(uses_bip143_segwit && uses_bip341_taproot && uses_p2wpqh); ++inpos) {
         if (!txTo.vin[inpos].scriptWitness.IsNull()) {
-            if (m_spent_outputs_ready && m_spent_outputs[inpos].scriptPubKey.size() == 2 + WITNESS_V1_TAPROOT_SIZE &&
+            if (m_spent_outputs_ready && m_spent_outputs[inpos].scriptPubKey.size() == 2 + WITNESS_V2_PQ_PROGRAM_SIZE &&
+                m_spent_outputs[inpos].scriptPubKey[0] == OP_2) {
+                // P2WPQH spends use the BIP341-style precomputed hashes (doc/quantum-p2wpqh-sighash-v1.md).
+                uses_p2wpqh = true;
+            } else if (m_spent_outputs_ready && m_spent_outputs[inpos].scriptPubKey.size() == 2 + WITNESS_V1_TAPROOT_SIZE &&
                 m_spent_outputs[inpos].scriptPubKey[0] == OP_1) {
                 // Treat every witness-bearing spend with 34-byte scriptPubKey that starts with OP_1 as a Taproot
                 // spend. This only works if spent_outputs was provided as well, but if it wasn't, actual validation
@@ -1425,10 +1430,10 @@ void PrecomputedTransactionData::Init(const T& txTo, std::vector<CTxOut>&& spent
                 uses_bip143_segwit = true;
             }
         }
-        if (uses_bip341_taproot && uses_bip143_segwit) break; // No need to scan further if we already need all.
+        if (uses_bip341_taproot && uses_bip143_segwit && uses_p2wpqh) break; // No need to scan further if we already need all.
     }
 
-    if (uses_bip143_segwit || uses_bip341_taproot) {
+    if (uses_bip143_segwit || uses_bip341_taproot || uses_p2wpqh) {
         // Computations shared between both sighash schemes.
         m_prevouts_single_hash = GetPrevoutsSHA256(txTo);
         m_sequences_single_hash = GetSequencesSHA256(txTo);
@@ -1440,7 +1445,7 @@ void PrecomputedTransactionData::Init(const T& txTo, std::vector<CTxOut>&& spent
         hashOutputs = SHA256Uint256(m_outputs_single_hash);
         m_bip143_segwit_ready = true;
     }
-    if (uses_bip341_taproot && m_spent_outputs_ready) {
+    if ((uses_bip341_taproot || uses_p2wpqh) && m_spent_outputs_ready) {
         m_spent_amounts_single_hash = GetSpentAmountsSHA256(m_spent_outputs);
         m_spent_scripts_single_hash = GetSpentScriptsSHA256(m_spent_outputs);
         m_bip341_taproot_ready = true;
@@ -1462,6 +1467,7 @@ template PrecomputedTransactionData::PrecomputedTransactionData(const CMutableTr
 const HashWriter HASHER_TAPSIGHASH{TaggedHash("TapSighash")};
 const HashWriter HASHER_TAPLEAF{TaggedHash("TapLeaf")};
 const HashWriter HASHER_TAPBRANCH{TaggedHash("TapBranch")};
+const HashWriter HASHER_P2WPQH_SIGHASH{TaggedHash("Marscoin/P2WPQH/sighash")};
 
 static bool HandleMissingData(MissingDataBehavior mdb)
 {
@@ -1564,6 +1570,75 @@ bool SignatureHashSchnorr(uint256& hash_out, ScriptExecutionData& execdata, cons
     hash_out = ss.GetSHA256();
     return true;
 }
+
+bool IsValidPQHashType(uint8_t hash_type)
+{
+    return hash_type <= 0x03 || (hash_type >= 0x81 && hash_type <= 0x83);
+}
+
+template<typename T>
+bool SignatureHashPQ(uint256& hash_out, const T& tx_to, uint32_t in_pos, uint8_t hash_type, uint8_t param_set_id, Span<const unsigned char> pubkey, const PrecomputedTransactionData& cache, MissingDataBehavior mdb)
+{
+    assert(in_pos < tx_to.vin.size());
+    if (!(cache.m_bip341_taproot_ready && cache.m_spent_outputs_ready)) {
+        return HandleMissingData(mdb);
+    }
+    if (!IsValidPQHashType(hash_type)) return false;
+
+    // SIGHASH_DEFAULT (no hash type byte) behaves like SIGHASH_ALL but is committed as 0x00.
+    const uint8_t output_type = (hash_type == SIGHASH_DEFAULT) ? SIGHASH_ALL : (hash_type & SIGHASH_OUTPUT_MASK);
+    const uint8_t input_type = hash_type & SIGHASH_INPUT_MASK;
+
+    HashWriter ss{HASHER_P2WPQH_SIGHASH};
+
+    static constexpr uint8_t EPOCH = 0;
+    ss << EPOCH;
+    ss << hash_type;
+
+    // Transaction level data
+    ss << tx_to.version;
+    ss << tx_to.nLockTime;
+    if (input_type != SIGHASH_ANYONECANPAY) {
+        ss << cache.m_prevouts_single_hash;
+        ss << cache.m_spent_amounts_single_hash;
+        ss << cache.m_spent_scripts_single_hash;
+        ss << cache.m_sequences_single_hash;
+    }
+    if (output_type == SIGHASH_ALL) {
+        ss << cache.m_outputs_single_hash;
+    }
+
+    // Data about the input being spent. A P2WPQH witness has exactly three
+    // items, so it never carries an annex; the annex bit is reserved.
+    static constexpr uint8_t SPEND_TYPE = 0;
+    ss << SPEND_TYPE;
+    if (input_type == SIGHASH_ANYONECANPAY) {
+        ss << tx_to.vin[in_pos].prevout;
+        ss << cache.m_spent_outputs[in_pos];
+        ss << tx_to.vin[in_pos].nSequence;
+    } else {
+        ss << in_pos;
+    }
+
+    // Data about the output, if only one is signed.
+    if (output_type == SIGHASH_SINGLE) {
+        if (in_pos >= tx_to.vout.size()) return false;
+        HashWriter sha_single_output{};
+        sha_single_output << tx_to.vout[in_pos];
+        ss << sha_single_output.GetSHA256();
+    }
+
+    // Bind the signature to the parameter set and key. The parameter set
+    // determines the public key length, so no length prefix is needed.
+    ss << param_set_id;
+    ss.write(MakeByteSpan(pubkey));
+
+    hash_out = ss.GetSHA256();
+    return true;
+}
+
+template bool SignatureHashPQ(uint256& hash_out, const CTransaction& tx_to, uint32_t in_pos, uint8_t hash_type, uint8_t param_set_id, Span<const unsigned char> pubkey, const PrecomputedTransactionData& cache, MissingDataBehavior mdb);
+template bool SignatureHashPQ(uint256& hash_out, const CMutableTransaction& tx_to, uint32_t in_pos, uint8_t hash_type, uint8_t param_set_id, Span<const unsigned char> pubkey, const PrecomputedTransactionData& cache, MissingDataBehavior mdb);
 
 template <class T>
 uint256 SignatureHash(const CScript& scriptCode, const T& txTo, unsigned int nIn, int nHashType, const CAmount& amount, SigVersion sigversion, const PrecomputedTransactionData* cache)
@@ -1783,35 +1858,40 @@ bool GenericTransactionSignatureChecker<T>::CheckSequence(const CScriptNum& nSeq
 }
 
 template <class T>
-uint256 GenericTransactionSignatureChecker<T>::GetSigHashPQ(ScriptExecutionData& execdata) const
+bool GenericTransactionSignatureChecker<T>::CheckPQSignature(Span<const unsigned char> sig_payload, uint8_t param_set_id, Span<const unsigned char> pubkey, ScriptError* serror) const
 {
-    // PQ sighash: tagged hash over transaction data.
-    // SHA256(SHA256("PQSighash") || SHA256("PQSighash") ||
-    //        nVersion || nLockTime || sha_prevouts || sha_sequences ||
-    //        sha_outputs || input_index)
-    if (!this->txdata) return uint256{};
+    // Payload: [param id][signature] for SIGHASH_DEFAULT, or
+    // [param id][signature][hash type] for an explicit hash type.
+    if (!pq::sphincs::IsSupportedParameterSet(param_set_id)) return set_error(serror, SCRIPT_ERR_PQ_UNSUPPORTED_PARAM_SET);
+    const auto param_set = static_cast<pq::sphincs::ParameterSet>(param_set_id);
+    const size_t base_size = 1 + pq::sphincs::SignatureSize(param_set);
+    uint8_t hash_type = SIGHASH_DEFAULT;
+    if (sig_payload.size() == base_size + 1) {
+        hash_type = sig_payload.back();
+        // An explicit SIGHASH_DEFAULT byte is invalid; omit the byte instead.
+        if (hash_type == SIGHASH_DEFAULT) return set_error(serror, SCRIPT_ERR_PQ_SIG_HASHTYPE);
+        sig_payload = sig_payload.first(base_size);
+    } else if (sig_payload.size() != base_size) {
+        return set_error(serror, SCRIPT_ERR_PQ_SIG_FORMAT);
+    }
+    if (!pq::sphincs::ValidateSignatureEncoding(sig_payload).empty()) return set_error(serror, SCRIPT_ERR_PQ_SIG_FORMAT);
+    if (!IsValidPQHashType(hash_type)) return set_error(serror, SCRIPT_ERR_PQ_SIG_HASHTYPE);
 
-    HashWriter ss{};
-    // Tag: double-SHA256 of "PQSighash"
-    uint256 tag;
-    CSHA256().Write(reinterpret_cast<const unsigned char*>("PQSighash"), 9).Finalize(tag.begin());
-    ss << tag << tag;
+    // The signature hash commits to all spent amounts and scriptPubKeys.
+    if (!this->txdata || !this->txdata->m_bip341_taproot_ready || !this->txdata->m_spent_outputs_ready) {
+        return HandleMissingData(m_mdb);
+    }
+    uint256 sighash;
+    if (!SignatureHashPQ(sighash, *txTo, nIn, hash_type, param_set_id, pubkey, *this->txdata, m_mdb)) {
+        // Only an undefined hash (SIGHASH_SINGLE without a matching output) gets here.
+        return set_error(serror, SCRIPT_ERR_PQ_SIG_HASHTYPE);
+    }
 
-    // Transaction fields
-    ss << txTo->version;
-    ss << txTo->nLockTime;
-
-    // Prevouts hash
-    ss << txdata->m_prevouts_single_hash;
-    // Sequences hash
-    ss << txdata->m_sequences_single_hash;
-    // Outputs hash
-    ss << txdata->m_outputs_single_hash;
-
-    // Input index
-    ss << nIn;
-
-    return ss.GetSHA256();
+    std::string verify_err;
+    if (!pq::sphincs::VerifyMessage(param_set, pubkey, Span<const unsigned char>(sighash.begin(), sighash.size()), sig_payload, verify_err)) {
+        return set_error(serror, SCRIPT_ERR_PQ_SIG_VERIFY);
+    }
+    return true;
 }
 
 // explicit instantiation
@@ -1977,7 +2057,7 @@ static bool VerifyWitnessProgram(const CScriptWitness& witness, int witversion, 
             return set_success(serror);
         }
     } else if (witversion == 2 && program.size() == WITNESS_V2_PQ_PROGRAM_SIZE && !is_p2sh) {
-        // Post-quantum witness v2: SPHINCS+ signature verification
+        // Post-quantum witness v2 (P2WPQH): SLH-DSA signature verification
         if (!(flags & SCRIPT_VERIFY_WITNESS_V2)) return set_success(serror);
 
         // Witness stack: <signature_payload> <parameter_set_id> <public_key>
@@ -1993,7 +2073,6 @@ static bool VerifyWitnessProgram(const CScriptWitness& witness, int witversion, 
         if (param_set_raw.size() != 1 || !pq::sphincs::IsSupportedParameterSet(param_set_raw[0])) {
             return set_error(serror, SCRIPT_ERR_PQ_UNSUPPORTED_PARAM_SET);
         }
-        const auto param_set = static_cast<pq::sphincs::ParameterSet>(param_set_raw[0]);
 
         // Validate public key length
         if (pubkey.size() != pq::sphincs::SPHINCS_PUBLIC_KEY_SIZE_SHA2_128S) {
@@ -2009,25 +2088,9 @@ static bool VerifyWitnessProgram(const CScriptWitness& witness, int witversion, 
             return set_error(serror, SCRIPT_ERR_PQ_PROGRAM_MISMATCH);
         }
 
-        // Validate signature encoding
-        const std::string format_err = pq::sphincs::ValidateSignatureEncoding(sig_payload);
-        if (!format_err.empty()) {
-            return set_error(serror, SCRIPT_ERR_PQ_SIG_FORMAT);
-        }
-
-        // Compute PQ sighash: SHA256("PQSighash" || transaction_data)
-        // For the scaffold, we use the checker's sighash mechanism.
-        // The message to verify is the serialized transaction sighash.
-        uint256 sighash = checker.GetSigHashPQ(execdata);
-
-        // Verify SPHINCS+ signature
-        std::string verify_err;
-        if (!pq::sphincs::VerifyMessage(param_set,
-                Span<const unsigned char>(pubkey.data(), pubkey.size()),
-                Span<const unsigned char>(sighash.begin(), 32),
-                Span<const unsigned char>(sig_payload.data(), sig_payload.size()),
-                verify_err)) {
-            return set_error(serror, SCRIPT_ERR_PQ_SIG_VERIFY);
+        // Verify the signature over the P2WPQH signature hash (doc/quantum-p2wpqh-sighash-v1.md).
+        if (!checker.CheckPQSignature(sig_payload, param_set_raw[0], pubkey, serror)) {
+            return false; // serror is set
         }
 
         return set_success(serror);

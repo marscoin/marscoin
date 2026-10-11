@@ -94,21 +94,24 @@ class MempoolTRUC(BitcoinTestFramework):
         assert_greater_than_or_equal(1000, tx_v3_child_almost_heavy["tx"].get_vsize())
         self.check_mempool([tx_v3_parent_normal["txid"], tx_v3_child_almost_heavy["txid"]])
         assert_equal(node.getmempoolentry(tx_v3_parent_normal["txid"])["descendantcount"], 2)
-        tx_v3_child_almost_heavy_rbf = self.wallet.send_self_transfer(
-            from_node=node,
+        # Upstream replaces the child here. Marscoin never replaces mempool
+        # transactions (58e16509a2), so the replacement is refused.
+        tx_v3_child_almost_heavy_rbf = self.wallet.create_self_transfer(
             fee_rate=DEFAULT_FEE * 2,
             utxo_to_spend=tx_v3_parent_normal["new_utxo"],
             target_weight=3500,
             version=3
         )
-        assert_greater_than_or_equal(tx_v3_child_almost_heavy["tx"].get_vsize() + tx_v3_child_almost_heavy_rbf["tx"].get_vsize(), 1000)
-        self.check_mempool([tx_v3_parent_normal["txid"], tx_v3_child_almost_heavy_rbf["txid"]])
+        assert_raises_rpc_error(-26, "bip125-replacement-disallowed", node.sendrawtransaction, tx_v3_child_almost_heavy_rbf["hex"])
+        self.check_mempool([tx_v3_parent_normal["txid"], tx_v3_child_almost_heavy["txid"]])
         assert_equal(node.getmempoolentry(tx_v3_parent_normal["txid"])["descendantcount"], 2)
 
     @cleanup(extra_args=None)
     def test_truc_replacement(self):
+        # Upstream: TRUC transactions are always replaceable. Marscoin never
+        # replaces mempool transactions (58e16509a2), TRUC included.
         node = self.nodes[0]
-        self.log.info("Test TRUC transactions may be replaced by TRUC transactions")
+        self.log.info("Test TRUC transactions can't be replaced by TRUC transactions")
         utxo_v3_bip125 = self.wallet.get_utxo()
         tx_v3_bip125 = self.wallet.send_self_transfer(
             from_node=node,
@@ -119,24 +122,24 @@ class MempoolTRUC(BitcoinTestFramework):
         )
         self.check_mempool([tx_v3_bip125["txid"]])
 
-        tx_v3_bip125_rbf = self.wallet.send_self_transfer(
-            from_node=node,
+        tx_v3_bip125_rbf = self.wallet.create_self_transfer(
             fee_rate=DEFAULT_FEE * 2,
             utxo_to_spend=utxo_v3_bip125,
             version=3
         )
-        self.check_mempool([tx_v3_bip125_rbf["txid"]])
+        assert_raises_rpc_error(-26, "bip125-replacement-disallowed", node.sendrawtransaction, tx_v3_bip125_rbf["hex"])
+        self.check_mempool([tx_v3_bip125["txid"]])
 
-        self.log.info("Test TRUC transactions may be replaced by non-TRUC (BIP125) transactions")
-        tx_v3_bip125_rbf_v2 = self.wallet.send_self_transfer(
-            from_node=node,
+        self.log.info("Test TRUC transactions can't be replaced by non-TRUC (BIP125) transactions")
+        tx_v3_bip125_rbf_v2 = self.wallet.create_self_transfer(
             fee_rate=DEFAULT_FEE * 3,
             utxo_to_spend=utxo_v3_bip125,
             version=2
         )
-        self.check_mempool([tx_v3_bip125_rbf_v2["txid"]])
+        assert_raises_rpc_error(-26, "bip125-replacement-disallowed", node.sendrawtransaction, tx_v3_bip125_rbf_v2["hex"])
+        self.check_mempool([tx_v3_bip125["txid"]])
 
-        self.log.info("Test that replacements cannot cause violation of inherited TRUC")
+        self.log.info("Test that a conflicting non-TRUC child of a TRUC parent is refused")
         utxo_v3_parent = self.wallet.get_utxo()
         tx_v3_parent = self.wallet.send_self_transfer(
             from_node=node,
@@ -150,22 +153,22 @@ class MempoolTRUC(BitcoinTestFramework):
             utxo_to_spend=tx_v3_parent["new_utxo"],
             version=3
         )
-        self.check_mempool([tx_v3_bip125_rbf_v2["txid"], tx_v3_parent["txid"], tx_v3_child["txid"]])
+        self.check_mempool([tx_v3_bip125["txid"], tx_v3_parent["txid"], tx_v3_child["txid"]])
 
         tx_v3_child_rbf_v2 = self.wallet.create_self_transfer(
             fee_rate=DEFAULT_FEE * 2,
             utxo_to_spend=tx_v3_parent["new_utxo"],
             version=2
         )
-        expected_error_v2_v3 = f"TRUC-violation, non-version=3 tx {tx_v3_child_rbf_v2['txid']} (wtxid={tx_v3_child_rbf_v2['wtxid']}) cannot spend from version=3 tx {tx_v3_parent['txid']} (wtxid={tx_v3_parent['wtxid']})"
-        assert_raises_rpc_error(-26, expected_error_v2_v3, node.sendrawtransaction, tx_v3_child_rbf_v2["hex"])
-        self.check_mempool([tx_v3_bip125_rbf_v2["txid"], tx_v3_parent["txid"], tx_v3_child["txid"]])
+        # The conflict is refused before the TRUC inheritance rule is checked.
+        assert_raises_rpc_error(-26, "bip125-replacement-disallowed", node.sendrawtransaction, tx_v3_child_rbf_v2["hex"])
+        self.check_mempool([tx_v3_bip125["txid"], tx_v3_parent["txid"], tx_v3_child["txid"]])
 
 
     @cleanup(extra_args=["-mempoolfullrbf=0"])
     def test_truc_bip125(self):
         node = self.nodes[0]
-        self.log.info("Test TRUC transactions that don't signal BIP125 are replaceable")
+        self.log.info("Test TRUC transactions that don't signal BIP125 aren't replaceable either")
         assert_equal(node.getmempoolinfo()["fullrbf"], False)
         utxo_v3_no_bip125 = self.wallet.get_utxo()
         tx_v3_no_bip125 = self.wallet.send_self_transfer(
@@ -178,13 +181,13 @@ class MempoolTRUC(BitcoinTestFramework):
 
         self.check_mempool([tx_v3_no_bip125["txid"]])
         assert not node.getmempoolentry(tx_v3_no_bip125["txid"])["bip125-replaceable"]
-        tx_v3_no_bip125_rbf = self.wallet.send_self_transfer(
-            from_node=node,
+        tx_v3_no_bip125_rbf = self.wallet.create_self_transfer(
             fee_rate=DEFAULT_FEE * 2,
             utxo_to_spend=utxo_v3_no_bip125,
             version=3
         )
-        self.check_mempool([tx_v3_no_bip125_rbf["txid"]])
+        assert_raises_rpc_error(-26, "bip125-replacement-disallowed", node.sendrawtransaction, tx_v3_no_bip125_rbf["hex"])
+        self.check_mempool([tx_v3_no_bip125["txid"]])
 
     @cleanup(extra_args=["-datacarriersize=40000"])
     def test_truc_reorg(self):
@@ -341,7 +344,7 @@ class MempoolTRUC(BitcoinTestFramework):
         However, this option is only available in single transaction acceptance. It doesn't work in
         a multi-testmempoolaccept (where RBF is disabled) or when doing package CPFP.
         """
-        self.log.info("Test TRUC sibling eviction in submitpackage and multi-testmempoolaccept")
+        self.log.info("Test that there is no TRUC sibling eviction in submitpackage and multi-testmempoolaccept")
         node = self.nodes[0]
         # Add a parent + child to mempool
         tx_mempool_parent = self.wallet.send_self_transfer_multi(
@@ -390,21 +393,22 @@ class MempoolTRUC(BitcoinTestFramework):
         result_test_1p1c = node.testmempoolaccept([tx_sibling_1["hex"], tx_has_mempool_uncle["hex"]])
         assert_equal(result_test_1p1c[0]["reject-reason"], "TRUC-violation")
 
-        # Allowed when tx is submitted in a package and evaluated individually.
-        # Note that the child failed since it would be the 3rd generation.
+        # Upstream allows sibling eviction when the transaction is evaluated
+        # individually. Marscoin never replaces mempool transactions
+        # (58e16509a2) and has sibling eviction off, so the mempool sibling
+        # stays and the new child is refused.
         result_package_indiv = node.submitpackage([tx_sibling_1["hex"], tx_has_mempool_uncle["hex"]])
-        self.check_mempool([tx_mempool_parent["txid"], tx_sibling_1["txid"]])
-        expected_error_gen3 = f"TRUC-violation, tx {tx_has_mempool_uncle['txid']} (wtxid={tx_has_mempool_uncle['wtxid']}) would have too many ancestors"
+        assert result_package_indiv["package_msg"] != "success"
+        self.check_mempool([tx_mempool_parent["txid"], tx_mempool_sibling["txid"]])
 
-        assert_equal(result_package_indiv["tx-results"][tx_has_mempool_uncle['wtxid']]['error'], expected_error_gen3)
-
-        # Allowed when tx is submitted in a package with in-mempool parent (which is deduplicated).
-        node.submitpackage([tx_mempool_parent["hex"], tx_sibling_2["hex"]])
-        self.check_mempool([tx_mempool_parent["txid"], tx_sibling_2["txid"]])
+        # A sibling that spends the same output as the mempool sibling is a direct conflict.
+        result_package_conflict = node.submitpackage([tx_mempool_parent["hex"], tx_sibling_2["hex"]])
+        assert "replacement-disallowed" in result_package_conflict["tx-results"][tx_sibling_2["wtxid"]]["error"]
+        self.check_mempool([tx_mempool_parent["txid"], tx_mempool_sibling["txid"]])
 
         # Child cannot pay for sibling eviction for parent, as it violates TRUC topology limits
         result_package_cpfp = node.submitpackage([tx_sibling_3["hex"], tx_bumps_parent_with_sibling["hex"]])
-        self.check_mempool([tx_mempool_parent["txid"], tx_sibling_2["txid"]])
+        self.check_mempool([tx_mempool_parent["txid"], tx_mempool_sibling["txid"]])
         expected_error_cpfp = f"TRUC-violation, tx {tx_mempool_parent['txid']} (wtxid={tx_mempool_parent['wtxid']}) would exceed descendant count limit"
 
         assert_equal(result_package_cpfp["tx-results"][tx_sibling_3['wtxid']]['error'], expected_error_cpfp)
@@ -482,7 +486,7 @@ class MempoolTRUC(BitcoinTestFramework):
     @cleanup(extra_args=None)
     def test_reorg_2child_rbf(self):
         node = self.nodes[0]
-        self.log.info("Test that children of a TRUC transaction can be replaced individually, even if there are multiple due to reorg")
+        self.log.info("Test that children of a TRUC transaction aren't replaced, even if there are multiple due to reorg")
 
         ancestor_tx = self.wallet.send_self_transfer_multi(from_node=node, num_outputs=2, version=3)
         self.check_mempool([ancestor_tx["txid"]])
@@ -502,86 +506,44 @@ class MempoolTRUC(BitcoinTestFramework):
         self.check_mempool([ancestor_tx["txid"], child_1["txid"], child_2["txid"]])
         assert_equal(node.getmempoolentry(ancestor_tx["txid"])["descendantcount"], 3)
 
-        # Create a replacement of child_1. It does not conflict with child_2.
-        child_1_conflict = self.wallet.send_self_transfer(from_node=node, version=3, utxo_to_spend=ancestor_tx["new_utxos"][0], fee_rate=Decimal("0.01"))
+        # Upstream replaces child_1 here. Marscoin never replaces mempool
+        # transactions (58e16509a2), even after a reorg.
+        child_1_conflict = self.wallet.create_self_transfer(version=3, utxo_to_spend=ancestor_tx["new_utxos"][0], fee_rate=Decimal("0.01"))
 
         # Ensure child_1 and child_1_conflict are different transactions
         assert (child_1_conflict["txid"] != child_1["txid"])
-        self.check_mempool([ancestor_tx["txid"], child_1_conflict["txid"], child_2["txid"]])
+        assert_raises_rpc_error(-26, "bip125-replacement-disallowed", node.sendrawtransaction, child_1_conflict["hex"])
+        self.check_mempool([ancestor_tx["txid"], child_1["txid"], child_2["txid"]])
         assert_equal(node.getmempoolentry(ancestor_tx["txid"])["descendantcount"], 3)
 
     @cleanup(extra_args=None)
     def test_truc_sibling_eviction(self):
-        self.log.info("Test sibling eviction for TRUC")
+        # Upstream lets a higher-feerate child evict a TRUC parent's existing
+        # child. That would be a replacement, which Marscoin never does
+        # (58e16509a2), so there is no sibling eviction.
+        self.log.info("Test there is no sibling eviction for TRUC")
         node = self.nodes[0]
         tx_v3_parent = self.wallet.send_self_transfer_multi(from_node=node, num_outputs=2, version=3)
-        # This is the sibling to replace
         tx_v3_child_1 = self.wallet.send_self_transfer(
             from_node=node, utxo_to_spend=tx_v3_parent["new_utxos"][0], fee_rate=DEFAULT_FEE * 2, version=3
         )
-        assert tx_v3_child_1["txid"] in node.getrawmempool()
+        self.check_mempool([tx_v3_parent["txid"], tx_v3_child_1["txid"]])
 
-        self.log.info("Test tx must be higher feerate than sibling to evict it")
-        tx_v3_child_2_rule6 = self.wallet.create_self_transfer(
-            utxo_to_spend=tx_v3_parent["new_utxos"][1], fee_rate=DEFAULT_FEE, version=3
-        )
-        rule6_str = f"insufficient fee (including sibling eviction), rejecting replacement {tx_v3_child_2_rule6['txid']}; new feerate"
-        assert_raises_rpc_error(-26, rule6_str, node.sendrawtransaction, tx_v3_child_2_rule6["hex"])
-        self.check_mempool([tx_v3_parent['txid'], tx_v3_child_1['txid']])
+        for fee_rate in (DEFAULT_FEE, DEFAULT_FEE * 10, DEFAULT_FEE * 1000):
+            tx_v3_child_2 = self.wallet.create_self_transfer(
+                utxo_to_spend=tx_v3_parent["new_utxos"][1], fee_rate=fee_rate, version=3
+            )
+            assert_raises_rpc_error(-26, "TRUC-violation", node.sendrawtransaction, tx_v3_child_2["hex"], 0)
+            self.check_mempool([tx_v3_parent["txid"], tx_v3_child_1["txid"]])
 
-        self.log.info("Test tx must meet absolute fee rules to evict sibling")
-        tx_v3_child_2_rule4 = self.wallet.create_self_transfer(
-            utxo_to_spend=tx_v3_parent["new_utxos"][1], fee_rate=2 * DEFAULT_FEE + Decimal("0.00000001"), version=3
-        )
-        rule4_str = f"insufficient fee (including sibling eviction), rejecting replacement {tx_v3_child_2_rule4['txid']}, not enough additional fees to relay"
-        assert_raises_rpc_error(-26, rule4_str, node.sendrawtransaction, tx_v3_child_2_rule4["hex"])
-        self.check_mempool([tx_v3_parent['txid'], tx_v3_child_1['txid']])
-
-        self.log.info("Test tx cannot cause more than 100 evictions including RBF and sibling eviction")
-        # First add 4 groups of 25 transactions.
-        utxos_for_conflict = []
-        txids_v2_100 = []
-        for _ in range(4):
-            confirmed_utxo = self.wallet.get_utxo(confirmed_only=True)
-            utxos_for_conflict.append(confirmed_utxo)
-            # 25 is within descendant limits
-            chain_length = int(MAX_REPLACEMENT_CANDIDATES / 4)
-            chain = self.wallet.create_self_transfer_chain(chain_length=chain_length, utxo_to_spend=confirmed_utxo)
-            for item in chain:
-                txids_v2_100.append(item["txid"])
-                node.sendrawtransaction(item["hex"])
-        self.check_mempool(txids_v2_100 + [tx_v3_parent["txid"], tx_v3_child_1["txid"]])
-
-        # Replacing 100 transactions is fine
-        tx_v3_replacement_only = self.wallet.create_self_transfer_multi(utxos_to_spend=utxos_for_conflict, fee_per_output=4000000)
-        # Override maxfeerate - it costs a lot to replace these 100 transactions.
-        assert node.testmempoolaccept([tx_v3_replacement_only["hex"]], maxfeerate=0)[0]["allowed"]
-        # Adding another one exceeds the limit.
-        utxos_for_conflict.append(tx_v3_parent["new_utxos"][1])
-        tx_v3_child_2_rule5 = self.wallet.create_self_transfer_multi(utxos_to_spend=utxos_for_conflict, fee_per_output=4000000, version=3)
-        rule5_str = f"too many potential replacements (including sibling eviction), rejecting replacement {tx_v3_child_2_rule5['txid']}; too many potential replacements (101 > 100)"
-        assert_raises_rpc_error(-26, rule5_str, node.sendrawtransaction, tx_v3_child_2_rule5["hex"])
-        self.check_mempool(txids_v2_100 + [tx_v3_parent["txid"], tx_v3_child_1["txid"]])
-
-        self.log.info("Test sibling eviction is successful if it meets all RBF rules")
-        tx_v3_child_2 = self.wallet.create_self_transfer(
-            utxo_to_spend=tx_v3_parent["new_utxos"][1], fee_rate=DEFAULT_FEE*10, version=3
-        )
-        node.sendrawtransaction(tx_v3_child_2["hex"])
-        self.check_mempool(txids_v2_100 + [tx_v3_parent["txid"], tx_v3_child_2["txid"]])
-
-        self.log.info("Test that it's possible to do a sibling eviction and RBF at the same time")
+        self.log.info("Test a sibling eviction combined with an RBF is refused too")
         utxo_unrelated_conflict = self.wallet.get_utxo(confirmed_only=True)
-        tx_unrelated_replacee = self.wallet.send_self_transfer(from_node=node, utxo_to_spend=utxo_unrelated_conflict)
-        assert tx_unrelated_replacee["txid"] in node.getrawmempool()
-
-        fee_to_beat = max(int(tx_v3_child_2["fee"] * COIN), int(tx_unrelated_replacee["fee"]*COIN))
-
+        tx_unrelated = self.wallet.send_self_transfer(from_node=node, utxo_to_spend=utxo_unrelated_conflict)
         tx_v3_child_3 = self.wallet.create_self_transfer_multi(
-            utxos_to_spend=[tx_v3_parent["new_utxos"][0], utxo_unrelated_conflict], fee_per_output=fee_to_beat*2, version=3
+            utxos_to_spend=[tx_v3_parent["new_utxos"][0], utxo_unrelated_conflict], fee_per_output=4000000, version=3
         )
-        node.sendrawtransaction(tx_v3_child_3["hex"])
-        self.check_mempool(txids_v2_100 + [tx_v3_parent["txid"], tx_v3_child_3["txid"]])
+        assert_raises_rpc_error(-26, "bip125-replacement-disallowed", node.sendrawtransaction, tx_v3_child_3["hex"], 0)
+        self.check_mempool([tx_v3_parent["txid"], tx_v3_child_1["txid"], tx_unrelated["txid"]])
 
     @cleanup(extra_args=None)
     def test_reorg_sibling_eviction_1p2c(self):
@@ -612,14 +574,15 @@ class MempoolTRUC(BitcoinTestFramework):
         expected_error_2siblings = f"TRUC-violation, tx {tx_with_multi_children['txid']} (wtxid={tx_with_multi_children['wtxid']}) would exceed descendant count limit"
         assert_raises_rpc_error(-26, expected_error_2siblings, node.sendrawtransaction, tx_with_sibling3["hex"])
 
-        # However, an RBF (with conflicting inputs) is possible even if the resulting cluster size exceeds 2
-        tx_with_sibling3_rbf = self.wallet.send_self_transfer(
-            from_node=node,
+        # Upstream allows an RBF with conflicting inputs here. Marscoin never
+        # replaces mempool transactions (58e16509a2).
+        tx_with_sibling3_rbf = self.wallet.create_self_transfer(
             version=3,
             utxo_to_spend=tx_with_multi_children["new_utxos"][0],
             fee_rate=DEFAULT_FEE*50
         )
-        self.check_mempool([tx_with_multi_children["txid"], tx_with_sibling3_rbf["txid"], tx_with_sibling2["txid"]])
+        assert_raises_rpc_error(-26, "bip125-replacement-disallowed", node.sendrawtransaction, tx_with_sibling3_rbf["hex"])
+        self.check_mempool([tx_with_multi_children["txid"], tx_with_sibling1["txid"], tx_with_sibling2["txid"]])
 
 
     def run_test(self):

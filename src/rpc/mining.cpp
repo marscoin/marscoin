@@ -8,6 +8,7 @@
 #include <chain.h>
 #include <chainparams.h>
 #include <chainparamsbase.h>
+#include <common/args.h>
 #include <common/system.h>
 #include <consensus/amount.h>
 #include <consensus/consensus.h>
@@ -135,17 +136,40 @@ static bool GenerateBlock(ChainstateManager& chainman, Mining& miner, CBlock&& b
 {
     block_out.reset();
     block.hashMerkleRoot = BlockMerkleRoot(block);
+    const Consensus::Params& consensus{chainman.GetConsensus()};
 
-    auto& miningHeader = CAuxPow::initAuxPow(block);
-    while (max_tries > 0 && miningHeader.nNonce < std::numeric_limits<uint32_t>::max() && !CheckProofOfWork(miningHeader, block.nBits, chainman.GetConsensus()) && !chainman.m_interrupt) {
-        ++miningHeader.nNonce;
-        --max_tries;
+    // Under RandomX key binding the block itself is mined, keyed by an earlier
+    // block of its chain; merged mining is invalid there.
+    std::optional<uint256> randomx_key;
+    if (consensus.fPowUseRandomX) {
+        LOCK(cs_main);
+        const CBlockIndex* prev{chainman.m_blockman.LookupBlockIndex(block.hashPrevBlock)};
+        if (prev && consensus.IsRandomXKeyBound(prev->nHeight + 1)) randomx_key = GetRandomXSeedKey(*prev, consensus);
     }
-    if (max_tries == 0 || chainman.m_interrupt) {
-        return false;
-    }
-    if (miningHeader.nNonce == std::numeric_limits<uint32_t>::max()) {
-        return true;
+
+    if (randomx_key) {
+        while (max_tries > 0 && block.nNonce < std::numeric_limits<uint32_t>::max() && !CheckProofOfWorkWithKey(block, block.nBits, *randomx_key, consensus, PowHashCache::MINING) && !chainman.m_interrupt) {
+            ++block.nNonce;
+            --max_tries;
+        }
+        if (max_tries == 0 || chainman.m_interrupt) {
+            return false;
+        }
+        if (block.nNonce == std::numeric_limits<uint32_t>::max()) {
+            return true;
+        }
+    } else {
+        auto& miningHeader = CAuxPow::initAuxPow(block);
+        while (max_tries > 0 && miningHeader.nNonce < std::numeric_limits<uint32_t>::max() && !CheckProofOfWork(miningHeader, block.nBits, consensus, PowHashCache::MINING) && !chainman.m_interrupt) {
+            ++miningHeader.nNonce;
+            --max_tries;
+        }
+        if (max_tries == 0 || chainman.m_interrupt) {
+            return false;
+        }
+        if (miningHeader.nNonce == std::numeric_limits<uint32_t>::max()) {
+            return true;
+        }
     }
 
     block_out = std::make_shared<const CBlock>(std::move(block));
@@ -163,7 +187,7 @@ static UniValue generateBlocks(ChainstateManager& chainman, Mining& miner, const
 {
     UniValue blockHashes(UniValue::VARR);
     while (nGenerate > 0 && !chainman.m_interrupt) {
-        std::unique_ptr<BlockTemplate> block_template{miner.createNewBlock({.use_mempool = false, .coinbase_output_script = coinbase_output_script})};
+        std::unique_ptr<BlockTemplate> block_template{miner.createNewBlock({.coinbase_output_script = coinbase_output_script})};
         CHECK_NONFATAL(block_template);
 
         std::shared_ptr<const CBlock> block_out;
@@ -650,6 +674,8 @@ static RPCHelpMan getblocktemplate()
                 {RPCResult::Type::NUM_TIME, "curtime", "current timestamp in " + UNIX_EPOCH_TIME},
                 {RPCResult::Type::STR, "bits", "compressed target of next block"},
                 {RPCResult::Type::NUM, "height", "The height of the next block"},
+                {RPCResult::Type::NUM, "randomxseedheight", /*optional=*/true, "Under RandomX key binding: height of the block whose hash keys RandomX for the next block"},
+                {RPCResult::Type::STR_HEX, "randomxseedhash", /*optional=*/true, "Under RandomX key binding: the RandomX key for the next block"},
                 {RPCResult::Type::STR_HEX, "signet_challenge", /*optional=*/true, "Only on signet"},
                 {RPCResult::Type::STR_HEX, "default_witness_commitment", /*optional=*/true, "a valid witness commitment for the unmodified block template"},
             }},
@@ -934,8 +960,19 @@ static RPCHelpMan getblocktemplate()
         }
     }
 
-    // Enforce legacy blocks only via getblocktemplate
+    // getblocktemplate offers a legacy block version, so that plain (not merge-
+    // mined) miners keep working where the chain accepts it (mainnet, testnet).
+    // Where legacy blocks are rejected (regtest, signet, marsqnet), it offers
+    // the same version with the auxpow chain ID instead.
     block.nVersion = CPureBlockHeader::VERSION_LEGACY;
+    // -regtest only: -blockversion=N sets the version, as in the block assembler.
+    if (chainman.GetParams().MineBlocksOnDemand()) {
+        block.nVersion = gArgs.GetIntArg("-blockversion", block.nVersion);
+        block.SetAuxpowVersion(false);
+    }
+    if (!consensusParams.AllowLegacyBlocks(pindexPrev->nHeight + 1)) {
+        block.SetChainId(consensusParams.nAuxpowChainId);
+    }
 
     result.pushKV("version", block.nVersion);
     result.pushKV("rules", std::move(aRules));
@@ -967,6 +1004,10 @@ static RPCHelpMan getblocktemplate()
     result.pushKV("curtime", block.GetBlockTime());
     result.pushKV("bits", strprintf("%08x", block.nBits));
     result.pushKV("height", (int64_t)(pindexPrev->nHeight+1));
+    if (consensusParams.IsRandomXKeyBound(pindexPrev->nHeight + 1)) {
+        result.pushKV("randomxseedheight", RandomXSeedHeight(pindexPrev->nHeight + 1, consensusParams));
+        result.pushKV("randomxseedhash", GetRandomXSeedKey(*pindexPrev, consensusParams).GetHex());
+    }
 
     if (consensusParams.signet_blocks) {
         result.pushKV("signet_challenge", HexStr(consensusParams.signet_challenge));
@@ -1025,7 +1066,25 @@ static RPCHelpMan submitblock()
         throw JSONRPCError(RPC_DESERIALIZATION_ERROR, "Block decode failed");
     }
 
+    if (block.vtx.empty() || !block.vtx[0]->IsCoinBase()) {
+        throw JSONRPCError(RPC_DESERIALIZATION_ERROR, "Block does not start with a coinbase");
+    }
+
     ChainstateManager& chainman = EnsureAnyChainman(request.context);
+    uint256 hash = block.GetHash();
+    {
+        LOCK(cs_main);
+        const CBlockIndex* pindex = chainman.m_blockman.LookupBlockIndex(hash);
+        if (pindex) {
+            if (pindex->IsValid(BLOCK_VALID_SCRIPTS)) {
+                return "duplicate";
+            }
+            if (pindex->nStatus & BLOCK_FAILED_MASK) {
+                return "duplicate-invalid";
+            }
+        }
+    }
+
     {
         LOCK(cs_main);
         const CBlockIndex* pindex = chainman.m_blockman.LookupBlockIndex(block.hashPrevBlock);

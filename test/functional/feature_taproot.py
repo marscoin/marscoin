@@ -824,6 +824,9 @@ def spenders_taproot_active():
                     elif witlen > 32:
                         prog += bytes([0 for _ in range(witlen - 32)])
                     return CScript([CScriptOp.encode_op_n(witver), prog])
+                if not p2sh and witver == 2 and witlen == 32:
+                    # Marscoin's P2WPQH, not an unknown witness version
+                    continue
                 scripts = [("s0", CScript([pubs[0], OP_CHECKSIG])), ("dummy", CScript([OP_RETURN]))]
                 tap = taproot_construct(pubs[1], scripts)
                 if not p2sh and witver == 1 and witlen == 32:

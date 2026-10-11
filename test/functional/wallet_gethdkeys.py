@@ -49,6 +49,9 @@ class WalletGetHDKeyTest(BitcoinTestFramework):
 
         descs = wallet.listdescriptors(True)
         for desc in descs["descriptors"]:
+            # wpq() descriptors derive from their own PQ HD node, not the HD key
+            if desc["desc"].startswith("wpq("):
+                continue
             assert xprv in desc["desc"]
 
         self.log.info("HD pubkey can be retrieved from encrypted wallets")
@@ -69,6 +72,8 @@ class WalletGetHDKeyTest(BitcoinTestFramework):
             xpub_info = wallet.gethdkeys(active_only=True, private=True)[0]
             assert xpub_info["xprv"] != xprv
             for desc in wallet.listdescriptors(True)["descriptors"]:
+                if desc["desc"].startswith("wpq("):
+                    continue
                 if desc["active"]:
                     # After encrypting, HD key was rotated and should appear in all active descriptors
                     assert xpub_info["xprv"] in desc["desc"]

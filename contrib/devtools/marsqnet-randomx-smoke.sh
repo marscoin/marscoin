@@ -60,4 +60,35 @@ if [[ "$NODE2_HEIGHT" -lt "$BLOCKS" ]]; then
   exit 1
 fi
 
+cli1() { "$MARSCOINCLI" -datadir="$NODE1_DIR" -chain="$CHAIN" -rpcport="$NODE1_RPC_PORT" "$@"; }
+cli2() { "$MARSCOINCLI" -datadir="$NODE2_DIR" -chain="$CHAIN" -rpcport="$NODE2_RPC_PORT" "$@"; }
+
+# Both nodes must agree on the tip, which they only accept with valid RandomX proof of work.
+BEST1="$(cli1 getbestblockhash)"
+BEST2="$(cli2 getbestblockhash)"
+if [[ "$BEST1" != "$BEST2" ]]; then
+  echo "[marsqnet-smoke] ERROR: nodes disagree on the best block ($BEST1 vs $BEST2)" >&2
+  exit 1
+fi
+
+CHAIN_NAME="$(cli1 getblockchaininfo | python3 -c 'import json,sys; print(json.load(sys.stdin)["chain"])')"
+if [[ "$CHAIN_NAME" != "$CHAIN" ]]; then
+  echo "[marsqnet-smoke] ERROR: getblockchaininfo reports chain '$CHAIN_NAME', expected '$CHAIN'" >&2
+  exit 1
+fi
+
+# Locally mined blocks carry the marsqnet auxpow chain ID (0x4D51) in the version.
+CHAIN_ID="$(cli1 getblockheader "$BEST1" | python3 -c 'import json,sys; print(hex(json.load(sys.stdin)["version"] >> 16))')"
+if [[ "$CHAIN_ID" != "0x4d51" ]]; then
+  echo "[marsqnet-smoke] ERROR: tip block chain ID is $CHAIN_ID, expected 0x4d51" >&2
+  exit 1
+fi
+
+WARNINGS="$(cli1 getblockchaininfo | python3 -c 'import json,sys; print(json.load(sys.stdin).get("warnings") or "")')"
+if [[ -n "$WARNINGS" && "$WARNINGS" != "[]" ]]; then
+  echo "[marsqnet-smoke] ERROR: unexpected warnings: $WARNINGS" >&2
+  exit 1
+fi
+
+echo "[marsqnet-smoke] tip: $BEST1 (chain $CHAIN_NAME, chain ID $CHAIN_ID)"
 echo "[marsqnet-smoke] success"

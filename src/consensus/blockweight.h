@@ -57,6 +57,15 @@ ABWLState ComputeNextABWLState(int64_t prev_epsilon, int64_t prev_beta, int64_t 
 int64_t GetAdaptiveBlockWeightLimit(const CBlockIndex* pindexPrev, const Consensus::Params& params);
 
 /**
+ * Upper bound on block weight for context-free checks (CheckBlock).
+ *
+ * Chains without ABWL configured keep the legacy MAX_BLOCK_WEIGHT. Chains with
+ * ABWL use the absolute ABWL ceiling; the exact limit is enforced later in
+ * ContextualCheckBlock.
+ */
+int64_t GetContextFreeMaxBlockWeight(const Consensus::Params& params);
+
+/**
  * Compute the initial ABWL state at the activation height.
  * Epsilon and beta are each set to ABWL_WEIGHT_FLOOR / 2 so that
  * the initial limit (epsilon + beta) equals the legacy fixed limit exactly.
