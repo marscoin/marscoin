@@ -67,10 +67,11 @@ class MempoolPackagesTest(BitcoinTestFramework):
         # and the second chain should work just fine
         self.chain_tx([second_chain])
 
-        # Ensure an individual transaction with single direct conflict can RBF the chain which used our carve-out rule
+        # Upstream replaces the transaction that used the carve-out rule here.
+        # Marscoin never replaces mempool transactions (58e16509a2).
         replacement_tx = replaceable_tx["tx"]
         replacement_tx.vout[0].nValue -= 1000000
-        self.nodes[0].sendrawtransaction(replacement_tx.serialize().hex())
+        assert_raises_rpc_error(-26, "bip125-replacement-disallowed", self.nodes[0].sendrawtransaction, replacement_tx.serialize().hex())
 
         # Finally, check that we added two transactions
         assert_equal(len(self.nodes[0].getrawmempool()), DEFAULT_ANCESTOR_LIMIT + 3)

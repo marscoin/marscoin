@@ -37,23 +37,27 @@ class PrioritiseTransactionTest(BitcoinTestFramework):
         assert_equal(node.getprioritisedtransactions(), {})
 
     def test_replacement(self):
-        self.log.info("Test tx prioritisation stays after a tx is replaced")
+        self.log.info("Test tx prioritisation stays when a conflicting tx is refused")
+        # Upstream replaces the prioritised transaction here. Marscoin never
+        # replaces mempool transactions (58e16509a2): the conflict is refused,
+        # and the first transaction keeps its place and its fee delta.
         conflicting_input = self.wallet.get_utxo()
-        tx_replacee = self.wallet.create_self_transfer(utxo_to_spend=conflicting_input, fee_rate=Decimal("0.0001"))
-        tx_replacement = self.wallet.create_self_transfer(utxo_to_spend=conflicting_input, fee_rate=Decimal("0.005"))
-        # Add 1 satoshi fee delta to replacee
-        self.nodes[0].prioritisetransaction(tx_replacee["txid"], 0, 100)
-        assert_equal(self.nodes[0].getprioritisedtransactions(), { tx_replacee["txid"] : { "fee_delta" : 100, "in_mempool" : False}})
-        self.nodes[0].sendrawtransaction(tx_replacee["hex"])
-        assert_equal(self.nodes[0].getprioritisedtransactions(), { tx_replacee["txid"] : { "fee_delta" : 100, "in_mempool" : True, "modified_fee": int(tx_replacee["fee"] * COIN + 100)}})
-        self.nodes[0].sendrawtransaction(tx_replacement["hex"])
-        assert tx_replacee["txid"] not in self.nodes[0].getrawmempool()
-        assert_equal(self.nodes[0].getprioritisedtransactions(), { tx_replacee["txid"] : { "fee_delta" : 100, "in_mempool" : False}})
+        tx_first = self.wallet.create_self_transfer(utxo_to_spend=conflicting_input, fee_rate=Decimal("0.0001"))
+        tx_conflict = self.wallet.create_self_transfer(utxo_to_spend=conflicting_input, fee_rate=Decimal("0.005"))
+        # Add 1 satoshi fee delta to the first transaction
+        self.nodes[0].prioritisetransaction(tx_first["txid"], 0, 100)
+        assert_equal(self.nodes[0].getprioritisedtransactions(), { tx_first["txid"] : { "fee_delta" : 100, "in_mempool" : False}})
+        self.nodes[0].sendrawtransaction(tx_first["hex"])
+        in_mempool = { tx_first["txid"] : { "fee_delta" : 100, "in_mempool" : True, "modified_fee": int(tx_first["fee"] * COIN + 100)}}
+        assert_equal(self.nodes[0].getprioritisedtransactions(), in_mempool)
+        assert_raises_rpc_error(-26, "bip125-replacement-disallowed", self.nodes[0].sendrawtransaction, tx_conflict["hex"])
+        assert tx_first["txid"] in self.nodes[0].getrawmempool()
+        assert tx_conflict["txid"] not in self.nodes[0].getrawmempool()
+        assert_equal(self.nodes[0].getprioritisedtransactions(), in_mempool)
 
         # PrioritiseTransaction is additive
-        self.nodes[0].prioritisetransaction(tx_replacee["txid"], 0, COIN)
-        self.nodes[0].sendrawtransaction(tx_replacee["hex"])
-        assert_equal(self.nodes[0].getprioritisedtransactions(), { tx_replacee["txid"] : { "fee_delta" : COIN + 100, "in_mempool" : True, "modified_fee": int(tx_replacee["fee"] * COIN + COIN + 100)}})
+        self.nodes[0].prioritisetransaction(tx_first["txid"], 0, COIN)
+        assert_equal(self.nodes[0].getprioritisedtransactions(), { tx_first["txid"] : { "fee_delta" : COIN + 100, "in_mempool" : True, "modified_fee": int(tx_first["fee"] * COIN + COIN + 100)}})
         self.generate(self.nodes[0], 1)
         assert_equal(self.nodes[0].getprioritisedtransactions(), {})
 

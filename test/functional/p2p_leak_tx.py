@@ -9,6 +9,7 @@ from test_framework.p2p import p2p_lock, P2PDataStore, P2PTxInvStore
 from test_framework.test_framework import BitcoinTestFramework
 from test_framework.util import (
     assert_equal,
+    assert_raises_rpc_error,
 )
 from test_framework.wallet import MiniWallet
 
@@ -27,7 +28,7 @@ class P2PLeakTxTest(BitcoinTestFramework):
         self.miniwallet = MiniWallet(self.gen_node)
 
         self.test_tx_in_block()
-        self.test_notfound_on_replaced_tx()
+        self.test_tx_not_replaced()
         self.test_notfound_on_unannounced_tx()
 
     def test_tx_in_block(self):
@@ -46,7 +47,10 @@ class P2PLeakTxTest(BitcoinTestFramework):
         inbound_peer.send_and_ping(want_tx)
         assert_equal(inbound_peer.last_message.get("tx").tx.getwtxid(), wtxid)
 
-    def test_notfound_on_replaced_tx(self):
+    def test_tx_not_replaced(self):
+        # Upstream checks that a replaced transaction is answered with notfound.
+        # Marscoin never replaces mempool transactions (58e16509a2), so the
+        # conflict is refused and the announced transaction stays available.
         self.gen_node.disconnect_p2ps()
         inbound_peer = self.gen_node.add_p2p_connection(P2PTxInvStore())
 
@@ -54,25 +58,20 @@ class P2PLeakTxTest(BitcoinTestFramework):
         tx_a = self.miniwallet.send_self_transfer(from_node=self.gen_node)
         inbound_peer.wait_for_broadcast(txns=[tx_a["wtxid"]])
 
+        self.log.info("A conflicting tx_b is refused")
         tx_b = tx_a["tx"]
         tx_b.vout[0].nValue -= 9000
-        self.gen_node.sendrawtransaction(tx_b.serialize().hex())
-        inbound_peer.wait_until(lambda: "tx" in inbound_peer.last_message and inbound_peer.last_message.get("tx").tx.getwtxid() == tx_b.getwtxid())
+        assert_raises_rpc_error(-26, "bip125-replacement-disallowed", self.gen_node.sendrawtransaction, tx_b.serialize().hex())
 
-        self.log.info("Re-request of tx_a after replacement is answered with notfound")
-        req_vec = [
-            CInv(t=MSG_TX, h=int(tx_a["txid"], 16)),
-            CInv(t=MSG_WTX, h=int(tx_a["wtxid"], 16)),
-        ]
+        self.log.info("Re-request of tx_a is still answered with the transaction")
         want_tx = msg_getdata()
-        want_tx.inv = req_vec
+        want_tx.inv = [CInv(t=MSG_WTX, h=int(tx_a["wtxid"], 16))]
         with p2p_lock:
             inbound_peer.last_message.pop("notfound", None)
             inbound_peer.last_message.pop("tx", None)
         inbound_peer.send_and_ping(want_tx)
-
-        assert_equal(inbound_peer.last_message.get("notfound").vec, req_vec)
-        assert "tx" not in inbound_peer.last_message
+        assert_equal(inbound_peer.last_message.get("tx").tx.getwtxid(), tx_a["wtxid"])
+        assert "notfound" not in inbound_peer.last_message
 
     def test_notfound_on_unannounced_tx(self):
         self.log.info("Check that we don't leak txs to inbound peers that we haven't yet announced to")
