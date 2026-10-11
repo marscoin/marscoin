@@ -3879,8 +3879,9 @@ void ChainstateManager::ReceivedBlockTransactions(const CBlock& block, CBlockInd
 
 static bool CheckBlockHeader(const CBlockHeader& block, BlockValidationState& state, const Consensus::Params& consensusParams, bool fCheckPOW = true)
 {
-    // Check proof of work matches claimed amount
-    if (fCheckPOW && !CheckProofOfWork(block, consensusParams))
+    // Check proof of work matches claimed amount. A RandomX header's key can
+    // depend on its height, so ContextualCheckBlockHeader() checks it instead.
+    if (fCheckPOW && !consensusParams.fPowUseRandomX && !CheckProofOfWork(block, consensusParams))
         return state.Invalid(BlockValidationResult::BLOCK_INVALID_HEADER, "high-hash", "proof of work failed");
 
     return true;
@@ -4074,6 +4075,10 @@ std::vector<unsigned char> ChainstateManager::GenerateCoinbaseCommitment(CBlock&
 
 bool HasValidProofOfWork(const std::vector<CBlockHeader>& headers, const Consensus::Params& consensusParams)
 {
+    // A RandomX header's key can depend on its height, which isn't known here.
+    // Its proof of work is checked by ContextualCheckBlockHeader() before the
+    // header is stored, and by the headers presync for low-work chains.
+    if (consensusParams.fPowUseRandomX) return true;
     return std::all_of(headers.cbegin(), headers.cend(),
             [&](const auto& header) { return CheckProofOfWork(header, consensusParams);});
 }
@@ -4128,7 +4133,7 @@ arith_uint256 CalculateClaimedHeadersWork(const std::vector<CBlockHeader>& heade
  *  in ConnectBlock().
  *  Note that -reindex-chainstate skips the validation that happens here!
  */
-static bool ContextualCheckBlockHeader(const CBlockHeader& block, BlockValidationState& state, BlockManager& blockman, const ChainstateManager& chainman, const CBlockIndex* pindexPrev) EXCLUSIVE_LOCKS_REQUIRED(::cs_main)
+static bool ContextualCheckBlockHeader(const CBlockHeader& block, BlockValidationState& state, BlockManager& blockman, const ChainstateManager& chainman, const CBlockIndex* pindexPrev, bool check_pow = true) EXCLUSIVE_LOCKS_REQUIRED(::cs_main)
 {
     AssertLockHeld(::cs_main);
     assert(pindexPrev != nullptr);
@@ -4141,8 +4146,28 @@ static bool ContextualCheckBlockHeader(const CBlockHeader& block, BlockValidatio
                              "late-legacy-block",
                              "legacy block after auxpow start");
 
-    // Check proof of work (handle incorrect units for DGW)
-    if (nHeight <= 126000) {
+    // RandomX proof of work (doc/quantum-randomx-key-binding-v1.md). From the
+    // key binding height the key is an earlier block of this chain and merged
+    // mining is invalid; before it, the key comes from the hashed header.
+    if (consensusParams.fPowUseRandomX && check_pow) {
+        if (consensusParams.IsRandomXKeyBound(nHeight)) {
+            if (block.IsAuxpow() || block.auxpow) {
+                return state.Invalid(BlockValidationResult::BLOCK_INVALID_HEADER, "auxpow-randomx", "merged mining is not allowed with RandomX key binding");
+            }
+            if (!block.IsLegacy() && consensusParams.fStrictChainId && block.GetChainId() != consensusParams.nAuxpowChainId) {
+                return state.Invalid(BlockValidationResult::BLOCK_INVALID_HEADER, "bad-chain-id", "block does not have our chain ID");
+            }
+            if (!CheckProofOfWorkWithKey(block, block.nBits, GetRandomXSeedKey(*pindexPrev, consensusParams), consensusParams)) {
+                return state.Invalid(BlockValidationResult::BLOCK_INVALID_HEADER, "high-hash", "proof of work failed");
+            }
+        } else if (!CheckProofOfWork(block, consensusParams)) {
+            return state.Invalid(BlockValidationResult::BLOCK_INVALID_HEADER, "high-hash", "proof of work failed");
+        }
+    }
+
+    // Check proof of work (handle incorrect units for DGW). The tolerance is
+    // mainnet history; a RandomX chain leaves it at key binding.
+    if (nHeight <= 126000 && !consensusParams.IsRandomXKeyBound(nHeight)) {
         unsigned int nBitsNext = GetNextWorkRequired(pindexPrev, &block, consensusParams);
         double n1 = ConvertBitsToDouble(block.nBits);
         double n2 = ConvertBitsToDouble(nBitsNext);
@@ -4604,7 +4629,7 @@ bool TestBlockValidity(BlockValidationState& state,
     indexDummy.phashBlock = &block_hash;
 
     // NOTE: CheckBlockHeader is called by CheckBlock
-    if (!ContextualCheckBlockHeader(block, state, chainstate.m_blockman, chainstate.m_chainman, pindexPrev)) {
+    if (!ContextualCheckBlockHeader(block, state, chainstate.m_blockman, chainstate.m_chainman, pindexPrev, fCheckPOW)) {
         LogError("%s: Consensus::ContextualCheckBlockHeader: %s\n", __func__, state.ToString());
         return false;
     }

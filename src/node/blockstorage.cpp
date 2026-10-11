@@ -1116,8 +1116,10 @@ bool ReadBlockOrHeader(T& block, const FlatFilePos& pos, const BlockManager& blo
         return false;
     }
 
-    // Check the header
-    if (!CheckProofOfWork(block, blockman.GetConsensus())) {
+    // Check the header. A RandomX block's key can depend on its height, which
+    // isn't known here; the block was fully validated before it was stored,
+    // and reads through a block index entry still check its hash.
+    if (!blockman.GetConsensus().fPowUseRandomX && !CheckProofOfWork(block, blockman.GetConsensus())) {
         LogError("%s: Errors in block header at %s\n", __func__, pos.ToString());
         return false;
     }
