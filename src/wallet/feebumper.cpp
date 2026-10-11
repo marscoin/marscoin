@@ -23,6 +23,14 @@ namespace wallet {
 //! mined, or conflicts with a mined transaction. Return a feebumper::Result.
 static feebumper::Result PreconditionChecks(const CWallet& wallet, const CWalletTx& wtx, bool require_mine, std::vector<bilingual_str>& errors) EXCLUSIVE_LOCKS_REQUIRED(wallet.cs_wallet)
 {
+    // A fee bump replaces the transaction, and Marscoin nodes never replace
+    // mempool transactions (58e16509a2). Without this, bumpfee reported
+    // success while the replacement was refused, and the wallet recorded the
+    // original as replaced by a transaction that could never confirm. This
+    // also hides "Increase transaction fee" in the GUI.
+    errors.push_back(Untranslated("Fee bumping is not available: it replaces the transaction, and Marscoin never replaces mempool transactions. To speed up a transaction, spend one of its outputs with a higher fee (child pays for parent)."));
+    return feebumper::Result::INVALID_REQUEST;
+
     if (wallet.HasWalletSpend(wtx.tx)) {
         errors.push_back(Untranslated("Transaction has descendants in the wallet"));
         return feebumper::Result::INVALID_PARAMETER;
