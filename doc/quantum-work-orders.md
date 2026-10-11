@@ -61,7 +61,7 @@ tracked in #32, #34, #36, #37 and #43.
 | [MQ-23](#mq-23--pq-keys-in-the-key-manager) | PQ keys in the key manager | D · Wallet | In progress: `wpq()` keys in the descriptor ScriptPubKeyMan (#82) | MQ-22 |
 | [MQ-24](#mq-24--migration-tooling) | Migration tooling | D · Wallet | Queued | MQ-23 |
 | [MQ-25](#mq-25--script-level-and-unit-tests) | Script-level and unit tests | E · Verification | In progress: 632 of 661 unit cases pass; all 661 with #83 | — |
-| [MQ-26](#mq-26--functional-tests) | Functional tests | E · Verification | In progress: 204 of 245 non-skipped runs pass after #88–#91 and #94 | — |
+| [MQ-26](#mq-26--functional-tests) | Functional tests | E · Verification | In progress: RBF batch adapted (#101–#104); wallet_conflicts/listtransactions/resend remain | — |
 | [MQ-27](#mq-27--ci-and-release-discipline) | CI and release discipline | E · Verification | In progress: secret scanning (#54, and #86 for 28.x) and config lint (#72) | — |
 | [MQ-28](#mq-28--performance-and-stress-testing) | Performance and stress testing | E · Verification | In progress: benchmarks merged (PR #74); stress run pending | MQ-25 |
 | [MQ-29](#mq-29--documentation-refresh) | Documentation refresh | E · Verification | In progress: sighash spec merged (#64) | — |
@@ -953,15 +953,22 @@ at 6cfa00e, 314 runs): 202 pass, 43 fail, 69 skip. Fixed since the last count:
   (MQ-54), and #94 fixes an intermittent failure in `p2p_invalid_messages`.
 
 Remaining failures by cause:
-- **RBF, disabled by design.** `feature_rbf`, `mempool_package_rbf`,
-  `mempool_truc`, `wallet_bumpfee`, `wallet_conflicts`, `wallet_balance`,
-  `wallet_listtransactions`, `feature_fee_estimation`,
-  `mining_prioritisetransaction`, `mempool_accept`, `mempool_limit`,
-  `mempool_package_onemore`, `rpc_packages` and `p2p_leak_tx`.
-  `wallet_resendwallettransactions` takes an RBF path only when a random txid
-  order comes out a certain way, so it fails intermittently. Still open: drop
-  the RBF-only tests with a note, or have them assert that replacement is
-  refused.
+- **RBF, disabled by design.** The owner decided (2026-10-11) these assert the
+  refusal rather than being dropped, documenting the no-RBF policy
+  (58e16509a2). Done:
+  - #101: `feature_rbf` rewritten; also turns off TRUC sibling eviction, which
+    still replaced a TRUC child (a policy fix, likely in 28.x too).
+  - #102: `p2p_leak_tx`, `mining_prioritisetransaction`,
+    `mempool_package_onemore`, `feature_fee_estimation`.
+  - #103: `mempool_accept`, `rpc_packages`, `mempool_limit`,
+    `mempool_package_rbf` (rewritten), `mempool_truc`.
+  - #104: `wallet_bumpfee`, plus a wallet fix: bumpfee/psbtbumpfee reported
+    success while the replacement was refused and marked the original as
+    replaced (likely in 28.x too).
+  Remaining (need the build host): `wallet_conflicts`, `wallet_balance` (done
+  locally, untested), `wallet_listtransactions` (drafted locally),
+  `wallet_resendwallettransactions` (fails only on a certain random txid
+  order).
 - **Buried deployments.** `feature_cltv` and `feature_dersig`.
 - **Chain data.**
   - `rpc_validateaddress` checks mainnet BIP173/BIP350 vectors, which need
