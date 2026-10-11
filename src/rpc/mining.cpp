@@ -136,17 +136,40 @@ static bool GenerateBlock(ChainstateManager& chainman, Mining& miner, CBlock&& b
 {
     block_out.reset();
     block.hashMerkleRoot = BlockMerkleRoot(block);
+    const Consensus::Params& consensus{chainman.GetConsensus()};
 
-    auto& miningHeader = CAuxPow::initAuxPow(block);
-    while (max_tries > 0 && miningHeader.nNonce < std::numeric_limits<uint32_t>::max() && !CheckProofOfWork(miningHeader, block.nBits, chainman.GetConsensus(), PowHashCache::MINING) && !chainman.m_interrupt) {
-        ++miningHeader.nNonce;
-        --max_tries;
+    // Under RandomX key binding the block itself is mined, keyed by an earlier
+    // block of its chain; merged mining is invalid there.
+    std::optional<uint256> randomx_key;
+    if (consensus.fPowUseRandomX) {
+        LOCK(cs_main);
+        const CBlockIndex* prev{chainman.m_blockman.LookupBlockIndex(block.hashPrevBlock)};
+        if (prev && consensus.IsRandomXKeyBound(prev->nHeight + 1)) randomx_key = GetRandomXSeedKey(*prev, consensus);
     }
-    if (max_tries == 0 || chainman.m_interrupt) {
-        return false;
-    }
-    if (miningHeader.nNonce == std::numeric_limits<uint32_t>::max()) {
-        return true;
+
+    if (randomx_key) {
+        while (max_tries > 0 && block.nNonce < std::numeric_limits<uint32_t>::max() && !CheckProofOfWorkWithKey(block, block.nBits, *randomx_key, consensus, PowHashCache::MINING) && !chainman.m_interrupt) {
+            ++block.nNonce;
+            --max_tries;
+        }
+        if (max_tries == 0 || chainman.m_interrupt) {
+            return false;
+        }
+        if (block.nNonce == std::numeric_limits<uint32_t>::max()) {
+            return true;
+        }
+    } else {
+        auto& miningHeader = CAuxPow::initAuxPow(block);
+        while (max_tries > 0 && miningHeader.nNonce < std::numeric_limits<uint32_t>::max() && !CheckProofOfWork(miningHeader, block.nBits, consensus, PowHashCache::MINING) && !chainman.m_interrupt) {
+            ++miningHeader.nNonce;
+            --max_tries;
+        }
+        if (max_tries == 0 || chainman.m_interrupt) {
+            return false;
+        }
+        if (miningHeader.nNonce == std::numeric_limits<uint32_t>::max()) {
+            return true;
+        }
     }
 
     block_out = std::make_shared<const CBlock>(std::move(block));
@@ -651,6 +674,8 @@ static RPCHelpMan getblocktemplate()
                 {RPCResult::Type::NUM_TIME, "curtime", "current timestamp in " + UNIX_EPOCH_TIME},
                 {RPCResult::Type::STR, "bits", "compressed target of next block"},
                 {RPCResult::Type::NUM, "height", "The height of the next block"},
+                {RPCResult::Type::NUM, "randomxseedheight", /*optional=*/true, "Under RandomX key binding: height of the block whose hash keys RandomX for the next block"},
+                {RPCResult::Type::STR_HEX, "randomxseedhash", /*optional=*/true, "Under RandomX key binding: the RandomX key for the next block"},
                 {RPCResult::Type::STR_HEX, "signet_challenge", /*optional=*/true, "Only on signet"},
                 {RPCResult::Type::STR_HEX, "default_witness_commitment", /*optional=*/true, "a valid witness commitment for the unmodified block template"},
             }},
@@ -979,6 +1004,10 @@ static RPCHelpMan getblocktemplate()
     result.pushKV("curtime", block.GetBlockTime());
     result.pushKV("bits", strprintf("%08x", block.nBits));
     result.pushKV("height", (int64_t)(pindexPrev->nHeight+1));
+    if (consensusParams.IsRandomXKeyBound(pindexPrev->nHeight + 1)) {
+        result.pushKV("randomxseedheight", RandomXSeedHeight(pindexPrev->nHeight + 1, consensusParams));
+        result.pushKV("randomxseedhash", GetRandomXSeedKey(*pindexPrev, consensusParams).GetHex());
+    }
 
     if (consensusParams.signet_blocks) {
         result.pushKV("signet_challenge", HexStr(consensusParams.signet_challenge));

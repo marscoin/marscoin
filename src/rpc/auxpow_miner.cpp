@@ -42,6 +42,10 @@ void auxMiningCheck(const node::NodeContext& node)
         const auto auxpowStart = Params().GetConsensus().nAuxpowStartHeight;
         if (chainman.ActiveHeight() + 1 < auxpowStart)
             throw std::runtime_error("mining auxblock method is not yet available");
+        // Under RandomX key binding, blocks are mined directly and auxpow is
+        // invalid (doc/quantum-randomx-key-binding-v1.md).
+        if (Params().GetConsensus().IsRandomXKeyBound(chainman.ActiveHeight() + 1))
+            throw JSONRPCError(RPC_MISC_ERROR, "Merged mining is not available: this chain mines RandomX blocks directly. Use getblocktemplate.");
     }
 }
 

@@ -3,6 +3,8 @@
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #include <headerssync.h>
+
+#include <auxpow.h>
 #include <logging.h>
 #include <pow.h>
 #include <util/check.h>
@@ -51,6 +53,7 @@ void HeadersSyncState::Finalize()
 {
     Assume(m_download_state != State::FINAL);
     ClearShrink(m_header_commitments);
+    m_randomx_seeds.clear();
     m_last_header_received.SetNull();
     ClearShrink(m_redownloaded_headers);
     m_redownload_buffer_last_hash.SetNull();
@@ -173,12 +176,40 @@ bool HeadersSyncState::ValidateAndStoreHeadersCommitments(const std::vector<CBlo
     return true;
 }
 
-bool HeadersSyncState::ValidateAndProcessSingleHeader(const CPureBlockHeader& current)
+bool HeadersSyncState::ValidateAndProcessSingleHeader(const CBlockHeader& current)
 {
     Assume(m_download_state == State::PRESYNC);
     if (m_download_state != State::PRESYNC) return false;
 
     int next_height = m_current_height + 1;
+
+    // A RandomX header's key can depend on its height, so its proof of work
+    // isn't checked when the headers message arrives. The presync phase doesn't
+    // store headers, so it checks it here, remembering seed blocks as they go
+    // by (doc/quantum-randomx-key-binding-v1.md).
+    if (m_consensus_params.fPowUseRandomX) {
+        bool pow_ok{false};
+        if (m_consensus_params.IsRandomXKeyBound(next_height)) {
+            const int seed_height{RandomXSeedHeight(next_height, m_consensus_params)};
+            std::optional<uint256> key;
+            if (seed_height <= m_chain_start->nHeight) {
+                key = m_chain_start->GetAncestor(seed_height)->GetBlockHash();
+            } else if (const auto it{m_randomx_seeds.find(seed_height)}; it != m_randomx_seeds.end()) {
+                key = it->second;
+            }
+            pow_ok = key && !current.IsAuxpow() && !current.auxpow &&
+                     CheckProofOfWorkWithKey(current, current.nBits, *key, m_consensus_params);
+        } else {
+            pow_ok = CheckProofOfWork(current, m_consensus_params);
+        }
+        if (!pow_ok) {
+            LogPrint(BCLog::NET, "Initial headers sync aborted with peer=%d: invalid proof of work at height=%i (presync phase)\n", m_id, next_height);
+            return false;
+        }
+        if (next_height % m_consensus_params.nRandomXSeedEpoch == 0) {
+            m_randomx_seeds[next_height] = current.GetHash();
+        }
+    }
 
     if (next_height % HEADER_COMMITMENT_PERIOD == m_commit_offset) {
         // Add a commitment.

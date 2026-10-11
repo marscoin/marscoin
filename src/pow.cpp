@@ -10,6 +10,7 @@
 #include <arith_uint256.h>
 #include <bignum.h>
 #include <chain.h>
+#include <cassert>
 #include <logging.h>
 #include <primitives/pureheader.h>
 #include <primitives/block.h>
@@ -27,7 +28,7 @@ namespace {
 #ifdef ENABLE_RANDOMX_VENDOR
 struct RandomXCacheState {
     randomx::CacheHandle handle;
-    uint256 prev_block_hash;
+    uint256 key;
     bool has_cache{false};
     std::mutex mutex;
 };
@@ -425,16 +426,11 @@ bool IsProofOfWorkSupported(const Consensus::Params& params)
 #endif
 }
 
-std::optional<uint256> GetProofOfWorkHash(const CPureBlockHeader& header, const Consensus::Params& params, PowHashCache cache)
+std::optional<uint256> GetRandomXHash(const CPureBlockHeader& header, const uint256& key, PowHashCache cache)
 {
-    if (!params.fPowUseRandomX) {
-        return header.GetPoWHash();
-    }
-
 #ifndef ENABLE_RANDOMX_VENDOR
     return std::nullopt;
 #else
-    std::vector<unsigned char> key(header.hashPrevBlock.begin(), header.hashPrevBlock.end());
     DataStream input_stream;
     input_stream << header;
 
@@ -443,12 +439,13 @@ std::optional<uint256> GetProofOfWorkHash(const CPureBlockHeader& header, const 
 
     RandomXCacheState& state{cache == PowHashCache::MINING ? g_randomx_mining_cache : g_randomx_cache};
     std::lock_guard<std::mutex> lock(state.mutex);
-    if (!state.has_cache || state.prev_block_hash != header.hashPrevBlock) {
-        if (!randomx::InitCache(state.handle, Span<const unsigned char>(key.data(), key.size()), error)) {
+    if (!state.has_cache || state.key != key) {
+        if (!randomx::InitCache(state.handle, Span<const unsigned char>(key.begin(), key.size()), error)) {
             LogError("%s: randomx cache init failed: %s\n", __func__, error);
+            state.has_cache = false;
             return std::nullopt;
         }
-        state.prev_block_hash = header.hashPrevBlock;
+        state.key = key;
         state.has_cache = true;
     }
 
@@ -459,6 +456,39 @@ std::optional<uint256> GetProofOfWorkHash(const CPureBlockHeader& header, const 
 
     return uint256{Span<const unsigned char>(hash_out.data(), hash_out.size())};
 #endif
+}
+
+std::optional<uint256> GetProofOfWorkHash(const CPureBlockHeader& header, const Consensus::Params& params, PowHashCache cache)
+{
+    if (!params.fPowUseRandomX) {
+        return header.GetPoWHash();
+    }
+    // Before RandomX key binding, the key is the hashed header's own
+    // hashPrevBlock (for an auxpow block, the parent header's).
+    return GetRandomXHash(header, header.hashPrevBlock, cache);
+}
+
+int RandomXSeedHeight(int height, const Consensus::Params& params)
+{
+    const int epoch{params.nRandomXSeedEpoch};
+    const int lag{params.nRandomXSeedLag};
+    if (height <= epoch + lag) return 0;
+    return (height - lag - 1) & ~(epoch - 1);
+}
+
+uint256 GetRandomXSeedKey(const CBlockIndex& prev, const Consensus::Params& params)
+{
+    const CBlockIndex* seed{prev.GetAncestor(RandomXSeedHeight(prev.nHeight + 1, params))};
+    assert(seed);
+    return seed->GetBlockHash();
+}
+
+bool CheckProofOfWorkWithKey(const CPureBlockHeader& header, unsigned int nBits, const uint256& key, const Consensus::Params& params, PowHashCache cache)
+{
+    // A header whose proof-of-work hash cannot be computed is invalid.
+    const std::optional<uint256> pow_hash{GetRandomXHash(header, key, cache)};
+    if (!pow_hash) return false;
+    return CheckProofOfWork(*pow_hash, nBits, params);
 }
 
 bool CheckProofOfWork(const CPureBlockHeader& header, unsigned int nBits, const Consensus::Params& params, PowHashCache cache)
