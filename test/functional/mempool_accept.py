@@ -152,25 +152,23 @@ class MempoolAcceptanceTest(BitcoinTestFramework):
             rawtxs=[raw_tx_0],
         )
 
-        self.log.info('A transaction that replaces a mempool transaction')
+        self.log.info('A transaction that would replace a mempool transaction is refused')
+        # Upstream accepts this replacement. Marscoin never replaces mempool
+        # transactions (58e16509a2), so the original stays.
         tx = tx_from_hex(raw_tx_0)
         tx.vout[0].nValue -= int(fee * COIN)  # Double the fee
-        tx.vin[0].nSequence = MAX_BIP125_RBF_SEQUENCE + 1  # Now, opt out of RBF
-        raw_tx_0 = tx.serialize().hex()
-        txid_0 = tx.rehash()
+        tx.vin[0].nSequence = MAX_BIP125_RBF_SEQUENCE + 1  # Opt out of RBF
         self.check_mempool_result(
-            result_expected=[{'txid': txid_0, 'allowed': True, 'vsize': tx.get_vsize(), 'fees': {'base': (2 * fee)}}],
-            rawtxs=[raw_tx_0],
+            result_expected=[{'txid': tx.rehash(), 'allowed': False, 'reject-reason': 'bip125-replacement-disallowed'}],
+            rawtxs=[tx.serialize().hex()],
         )
+        assert_raises_rpc_error(-26, 'bip125-replacement-disallowed', node.sendrawtransaction, tx.serialize().hex(), 0)
 
         self.log.info('A transaction that conflicts with an unconfirmed tx')
-        # Send the transaction that replaces the mempool transaction and opts out of replaceability
-        node.sendrawtransaction(hexstring=tx.serialize().hex(), maxfeerate=0)
-        # take original raw_tx_0
         tx = tx_from_hex(raw_tx_0)
         tx.vout[0].nValue -= int(4 * fee * COIN)  # Set more fee
         self.check_mempool_result(
-            result_expected=[{'txid': tx.rehash(), 'allowed': False, 'reject-reason': 'txn-mempool-conflict'}],
+            result_expected=[{'txid': tx.rehash(), 'allowed': False, 'reject-reason': 'bip125-replacement-disallowed'}],
             rawtxs=[tx.serialize().hex()],
             maxfeerate=0,
         )
