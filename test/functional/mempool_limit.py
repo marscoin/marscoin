@@ -83,7 +83,13 @@ class MempoolLimitTest(BitcoinTestFramework):
         )
         res = node.submitpackage([tx_B["hex"], tx_C["hex"]])
         assert_equal(res["package_msg"], "transaction failed")
-        assert "too-long-mempool-chain" in res["tx-results"][tx_C["wtxid"]]["error"]
+        # Upstream lets tx_B replace tx_A and then rejects tx_C for the chain
+        # limit. Marscoin never replaces mempool transactions (58e16509a2):
+        # tx_B is refused, tx_C has no parent, and tx_A stays.
+        assert "replacement-disallowed" in res["tx-results"][tx_B["wtxid"]]["error"]
+        assert tx_C["wtxid"] not in res["tx-results"] or "error" in res["tx-results"][tx_C["wtxid"]]
+        assert tx_A["txid"] in node.getrawmempool()
+        assert tx_B["txid"] not in node.getrawmempool()
 
     def test_mid_package_eviction(self):
         node = self.nodes[0]
@@ -177,7 +183,7 @@ class MempoolLimitTest(BitcoinTestFramework):
 
     def test_mid_package_replacement(self):
         node = self.nodes[0]
-        self.log.info("Check a package where an early tx depends on a later-replaced mempool tx")
+        self.log.info("Check that a package whose parent conflicts with a mempool tx is refused")
 
         self.restart_node(0, extra_args=self.extra_args[0])
 
@@ -229,20 +235,19 @@ class MempoolLimitTest(BitcoinTestFramework):
         # replaced_tx) is first looked up *before* replacement_tx is submitted.
         package_hex = [cpfp_parent["hex"], replacement_tx["hex"], child["hex"]]
 
-        # Package should be submitted, temporarily exceeding maxmempool, and then evicted.
+        # Upstream replaces replaced_tx in the middle of the package and then
+        # evicts. Marscoin never replaces mempool transactions (58e16509a2), so
+        # the conflicting parent is refused and the original stays.
         res = node.submitpackage(package_hex)
         assert_equal(res["package_msg"], "transaction failed")
-        assert len([tx_res for _, tx_res in res["tx-results"].items() if "error" in tx_res and tx_res["error"] == "bad-txns-inputs-missingorspent"])
+        assert any("replacement-disallowed" in tx_res.get("error", "") for tx_res in res["tx-results"].values())
 
         # Maximum size must never be exceeded.
         assert_greater_than(node.getmempoolinfo()["maxmempool"], node.getmempoolinfo()["bytes"])
 
         resulting_mempool_txids = node.getrawmempool()
-        # The replacement should be successful.
-        assert replacement_tx["txid"] in resulting_mempool_txids
-        # The replaced tx and all of its descendants must not be in mempool.
-        assert replaced_tx["txid"] not in resulting_mempool_txids
-        assert cpfp_parent["txid"] not in resulting_mempool_txids
+        assert replaced_tx["txid"] in resulting_mempool_txids
+        assert replacement_tx["txid"] not in resulting_mempool_txids
         assert child["txid"] not in resulting_mempool_txids
 
 
