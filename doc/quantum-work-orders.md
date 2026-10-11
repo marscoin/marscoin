@@ -43,7 +43,7 @@ tracked in #32, #34, #36, #37 and #43.
 | [MQ-05](#mq-05--redundant-block-producers) | Redundant block producers | B · Testnet ops | Queued | MQ-04 |
 | [MQ-06](#mq-06--uniform-identifiable-testnet-builds) | Uniform, identifiable testnet builds | B · Testnet ops | Queued | MQ-04 |
 | [MQ-07](#mq-07--monitoring-that-leads-to-action) | Monitoring that leads to action | B · Testnet ops | Waiting: operator applies fix | — |
-| [MQ-08](#mq-08--faucet-and-dashboard-reflect-chain-health) | Faucet and dashboard reflect chain health | B · Testnet ops | In progress: faucet and dashboard switched to marsqnet v2 | — |
+| [MQ-08](#mq-08--faucet-and-dashboard-reflect-chain-health) | Faucet and dashboard reflect chain health | B · Testnet ops | In progress: faucet and dashboard on v2; wallet now loads on startup | — |
 | [MQ-09](#mq-09--testnet-host-cleanup) | Testnet host cleanup | B · Testnet ops | Queued | — |
 | [MQ-10](#mq-10--switch-to-fips-205-slh-dsa) | Switch to FIPS 205 SLH-DSA | C · Consensus | Complete: PR #61 merged | — |
 | [MQ-11](#mq-11--complete-pq-signature-hash) | Complete PQ signature hash | C · Consensus | Complete: PR #64 merged | MQ-10 |
@@ -51,7 +51,7 @@ tracked in #32, #34, #36, #37 and #43.
 | [MQ-13](#mq-13--always-compiled-minimal-slh-dsa-verifier) | Always-compiled, minimal SLH-DSA verifier | C · Consensus | Complete: PR #71 merged | MQ-10 |
 | [MQ-14](#mq-14--parameter-set-agility-and-p2sh-wrapped-v2) | Parameter-set agility and P2SH-wrapped v2 | C · Consensus | Queued | MQ-10 |
 | [MQ-15](#mq-15--randomx-must-fail-closed) | RandomX must fail closed | C · Consensus | Complete: PR #56 merged | — |
-| [MQ-16](#mq-16--randomx-key-binding-and-auxpow-rules) | RandomX key binding and auxpow rules | C · Consensus | Queued | MQ-15 |
+| [MQ-16](#mq-16--randomx-key-binding-and-auxpow-rules) | RandomX key binding and auxpow rules | C · Consensus | Deployed: PR #99, activates on marsqnet v2 at height 1600 | MQ-15 |
 | [MQ-17](#mq-17--marsqnet-difficulty-retargeting) | Marsqnet difficulty retargeting | C · Consensus | Complete: PR #63 merged | MQ-18 |
 | [MQ-18](#mq-18--marsqnet-as-its-own-chain-type) | Marsqnet as its own chain type | C · Consensus | Complete: PR #63 merged (network bytes still to decide before launch) | MQ-15, MQ-46 |
 | [MQ-19](#mq-19--abwl-persistence-and-block-index-versioning) | ABWL persistence and block-index versioning | C · Consensus | Complete: PR #58 merged | — |
@@ -318,6 +318,12 @@ and show tip age and a stall banner on the dashboard.
 Acceptance: a simulated stall pauses the faucet and shows the banner, and both
 recover automatically.
 
+Note, 2026-10-11: after a node restart on 2026-10-10, the faucet's wallet
+wasn't reloaded (v28 reloads only wallets marked load-on-startup), so the
+faucet answered "Node unreachable" for about a day while its service looked
+healthy. The wallets now load on startup. After any restart, check the
+faucet's public status endpoint, not just the service.
+
 ### MQ-09 · Testnet host cleanup
 
 **Status:** Queued
@@ -528,7 +534,7 @@ Evidence, 2026-10-08 (branch `fix/randomx-fail-closed`, local, two commits):
 
 ### MQ-16 · RandomX key binding and auxpow rules
 
-**Status:** Queued
+**Status:** Implemented in PR #99 and deployed to all v2 nodes on 2026-10-11. It activates at v2 height 1600, and the first key change comes at height 2113.
 
 Finding: the RandomX key is the header's `hashPrevBlock`. For auxpow blocks it
 comes from the parent block, which is null for locally mined parents
@@ -549,6 +555,22 @@ an all-zero RandomX key, the null `hashPrevBlock` of the locally built auxpow
 parent. So the key never rotates. A miner could also vary it on every block, to
 make each validating node rebuild its RandomX cache (256 MB, about a second of
 CPU) for each block or header it checks.
+
+Decision and implementation, 2026-10-11 (owner): keys come from Marscoin's own
+chain on Monero's schedule (epoch 2048, lag 64), and merged mining is invalid
+on RandomX chains. Spec: `doc/quantum-randomx-key-binding-v1.md`. PR #99:
+- moves the RandomX proof of work into the contextual header check;
+- has presync check RandomX headers itself, keyed by the seed blocks it has
+  passed;
+- mines plain blocks with the seed key;
+- adds `randomxseedheight` and `randomxseedhash` to `getblocktemplate`;
+- refuses aux mining;
+- drops mainnet's legacy 50% difficulty tolerance on RandomX chains.
+
+Verified end to end on a local marsqnet (epoch 16, lag 4): two nodes agreed
+through activation and four key changes, an old-rule node's merged-mined block
+was rejected (`auxpow-randomx`), and the presync unit test fails when its check
+is removed.
 
 ### MQ-17 · Marsqnet difficulty retargeting
 
@@ -1307,6 +1329,34 @@ Acceptance: an inventory and a plan.
 Scope: a separate hard-fork plan for RandomX on mainnet, covering the pool spec,
 miner software, the merged-mining decision from MQ-16 and activation,
 independent of the PQ soft fork. See #34.
+
+Context from the marsqnet v2 work, 2026-10-11. A RandomX hash depends on its
+key, so merged mining can share one hash between two chains only if both use
+the same key. With a key bound to Marscoin's chain (MQ-16), no existing RandomX
+chain can merge-mine with Marscoin. Mainnet's scrypt merged mining is
+unaffected; this is only about a move to RandomX.
+
+Security comes from total hashrate, not from the algorithm. Scrypt is
+dominated by Litecoin and Dogecoin ASICs, which is why a small scrypt chain
+merge-mines. RandomX removes the ASIC overhang, but CPUs already mine Monero at
+gigahashes per second, and RandomX hashrate can be rented or run on botnets. A
+new standalone RandomX chain is weakest at launch, when it has the least
+hashrate. Example: in August 2025 the Qubic pool briefly held a majority of
+Monero's hashrate and reorganized blocks.
+
+Options for mainnet:
+1. **Stay on scrypt, merged-mined (today):** borrowed security, no CPU
+   fairness.
+2. **Standalone RandomX with a chain-bound key:** anyone with a CPU can mine,
+   but security is limited to the hashrate Marscoin attracts, possibly with
+   extra rules during a transition (longer confirmation depth for exchanges).
+3. **RandomX merged-mined with Monero, Tari-style:** adopt Monero's key
+   schedule to borrow Monero miners' security. The key is then bound to
+   Monero's chain, which Marscoin nodes can't fully verify, and Monero pools
+   must opt in.
+
+Marsqnet v2 measures the technical side (mining, validation cost, key changes,
+convergence). The hashrate question is economic and can't be tested there.
 
 Acceptance: an owner decision and a written plan.
 
