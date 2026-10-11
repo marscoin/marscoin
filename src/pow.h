@@ -29,6 +29,14 @@ bool IsProofOfWorkSupported(const Consensus::Params& params);
  *  never blocks the validation of headers and blocks from peers. */
 enum class PowHashCache { VALIDATION, MINING };
 std::optional<uint256> GetProofOfWorkHash(const CPureBlockHeader& header, const Consensus::Params& params, PowHashCache cache = PowHashCache::VALIDATION);
+/** RandomX hash of a header with an explicit key; nullopt if it can't be computed. */
+std::optional<uint256> GetRandomXHash(const CPureBlockHeader& header, const uint256& key, PowHashCache cache = PowHashCache::VALIDATION);
+/** Height of the block whose hash keys RandomX for a block at `height` under key binding. */
+int RandomXSeedHeight(int height, const Consensus::Params& params);
+/** RandomX key, under key binding, for the block that extends `prev`. */
+uint256 GetRandomXSeedKey(const CBlockIndex& prev, const Consensus::Params& params);
+/** Proof-of-work check of a header's own RandomX hash with an explicit key. */
+bool CheckProofOfWorkWithKey(const CPureBlockHeader& header, unsigned int nBits, const uint256& key, const Consensus::Params& params, PowHashCache cache = PowHashCache::VALIDATION);
 bool CheckProofOfWork(const CPureBlockHeader& header, unsigned int nBits, const Consensus::Params& params, PowHashCache cache = PowHashCache::VALIDATION);
 
 /**

@@ -709,7 +709,7 @@ public:
 class CMarsqnetParams : public CChainParams
 {
 public:
-    CMarsqnetParams()
+    explicit CMarsqnetParams(const MarsqnetOptions& opts)
     {
         m_chain_type = ChainType::MARSQNET;
         consensus.signet_blocks = false;
@@ -738,6 +738,15 @@ public:
         consensus.enforce_BIP94 = false;
         consensus.fPowNoRetargeting = false;
         consensus.fPowUseRandomX = true;
+        // RandomX key binding (MQ-16): keys from the chain, no merged mining.
+        // Height 1600 leaves time to upgrade every v2 node first; the first
+        // key change after it comes at height 2113.
+        consensus.nRandomXKeyBindingHeight = 1600;
+        consensus.nRandomXSeedEpoch = 2048;
+        consensus.nRandomXSeedLag = 64;
+        if (opts.randomx_key_binding_height) consensus.nRandomXKeyBindingHeight = *opts.randomx_key_binding_height;
+        if (opts.randomx_seed_epoch) consensus.nRandomXSeedEpoch = *opts.randomx_seed_epoch;
+        if (opts.randomx_seed_lag) consensus.nRandomXSeedLag = *opts.randomx_seed_lag;
         consensus.nRuleChangeActivationThreshold = 1512; // 75% for testchains
         consensus.nMinerConfirmationWindow = 2016;
 
@@ -838,7 +847,12 @@ std::unique_ptr<const CChainParams> CChainParams::TestNet4()
 
 std::unique_ptr<const CChainParams> CChainParams::Marsqnet()
 {
-    return std::make_unique<const CMarsqnetParams>();
+    return Marsqnet(MarsqnetOptions{});
+}
+
+std::unique_ptr<const CChainParams> CChainParams::Marsqnet(const MarsqnetOptions& options)
+{
+    return std::make_unique<const CMarsqnetParams>(options);
 }
 
 std::vector<int> CChainParams::GetAvailableSnapshotHeights() const

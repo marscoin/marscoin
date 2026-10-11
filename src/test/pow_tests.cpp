@@ -352,6 +352,31 @@ BOOST_AUTO_TEST_CASE(ChainParams_MARSQNET_params)
     BOOST_CHECK_EQUAL(params->GenesisBlock().nBits, UintToArith256(consensus.powLimit).GetCompact());
     BOOST_CHECK(params->GetAvailableSnapshotHeights().empty());
 
+    // RandomX key binding: Monero's schedule, active from its height on.
+    BOOST_CHECK_EQUAL(consensus.nRandomXKeyBindingHeight, 1600);
+    BOOST_CHECK_EQUAL(consensus.nRandomXSeedEpoch, 2048);
+    BOOST_CHECK_EQUAL(consensus.nRandomXSeedLag, 64);
+    BOOST_CHECK(!consensus.IsRandomXKeyBound(consensus.nRandomXKeyBindingHeight - 1));
+    BOOST_CHECK(consensus.IsRandomXKeyBound(consensus.nRandomXKeyBindingHeight));
+    // Plain regtest never binds keys.
+    BOOST_CHECK(!CreateChainParams(*m_node.args, ChainType::REGTEST)->GetConsensus().IsRandomXKeyBound(1'000'000));
+    {
+        ArgsManager args;
+        args.ForceSetArg("-randomxkeybindingheight", "10");
+        args.ForceSetArg("-randomxseedepoch", "16");
+        args.ForceSetArg("-randomxseedlag", "4");
+        const auto overridden_params = CreateChainParams(args, ChainType::MARSQNET);
+        const auto& overridden = overridden_params->GetConsensus();
+        BOOST_CHECK_EQUAL(overridden.nRandomXKeyBindingHeight, 10);
+        BOOST_CHECK_EQUAL(overridden.nRandomXSeedEpoch, 16);
+        BOOST_CHECK_EQUAL(overridden.nRandomXSeedLag, 4);
+    }
+    {
+        ArgsManager args;
+        args.ForceSetArg("-randomxseedepoch", "12"); // not a power of two
+        BOOST_CHECK_THROW(CreateChainParams(args, ChainType::MARSQNET), std::runtime_error);
+    }
+
     // Plain regtest no longer uses RandomX.
     BOOST_CHECK(!CreateChainParams(*m_node.args, ChainType::REGTEST)->GetConsensus().fPowUseRandomX);
 
@@ -407,6 +432,28 @@ BOOST_AUTO_TEST_CASE(marsqnet_genesis_randomx_pow)
     BOOST_CHECK(CheckProofOfWork(header, header.nBits, params->GetConsensus()));
 }
 
+BOOST_AUTO_TEST_CASE(randomx_key_binding_header_key)
+{
+    // Under key binding a header's RandomX hash depends on the key it is
+    // checked with. A header ground to meet the target with one key does not
+    // meet it with another.
+    const auto params = CreateChainParams(*m_node.args, ChainType::MARSQNET);
+    const auto& consensus = params->GetConsensus();
+    const uint256 key_a{params->GenesisBlock().GetHash()};
+    const uint256 key_b{};
+    CBlockHeader header = params->GenesisBlock().GetBlockHeader();
+    header.hashPrevBlock = key_a;
+    header.nNonce = 0;
+    while (!(CheckProofOfWorkWithKey(header, header.nBits, key_a, consensus) && !CheckProofOfWorkWithKey(header, header.nBits, key_b, consensus))) {
+        ++header.nNonce;
+    }
+    BOOST_CHECK(CheckProofOfWorkWithKey(header, header.nBits, key_a, consensus, PowHashCache::MINING));
+    BOOST_CHECK(!CheckProofOfWorkWithKey(header, header.nBits, key_b, consensus));
+    BOOST_CHECK(*GetRandomXHash(header, key_a) != *GetRandomXHash(header, key_b));
+    // Before key binding, the key is the header's own hashPrevBlock.
+    BOOST_CHECK_EQUAL(GetProofOfWorkHash(header, consensus)->GetHex(), GetRandomXHash(header, header.hashPrevBlock)->GetHex());
+}
+
 BOOST_AUTO_TEST_CASE(randomx_mining_cache_matches_validation)
 {
     // Local mining hashes with its own RandomX cache. It must compute the same
@@ -430,6 +477,49 @@ BOOST_AUTO_TEST_CASE(randomx_mining_cache_matches_validation)
     BOOST_CHECK(CheckProofOfWork(a, a.nBits, consensus, PowHashCache::MINING));
 }
 #endif
+
+BOOST_AUTO_TEST_CASE(randomx_seed_height)
+{
+    Consensus::Params params{};
+    params.nRandomXSeedEpoch = 2048;
+    params.nRandomXSeedLag = 64;
+    // Monero's schedule: the genesis block keys the first 2048 + 64 blocks.
+    for (const auto& [height, seed] : std::vector<std::pair<int, int>>{
+             {1, 0}, {2112, 0}, {2113, 2048}, {4160, 2048}, {4161, 4096}, {6208, 4096}, {6209, 6144}}) {
+        BOOST_CHECK_EQUAL(RandomXSeedHeight(height, params), seed);
+    }
+    params.nRandomXSeedEpoch = 16;
+    params.nRandomXSeedLag = 4;
+    for (const auto& [height, seed] : std::vector<std::pair<int, int>>{{20, 0}, {21, 16}, {36, 16}, {37, 32}}) {
+        BOOST_CHECK_EQUAL(RandomXSeedHeight(height, params), seed);
+    }
+    // The seed block is always at least lag + 1 blocks behind the block it keys.
+    for (int height = 1; height < 200; ++height) {
+        BOOST_CHECK(RandomXSeedHeight(height, params) <= std::max(0, height - params.nRandomXSeedLag - 1));
+    }
+}
+
+BOOST_AUTO_TEST_CASE(randomx_seed_key_from_chain)
+{
+    Consensus::Params params{};
+    params.nRandomXSeedEpoch = 16;
+    params.nRandomXSeedLag = 4;
+    std::vector<uint256> hashes(60);
+    std::vector<CBlockIndex> blocks(60);
+    for (int i = 0; i < 60; ++i) {
+        hashes[i] = uint256{static_cast<uint8_t>(i + 1)};
+        blocks[i].nHeight = i;
+        blocks[i].pprev = i ? &blocks[i - 1] : nullptr;
+        blocks[i].phashBlock = &hashes[i];
+        blocks[i].BuildSkip();
+    }
+    // The block after height 19 (height 20) is still keyed by the genesis block,
+    // the one after height 20 by block 16, and from height 37 by block 32.
+    BOOST_CHECK(GetRandomXSeedKey(blocks[19], params) == hashes[0]);
+    BOOST_CHECK(GetRandomXSeedKey(blocks[20], params) == hashes[16]);
+    BOOST_CHECK(GetRandomXSeedKey(blocks[35], params) == hashes[16]);
+    BOOST_CHECK(GetRandomXSeedKey(blocks[36], params) == hashes[32]);
+}
 
 BOOST_AUTO_TEST_CASE(RandomX_pow_fails_closed)
 {
