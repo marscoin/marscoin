@@ -192,26 +192,23 @@ class ListTransactionsTest(BitcoinTestFramework):
         self.sync_mempools()
         assert_array_result(self.nodes[0].listtransactions(), {"txid": txid_4}, {"bip125-replaceable": "yes"})
 
-        self.log.info("Test tx with unknown RBF state (bip125-replaceable=unknown)")
-        # Replace tx3, and check that tx4 becomes unknown
+        self.log.info("Test that replacing tx3 is refused, so tx4 keeps its state")
+        # Upstream replaces tx3 here, which leaves tx4 with an unknown state.
+        # Marscoin never replaces mempool transactions (58e16509a2): tx3 still
+        # reports "yes" (it signals BIP125), but it can't be replaced.
         tx3_b = tx3_modified
         tx3_b.vout[0].nValue -= int(Decimal("0.004") * COIN)  # bump the fee
         tx3_b = tx3_b.serialize().hex()
         tx3_b_signed = self.nodes[0].signrawtransactionwithwallet(tx3_b)['hex']
-        txid_3b = self.nodes[0].sendrawtransaction(tx3_b_signed, 0)
-        assert is_opt_in(self.nodes[0], txid_3b)
-
-        assert_array_result(self.nodes[0].listtransactions(), {"txid": txid_4}, {"bip125-replaceable": "unknown"})
-        self.sync_mempools()
-        assert_array_result(self.nodes[1].listtransactions(), {"txid": txid_4}, {"bip125-replaceable": "unknown"})
+        assert_raises_rpc_error(-26, "bip125-replacement-disallowed", self.nodes[0].sendrawtransaction, tx3_b_signed, 0)
+        assert txid_3 in self.nodes[0].getrawmempool()
 
         self.log.info("Test bip125-replaceable status with gettransaction RPC")
         for n in self.nodes[0:2]:
             assert_equal(n.gettransaction(txid_1)["bip125-replaceable"], "no")
             assert_equal(n.gettransaction(txid_2)["bip125-replaceable"], "no")
             assert_equal(n.gettransaction(txid_3)["bip125-replaceable"], "yes")
-            assert_equal(n.gettransaction(txid_3b)["bip125-replaceable"], "yes")
-            assert_equal(n.gettransaction(txid_4)["bip125-replaceable"], "unknown")
+            assert_equal(n.gettransaction(txid_4)["bip125-replaceable"], "yes")
 
         self.log.info("Test bip125-replaceable status with listsinceblock")
         for n in self.nodes[0:2]:
@@ -219,14 +216,13 @@ class ListTransactionsTest(BitcoinTestFramework):
             assert_equal(txs[txid_1], "no")
             assert_equal(txs[txid_2], "no")
             assert_equal(txs[txid_3], "yes")
-            assert_equal(txs[txid_3b], "yes")
-            assert_equal(txs[txid_4], "unknown")
+            assert_equal(txs[txid_4], "yes")
 
         self.log.info("Test mined transactions are no longer bip125-replaceable")
         self.generate(self.nodes[0], 1)
-        assert txid_3b not in self.nodes[0].getrawmempool()
-        assert_equal(self.nodes[0].gettransaction(txid_3b)["bip125-replaceable"], "no")
-        assert_equal(self.nodes[0].gettransaction(txid_4)["bip125-replaceable"], "unknown")
+        assert txid_3 not in self.nodes[0].getrawmempool()
+        assert_equal(self.nodes[0].gettransaction(txid_3)["bip125-replaceable"], "no")
+        assert_equal(self.nodes[0].gettransaction(txid_4)["bip125-replaceable"], "no")
 
     def run_externally_generated_address_test(self):
         """Test behavior when receiving address is not in the address book."""

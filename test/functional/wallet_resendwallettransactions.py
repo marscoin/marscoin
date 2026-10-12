@@ -17,8 +17,6 @@ from test_framework.test_framework import BitcoinTestFramework
 from test_framework.util import (
     assert_equal,
     assert_raises_rpc_error,
-    get_fee,
-    try_rpc,
 )
 
 class ResendWalletTransactionsTest(BitcoinTestFramework):
@@ -81,43 +79,16 @@ class ResendWalletTransactionsTest(BitcoinTestFramework):
         peer_second.wait_for_broadcast([txid])
 
         self.log.info("Chain of unconfirmed not-in-mempool txs are rebroadcast")
-        # This tests that the node broadcasts the parent transaction before the child transaction.
-        # To test that scenario, we need a method to reliably get a child transaction placed
-        # in mapWallet positioned before the parent. We cannot predict the position in mapWallet,
-        # but we can observe it using listreceivedbyaddress and other related RPCs.
-        #
-        # So we will create the child transaction, use listreceivedbyaddress to see what the
-        # ordering of mapWallet is, if the child is not before the parent, we will create a new
-        # child (via bumpfee) and remove the old child (via removeprunedfunds) until we get the
-        # ordering of child before parent.
+        # This checks that an unconfirmed parent+child chain is rebroadcast
+        # after it is evicted from the mempool. Upstream also forces the child
+        # before the parent in mapWallet (by repeatedly fee-bumping the child)
+        # to prove the rebroadcast is topologically ordered. Marscoin never
+        # replaces mempool transactions (58e16509a2), so the child can't be
+        # bumped; the chain is created directly, and the node still rebroadcasts
+        # the parent and child together below.
         child_inputs = [{"txid": txid, "vout": 0}]
         child_txid = node.sendall(recipients=[addr], inputs=child_inputs)["txid"]
-        # Get the child tx's info for manual bumping
-        child_tx_info = node.gettransaction(txid=child_txid, verbose=True)
-        child_output_value = child_tx_info["decoded"]["vout"][0]["value"]
-        # Include an additional 1 vbyte buffer to handle when we have a smaller signature
-        additional_child_fee = get_fee(child_tx_info["decoded"]["vsize"] + 1, Decimal(0.00001100))
-        while True:
-            txids = node.listreceivedbyaddress(minconf=0, address_filter=addr)[0]["txids"]
-            if txids == [child_txid, txid]:
-                break
-            # Manually bump the tx
-            # The inputs and the output address stay the same, just changing the amount for the new fee
-            child_output_value -= additional_child_fee
-            bumped_raw = node.createrawtransaction(inputs=child_inputs, outputs=[{addr: child_output_value}])
-            bumped = node.signrawtransactionwithwallet(bumped_raw)
-            bumped_txid = node.decoderawtransaction(bumped["hex"])["txid"]
-            # Sometimes we will get a signature that is a little bit shorter than we expect which causes the
-            # feerate to be a bit higher, then the followup to be a bit lower. This results in a replacement
-            # that can't be broadcast. We can just skip that and keep grinding.
-            if try_rpc(-26, "insufficient fee, rejecting replacement", node.sendrawtransaction, bumped["hex"]):
-                continue
-            # The scheduler queue creates a copy of the added tx after
-            # send/bumpfee and re-adds it to the wallet (undoing the next
-            # removeprunedfunds). So empty the scheduler queue:
-            node.syncwithvalidationinterfacequeue()
-            node.removeprunedfunds(child_txid)
-            child_txid = bumped_txid
+
         entry_time = node.getmempoolentry(child_txid)["time"]
 
         block_time = entry_time + 6 * 60
