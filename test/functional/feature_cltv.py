@@ -8,6 +8,7 @@ Test that the CHECKLOCKTIMEVERIFY soft-fork activates.
 """
 
 from test_framework.blocktools import (
+    DEFAULT_BLOCK_VERSION,
     TIME_GENESIS_BLOCK,
     create_block,
     create_coinbase,
@@ -123,7 +124,7 @@ class BIP65Test(BitcoinTestFramework):
 
         tip = self.nodes[0].getbestblockhash()
         block_time = self.nodes[0].getblockheader(tip)['mediantime'] + 1
-        block = create_block(int(tip, 16), create_coinbase(CLTV_HEIGHT - 1), block_time, version=3, txlist=invalid_cltv_txs)
+        block = create_block(int(tip, 16), create_coinbase(CLTV_HEIGHT - 1), block_time, txlist=invalid_cltv_txs)
         block.solve()
 
         self.test_cltv_info(is_active=False)  # Not active as of current tip and next block does not need to obey rules
@@ -131,19 +132,24 @@ class BIP65Test(BitcoinTestFramework):
         self.test_cltv_info(is_active=True)  # Not active as of current tip, but next block must obey rules
         assert_equal(self.nodes[0].getbestblockhash(), block.hash)
 
-        self.log.info("Test that blocks must now be at least version 4")
+        self.log.info("Test that a legacy low-version block is rejected")
+        # Upstream checks the BIP65 "blocks must be at least version 4" rule.
+        # Marscoin rejects any legacy-version block outright (its chain ID lives
+        # in the high nVersion bits), a stronger rule than BIP65's, so a
+        # version-3 block is rejected as late-legacy-block before the version
+        # check.
         tip = block.sha256
         block_time += 1
         block = create_block(tip, create_coinbase(CLTV_HEIGHT), block_time, version=3)
         block.solve()
 
-        with self.nodes[0].assert_debug_log(expected_msgs=[f'{block.hash}, bad-version(0x00000003)']):
+        with self.nodes[0].assert_debug_log(expected_msgs=['late-legacy-block, legacy block after auxpow start']):
             peer.send_and_ping(msg_block(block))
             assert_equal(int(self.nodes[0].getbestblockhash(), 16), tip)
             peer.sync_with_ping()
 
         self.log.info("Test that invalid-according-to-CLTV transactions cannot appear in a block")
-        block.nVersion = 4
+        block.nVersion = DEFAULT_BLOCK_VERSION
         block.vtx.append(CTransaction()) # dummy tx after coinbase that will be replaced later
 
         # create and test one invalid tx per CLTV failure reason (5 in total)
