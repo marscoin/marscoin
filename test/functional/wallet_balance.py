@@ -208,26 +208,28 @@ class WalletTest(BitcoinTestFramework):
 
         test_balances(fee_node_1=Decimal('0.01'))
 
-        # Node 1 bumps the transaction fee and resends
-        self.nodes[1].sendrawtransaction(txs[1]['hex'])
-        self.nodes[0].sendrawtransaction(txs[1]['hex'])  # sending on both nodes is faster than waiting for propagation
+        # Upstream: node 1 bumps the transaction fee and resends. Marscoin never
+        # replaces mempool transactions (58e16509a2), so the bump is refused on
+        # both nodes and node 1 keeps paying 0.01.
+        assert_raises_rpc_error(-26, "bip125-replacement-disallowed", self.nodes[1].sendrawtransaction, txs[1]['hex'])
+        assert_raises_rpc_error(-26, "bip125-replacement-disallowed", self.nodes[0].sendrawtransaction, txs[1]['hex'])
         self.sync_all()
 
-        self.log.info("Test getbalance and getbalances.mine.untrusted_pending with conflicted unconfirmed inputs")
-        test_balances(fee_node_1=Decimal('0.02'))
+        self.log.info("Test getbalance and getbalances.mine.untrusted_pending after a refused fee bump")
+        test_balances(fee_node_1=Decimal('0.01'))
 
         self.generatetoaddress(self.nodes[1], 1, ADDRESS_WATCHONLY)
 
         # balances are correct after the transactions are confirmed
         balance_node0 = Decimal('69.99')  # node 1's send plus change from node 0's send
-        balance_node1 = Decimal('29.98')  # change from node 0's send
+        balance_node1 = Decimal('29.99')  # change from node 0's send (fee 0.01, not bumped)
         assert_equal(self.nodes[0].getbalances()['mine']['trusted'], balance_node0)
         assert_equal(self.nodes[1].getbalances()['mine']['trusted'], balance_node1)
         assert_equal(self.nodes[0].getbalance(), balance_node0)
         assert_equal(self.nodes[1].getbalance(), balance_node1)
 
         # Send total balance away from node 1
-        txs = create_transactions(self.nodes[1], self.nodes[0].getnewaddress(), Decimal('29.97'), [Decimal('0.01')])
+        txs = create_transactions(self.nodes[1], self.nodes[0].getnewaddress(), Decimal('29.98'), [Decimal('0.01')])
         self.nodes[1].sendrawtransaction(txs[0]['hex'])
         self.generatetoaddress(self.nodes[1], 2, ADDRESS_WATCHONLY)
 
