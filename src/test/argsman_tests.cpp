@@ -1024,7 +1024,8 @@ BOOST_FIXTURE_TEST_CASE(util_ChainMerge, ChainMergeTestingSetup)
     // Results file is formatted like:
     //
     //   <input> || <output>
-    BOOST_CHECK_EQUAL(out_sha_hex, "9e60306e1363528bbc19a47f22bcede88e5d6815212f18ec8e6cdc4638dddab4");
+    // Marscoin: the error for conflicting chain options also lists -marsqnet and -qdevnet.
+    BOOST_CHECK_EQUAL(out_sha_hex, "9ad8557683c34a7000c044b0d9361058d127092489f3f1f9c49af5573ada2c8a");
 }
 
 BOOST_AUTO_TEST_CASE(util_ReadWriteSettings)

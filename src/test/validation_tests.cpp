@@ -61,14 +61,22 @@ BOOST_AUTO_TEST_CASE(block_subsidy_test)
 BOOST_AUTO_TEST_CASE(subsidy_limit_test)
 {
     const auto chainParams = CreateChainParams(*m_node.args, ChainType::MAIN);
+    const Consensus::Params& consensus{chainParams->GetConsensus()};
+    // Marscoin halves every 395,699 blocks (one Mars year), which isn't a
+    // multiple of 1,000, so add up the issuance per halving period. The total,
+    // about 39.57 million MARS, is above MAX_MONEY, which in consensus only
+    // bounds individual amounts.
     CAmount nSum = 0;
-    for (int nHeight = 0; nHeight < 14000000; nHeight += 1000) {
-        CAmount nSubsidy = GetBlockSubsidy(nHeight, chainParams->GetConsensus());
+    for (int halving = 0; halving < 64; ++halving) {
+        const int nHeight{halving * consensus.nSubsidyHalvingInterval};
+        const CAmount nSubsidy = GetBlockSubsidy(nHeight, consensus);
         BOOST_CHECK(nSubsidy <= 50 * COIN);
-        nSum += nSubsidy * 1000;
-        BOOST_CHECK(MoneyRange(nSum));
+        BOOST_CHECK(MoneyRange(nSubsidy));
+        BOOST_CHECK_EQUAL(GetBlockSubsidy(nHeight + consensus.nSubsidyHalvingInterval - 1, consensus), nSubsidy);
+        nSum += nSubsidy * consensus.nSubsidyHalvingInterval;
     }
-    BOOST_CHECK_EQUAL(nSum, CAmount{2099999997690000});
+    BOOST_CHECK_EQUAL(GetBlockSubsidy(64 * consensus.nSubsidyHalvingInterval, consensus), 0);
+    BOOST_CHECK_EQUAL(nSum, CAmount{3956989995647311});
 }
 
 BOOST_AUTO_TEST_CASE(signet_parse_tests)
@@ -150,7 +158,7 @@ BOOST_AUTO_TEST_CASE(test_assumeutxo)
     BOOST_CHECK_EQUAL(out110.hash_serialized.ToString(), "6657b736d4fe4db0cbc796789e812d5dba7f5c143764b1b6905612f1830609d1");
     BOOST_CHECK_EQUAL(out110.m_chain_tx_count, 111U);
 
-    const auto out110_2 = *params->AssumeutxoForBlockhash(uint256{"696e92821f65549c7ee134edceeeeaaa4105647a3c4fd9f298c0aec0ab50425c"});
+    const auto out110_2 = *params->AssumeutxoForBlockhash(uint256{"bee8e826d79f635d24cfdd60e675ccfaf5950926c3eeb40fd0806f53eaec44dc"});
     BOOST_CHECK_EQUAL(out110_2.hash_serialized.ToString(), "6657b736d4fe4db0cbc796789e812d5dba7f5c143764b1b6905612f1830609d1");
     BOOST_CHECK_EQUAL(out110_2.m_chain_tx_count, 111U);
 }
